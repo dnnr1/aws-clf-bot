@@ -5,9 +5,11 @@ import {
   MessageFlags,
   type InteractionReplyOptions,
 } from "discord.js";
+import { PracticeService } from "./application/study/practice-service.js";
 import { UserPreferencesService } from "./application/users/user-preferences-service.js";
 import { parseEnvironment } from "./infrastructure/config/environment.js";
 import { createDatabase } from "./infrastructure/database/client.js";
+import { DrizzlePracticeRepository } from "./infrastructure/database/practice-repository.js";
 import { DrizzleUserPreferencesRepository } from "./infrastructure/database/user-preferences-repository.js";
 import { logger } from "./infrastructure/logging/logger.js";
 import { handleDiscordInteraction } from "./presentation/discord/interaction-handler.js";
@@ -20,6 +22,8 @@ async function startBot(): Promise<void> {
   const preferences = new UserPreferencesService(
     new DrizzleUserPreferencesRepository(database),
   );
+  const practice = new PracticeService(new DrizzlePracticeRepository(database));
+  const services = { preferences, practice };
   let shutdownPromise: Promise<void> | undefined;
 
   const shutdown = (signal: string): Promise<void> => {
@@ -50,7 +54,7 @@ async function startBot(): Promise<void> {
     logger.error("discord.client_error", error),
   );
   client.on(Events.InteractionCreate, (interaction) => {
-    void handleDiscordInteraction(interaction, preferences).catch(
+    void handleDiscordInteraction(interaction, services).catch(
       async (error: unknown) => {
         logger.error("discord.interaction_failed", error, {
           interactionId: interaction.id,

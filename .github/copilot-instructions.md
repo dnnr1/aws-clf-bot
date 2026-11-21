@@ -10,6 +10,8 @@ Build a maintainable Discord study bot for the AWS Certified Cloud Practitioner 
 - User-facing bot messages, questions, explanations, feedback, and statistics must support English and Brazilian Portuguese (`pt-BR`). Slash-command names and descriptions remain in English.
 - Create original questions aligned to the official CLF-C02 exam guide. Never use exam dumps, recalled exam questions, or copied question banks.
 - Validate each question before adding it: four localized options, one valid correct-option identifier, localized explanation, domain, difficulty, objectives, relevant services, and source references when available.
+- Keep question content in the validated data bank under `data/questions/`; do not hard-code questions in Discord handlers or application logic.
+- Do not overwrite an existing question ID during seeding; persisted answers depend on stable question content.
 
 ## Architecture
 
@@ -45,6 +47,7 @@ Use these `package.json` scripts:
 - `npm run format:check`
 - `npm run db:generate` to generate a Drizzle migration
 - `npm run db:migrate` to apply migrations
+- `npm run db:seed` to validate and seed the question bank
 
 Check the package manifest and tool configuration before assuming any additional tool is installed.
 

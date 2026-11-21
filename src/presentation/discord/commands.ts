@@ -7,6 +7,9 @@ export const commandDefinitions = [
   new SlashCommandBuilder()
     .setName("language")
     .setDescription("Choose the language used by the bot."),
+  new SlashCommandBuilder()
+    .setName("practice")
+    .setDescription("Start a practice session with AWS study questions."),
 ] as const;
 
 export async function registerSlashCommands(

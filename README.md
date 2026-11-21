@@ -35,9 +35,10 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
 
    ```powershell
    npm run db:migrate
+   npm run db:seed
    ```
 
-   When the Drizzle schema changes, generate a new migration with `npm run db:generate`, review the SQL, and commit both the schema and migration.
+   The seed command validates and inserts the versioned question data in `data/questions/`. Existing question IDs are not overwritten. When the Drizzle schema changes, generate a new migration with `npm run db:generate`, review the SQL, and commit both the schema and migration.
 
 5. Run the available checks:
 

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "86b19e28-4c80-4fc6-9aa4-bddf4b574919",
+    "certificationId": "aws-clf-c02",
+    "domainId": "security-compliance",
+    "difficulty": "easy",
+    "prompt": {
+      "en": "A startup stores customer documents in Amazon S3. Under the AWS shared responsibility model, which task remains the startup's responsibility?",
+      "pt-BR": "Uma startup armazena documentos de clientes no Amazon S3. De acordo com o modelo de responsabilidade compartilhada da AWS, qual tarefa continua sendo responsabilidade da startup?"
+    },
+    "options": [
+      {
+        "key": "A",
+        "text": {
+          "en": "Protecting the physical facilities that host the storage hardware.",
+          "pt-BR": "Proteger fisicamente as instalações que hospedam o hardware de armazenamento."
+        }
+      },
+      {
+        "key": "B",
+        "text": {
+          "en": "Configuring bucket access so only authorized identities can retrieve the documents.",
+          "pt-BR": "Configurar o acesso ao bucket para que somente identidades autorizadas possam recuperar os documentos."
+        }
+      },
+      {
+        "key": "C",
+        "text": {
+          "en": "Replacing failed storage devices in the data center.",
+          "pt-BR": "Substituir dispositivos de armazenamento com falha no data center."
+        }
+      },
+      {
+        "key": "D",
+        "text": {
+          "en": "Patching the host operating system that runs the S3 storage service.",
+          "pt-BR": "Aplicar patches no sistema operacional host que executa o serviço de armazenamento S3."
+        }
+      }
+    ],
+    "correctOptionKey": "B",
+    "explanation": {
+      "en": "AWS secures the facilities and infrastructure that run S3. The customer is responsible for security in the cloud, including managing data access through bucket policies and IAM permissions.",
+      "pt-BR": "A AWS protege as instalações e a infraestrutura que executam o S3. O cliente é responsável pela segurança na nuvem, incluindo o gerenciamento do acesso aos dados por meio de políticas de bucket e permissões do IAM."
+    },
+    "objectives": ["2.1"],
+    "services": [
+      {
+        "id": "amazon-s3",
+        "name": "Amazon S3"
+      },
+      {
+        "id": "aws-iam",
+        "name": "AWS Identity and Access Management (IAM)"
+      }
+    ],
+    "sources": [
+      {
+        "label": "AWS CLF-C02 Exam Guide, Task Statement 2.1",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain2.html"
+      },
+      {
+        "label": "AWS Shared Responsibility Model",
+        "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
+      }
+    ]
+  }
+]

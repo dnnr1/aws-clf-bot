@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "npm run build && node --env-file-if-exists=.env dist/infrastructure/database/seed.js"
   },
   "dependencies": {
     "discord.js": "^14.28.1",

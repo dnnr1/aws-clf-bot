@@ -187,3 +187,20 @@ VALUES
   ('security-compliance', 'aws-clf-c02', 2, 'Security and Compliance', 'Segurança e conformidade'),
   ('cloud-technology-services', 'aws-clf-c02', 3, 'Cloud Technology and Services', 'Tecnologia e serviços em nuvem'),
   ('billing-pricing-support', 'aws-clf-c02', 4, 'Billing, Pricing, and Support', 'Faturamento, preços e suporte');
+--> statement-breakpoint
+INSERT INTO "exam_objectives" (
+  "id",
+  "certification_id",
+  "domain_id",
+  "objective_code",
+  "description_en",
+  "description_pt_br"
+)
+VALUES (
+  'clf-c02-2-1',
+  'aws-clf-c02',
+  'security-compliance',
+  '2.1',
+  'Understand the AWS shared responsibility model.',
+  'Compreender o modelo de responsabilidade compartilhada da AWS.'
+);
