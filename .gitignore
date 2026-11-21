@@ -1,0 +1,11 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build and test output
+dist/
+coverage/
