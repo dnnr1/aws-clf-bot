@@ -1,6 +1,8 @@
 import { ChannelType, type Client } from "discord.js";
 import { describe, expect, it, vi } from "vitest";
 import type { BotChannelMessageRepository } from "../../../src/application/discord/bot-channel-message-repository.js";
+import type { PracticeService } from "../../../src/application/study/practice-service.js";
+import type { UserPreferencesService } from "../../../src/application/users/user-preferences-service.js";
 import { maintainPracticeChannelPanel } from "../../../src/presentation/discord/practice-channel-panel.js";
 
 describe("maintainPracticeChannelPanel", () => {
@@ -22,12 +24,20 @@ describe("maintainPracticeChannelPanel", () => {
       findMessage: vi.fn().mockResolvedValue(null),
       saveMessage: vi.fn().mockResolvedValue(undefined),
     };
+    const practiceService = {
+      start: vi.fn(),
+    } as unknown as PracticeService;
+    const preferences = {
+      getLocale: vi.fn().mockResolvedValue("pt-BR"),
+    } as unknown as UserPreferencesService;
 
     await maintainPracticeChannelPanel(
       client as unknown as Client,
       "guild-id",
       "channel-id",
       messages,
+      practiceService,
+      preferences,
     );
 
     expect(send).toHaveBeenCalledOnce();

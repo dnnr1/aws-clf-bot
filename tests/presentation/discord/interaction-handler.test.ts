@@ -109,7 +109,11 @@ describe("channel configuration commands", () => {
       guildId,
       channelId,
     );
-    expect(maintainPracticePanel).toHaveBeenCalledWith(guildId, channelId);
+    expect(maintainPracticePanel).toHaveBeenCalledWith(
+      guildId,
+      channelId,
+      "12345678901234569",
+    );
     expect(interaction.editReply).toHaveBeenCalled();
   });
 

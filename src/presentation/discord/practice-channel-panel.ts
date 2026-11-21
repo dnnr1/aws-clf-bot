@@ -5,15 +5,24 @@ import {
   ChannelType,
   DiscordAPIError,
   EmbedBuilder,
+  TextChannel,
   type Client,
 } from "discord.js";
 import type { BotChannelMessageRepository } from "../../application/discord/bot-channel-message-repository.js";
+import type { PracticeService } from "../../application/study/practice-service.js";
+import { PracticeError } from "../../application/study/practice-error.js";
+import type { UserPreferencesService } from "../../application/users/user-preferences-service.js";
+import { type UserLocale } from "../../domain/users/user-locale.js";
+import { renderQuestion } from "./interaction-handler.js";
 
 export async function maintainPracticeChannelPanel(
   client: Client,
   guildId: string,
   channelId: string,
   messages: BotChannelMessageRepository,
+  practiceService: PracticeService,
+  preferences: UserPreferencesService,
+  discordUserId?: string,
 ): Promise<void> {
   const channel = await client.channels.fetch(channelId);
 
@@ -25,6 +34,19 @@ export async function maintainPracticeChannelPanel(
     throw new Error(
       "The practice channel must be a sendable text channel in the configured server.",
     );
+  }
+
+  if (discordUserId) {
+    await startPracticeSessionForPanel(
+      client,
+      channel,
+      guildId,
+      discordUserId,
+      practiceService,
+      preferences,
+      messages,
+    );
+    return;
   }
 
   const practicePanelKey = `practice-introduction-${guildId}`;
@@ -52,6 +74,77 @@ export async function maintainPracticeChannelPanel(
 
   const message = await channel.send(panelMessage);
   await messages.saveMessage(practicePanelKey, channel.id, message.id);
+
+  if (storedMessage && storedMessage.channelId !== channel.id) {
+    await removePreviousPanel(client, storedMessage);
+  }
+}
+
+async function startPracticeSessionForPanel(
+  client: Client,
+  channel: TextChannel,
+  guildId: string,
+  discordUserId: string,
+  practiceService: PracticeService,
+  preferences: UserPreferencesService,
+  messages: BotChannelMessageRepository,
+): Promise<void> {
+  const panelKey = `practice-active-${guildId}-${discordUserId}`;
+  const storedMessage = await messages.findMessage(panelKey);
+  const locale = (await preferences.getLocale(discordUserId)) as UserLocale;
+
+  let session;
+
+  try {
+    session = await practiceService.start(discordUserId);
+  } catch (error) {
+    if (
+      error instanceof PracticeError &&
+      error.code === "no_questions_available"
+    ) {
+      const content = locale === "en"
+        ? "No study questions are available yet. Please try again later."
+        : "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.";
+
+      if (storedMessage?.channelId === channel.id) {
+        try {
+          const message = await channel.messages.fetch(storedMessage.messageId);
+          if (message.author.id === client.user?.id) {
+            await message.edit({ content, embeds: [], components: [] });
+          }
+        } catch {
+          await channel.send(content);
+        }
+      } else {
+        await channel.send(content);
+      }
+      return;
+    }
+    throw error;
+  }
+
+  const rendered = renderQuestion(
+    session.sessionId,
+    discordUserId,
+    session.question,
+    locale,
+    session,
+  );
+
+  if (storedMessage?.channelId === channel.id) {
+    try {
+      const message = await channel.messages.fetch(storedMessage.messageId);
+      if (message.author.id === client.user?.id) {
+        await message.edit(rendered);
+        return;
+      }
+    } catch {
+      // message not found, fall through to send
+    }
+  }
+
+  const message = await channel.send(rendered);
+  await messages.saveMessage(panelKey, channel.id, message.id);
 
   if (storedMessage && storedMessage.channelId !== channel.id) {
     await removePreviousPanel(client, storedMessage);

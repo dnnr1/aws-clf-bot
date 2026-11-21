@@ -127,7 +127,11 @@ interface DiscordServices {
   channelSettings: GuildChannelSettingsService;
   practice: PracticeService;
   statistics: StatisticsService;
-  maintainPracticePanel: (guildId: string, channelId: string) => Promise<void>;
+  maintainPracticePanel: (
+    guildId: string,
+    channelId: string,
+    discordUserId?: string,
+  ) => Promise<void>;
   publishImmediateTip: (guildId: string, channelId: string) => Promise<boolean>;
 }
 
@@ -321,7 +325,7 @@ async function handleSetChannelCommand(
 
   if (interaction.commandName === "set-practice-channel") {
     await services.channelSettings.setPracticeChannel(guildId, channel.id);
-    await services.maintainPracticePanel(guildId, channel.id);
+    await services.maintainPracticePanel(guildId, channel.id, interaction.user.id);
   } else {
     const currentSettings = await services.channelSettings.getSettings(guildId);
     await services.channelSettings.setTipsChannel(guildId, channel.id);
@@ -647,13 +651,7 @@ async function handleAnswerButton(
 
   const [, sessionId, presentationId, ownerId, optionKey] = match;
 
-  if (
-    !sessionId ||
-    !presentationId ||
-    !ownerId ||
-    !optionKey ||
-    ownerId !== interaction.user.id
-  ) {
+  if (!sessionId || !presentationId || !ownerId || !optionKey) {
     await interaction.reply({
       embeds: [
         createStatusEmbed(
@@ -664,6 +662,46 @@ async function handleAnswerButton(
       ],
       flags: MessageFlags.Ephemeral,
     });
+    return;
+  }
+
+  if (ownerId !== interaction.user.id) {
+    await interaction.deferUpdate();
+    const locale = await services.preferences.getLocale(interaction.user.id);
+
+    try {
+      const session = await services.practice.start(interaction.user.id);
+      await interaction.editReply(
+        renderQuestion(
+          session.sessionId,
+          interaction.user.id,
+          session.question,
+          locale,
+          session,
+        ),
+      );
+    } catch (error) {
+      if (
+        error instanceof PracticeError &&
+        error.code === "no_questions_available"
+      ) {
+        await interaction.editReply({
+          embeds: [
+            createStatusEmbed(
+              locale === "en"
+                ? "No questions available"
+                : "Sem questões disponíveis",
+              practiceMessages[locale].noQuestions,
+              errorColor,
+            ),
+          ],
+          components: [],
+        });
+        return;
+      }
+
+      throw error;
+    }
     return;
   }
 
@@ -886,7 +924,7 @@ async function handleNextButton(
   }
 }
 
-function renderQuestion(
+export function renderQuestion(
   sessionId: string,
   discordUserId: string,
   question: StudyQuestion,

@@ -114,12 +114,15 @@ async function startBot(): Promise<void> {
       channelSettings,
       practice,
       statistics,
-      maintainPracticePanel: (guildId: string, channelId: string) =>
+      maintainPracticePanel: (guildId: string, channelId: string, discordUserId?: string) =>
         maintainPracticeChannelPanel(
           client,
           guildId,
           channelId,
           botChannelMessages,
+          practice,
+          preferences,
+          discordUserId,
         ),
       publishImmediateTip: (guildId: string, channelId: string) =>
         publishImmediateDailyTip(
