@@ -1,6 +1,6 @@
 # Architecture Proposal
 
-**Status:** Initial proposal for review. Feature implementation should wait until this proposal and the project specification are approved.
+**Status:** Approved baseline for incremental implementation.
 
 ## Goals and boundaries
 

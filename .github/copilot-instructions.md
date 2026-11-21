@@ -35,9 +35,17 @@ Treat the documents as the proposed baseline. Do not start feature implementatio
 
 ## Build, test, and lint
 
-The repository does not yet contain a package manifest or runnable build, test, or lint scripts. Once project setup exists, read `package.json` and the tool configuration and use their scripts rather than inventing commands. Vitest is the planned test runner; run a single test through its configured file filter (for example, `vitest run path/to/test-file`) after dependencies are installed.
+Use these `package.json` scripts:
+
+- `npm run build`
+- `npm run typecheck`
+- `npm test`
+- `npm test -- path/to/test-file` for one test file
+- `npm run lint`
+- `npm run format:check`
+
+Check the package manifest and tool configuration before assuming any additional tool is installed.
 
 ## Development workflow
 
 Follow specification-driven development: clarify requirements, update the specification and architecture, break approved work into focused tasks, implement incrementally, run relevant checks, and update documentation. Prioritize unit tests for domain rules, then application and database integration tests. Keep Conventional Commit subjects short and in English, with no extra description.
-

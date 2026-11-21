@@ -1,6 +1,6 @@
 # AWS CLF Study Bot - Project Specification
 
-**Status:** Initial requirements baseline for review. Feature implementation should wait until this specification, the architecture proposal, and the development plan are approved.
+**Status:** Approved requirements baseline for incremental implementation.
 
 ## Purpose
 

@@ -3,11 +3,7 @@
     "discord": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "--yes",
-        "@discord-mcp/cli@0.34.1",
-        "serve"
-      ],
+      "args": ["--yes", "@discord-mcp/cli@0.34.1", "serve"],
       "env": {
         "DISCORD_TOKEN": "${DISCORD_TOKEN}",
         "ALLOWED_GUILDS": "${DISCORD_GUILD_ID}",
@@ -16,11 +12,7 @@
         "MCP_WRITE_MODE": "preview",
         "MCP_ACCESS_MODE": "enforce"
       },
-      "tools": [
-        "mcp_tools_search",
-        "mcp_tools_read",
-        "mcp_tools_write"
-      ]
+      "tools": ["mcp_tools_search", "mcp_tools_read", "mcp_tools_write"]
     }
   }
 }
