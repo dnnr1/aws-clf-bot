@@ -36,6 +36,7 @@ export interface CompletedExamResult {
 }
 
 export interface AnswerFeedback {
+  mode: "practice" | "exam_simulation";
   isCorrect: boolean;
   correctOptionKey: AnswerOptionKey;
   correctOptionText: LocalizedText;

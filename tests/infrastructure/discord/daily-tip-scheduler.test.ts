@@ -77,6 +77,11 @@ describe("startDailyTipScheduler", () => {
       );
       expect(publications.claimPublication).not.toHaveBeenCalled();
       expect(channelSend).toHaveBeenCalledOnce();
+      const embed = channelSend.mock.calls[0]?.[0].embeds[0].toJSON();
+      expect(embed.title).toBe("Valor da nuvem");
+      expect(
+        embed.fields?.map((field: { name: string }) => field.name),
+      ).toEqual(["Dica", "Fonte"]);
     } finally {
       stop();
       vi.useRealTimers();

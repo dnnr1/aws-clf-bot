@@ -5,6 +5,7 @@ import type { PracticeRepository } from "../../../src/application/study/practice
 function createRepository(): PracticeRepository {
   return {
     startSession: vi.fn(),
+    restartSession: vi.fn(),
     startExam: vi.fn(),
     getNextQuestion: vi.fn(),
     submitAnswer: vi.fn(),
@@ -34,6 +35,21 @@ describe("PracticeService", () => {
     await service.startExam("12345678901234567");
 
     expect(repository.startExam).toHaveBeenCalledWith("12345678901234567");
+  });
+
+  it("restarts the owned practice session through the repository", async () => {
+    const repository = createRepository();
+    const service = new PracticeService(repository);
+
+    await service.restart(
+      "12345678901234567",
+      "86b19e28-4c80-4fc6-9aa4-bddf4b574919",
+    );
+
+    expect(repository.restartSession).toHaveBeenCalledWith(
+      "12345678901234567",
+      "86b19e28-4c80-4fc6-9aa4-bddf4b574919",
+    );
   });
 
   it("delegates supported answers to the session repository", async () => {

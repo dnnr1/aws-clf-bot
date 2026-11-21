@@ -18,10 +18,10 @@ Help members of a private Discord server prepare for the AWS Certified Cloud Pra
 - Use `DISCORD_PRACTICE_CHANNEL_ID` and `DISCORD_TIPS_CHANNEL_ID` as optional default channel IDs. A server administrator can override them at runtime with `/set-practice-channel` and `/set-tips-channel`; store overrides per server, take precedence over environment defaults, and apply them without restarting the bot.
 - Restrict both channel-setting commands to users with the Discord Administrator permission, enforced in command registration and rechecked for each interaction. Accept only text channels belonging to the invoking server.
 - Maintain one bot-authored introduction panel in the practice channel; update the same message on startup and remove the previous panel when an administrator changes channels.
-- Include a button on the introduction panel that starts `/practice` as a private interaction for the clicking user.
+- Include a button on the introduction panel that starts a private, continuous practice session for the clicking user; practice is started from the panel, not a slash command.
 - Accept study commands and component interactions only in the configured practice channel.
 - Keep each command response, question, answer, explanation, and error private to the invoking user with ephemeral interaction replies. The shared practice channel contains only the introduction panel.
-- Publish one initial bilingual, sourced learning tip as soon as a tips channel is available, then publish scheduled tips at 12:00, 16:00, and 20:00 UTC. The initial tip reserves the first daily slot. Reserve each slot once before sending; do not retry failed or ambiguous sends or backfill missed slots. This at-most-once policy limits publications to three per server per UTC day.
+- Publish one sourced learning tip in Brazilian Portuguese as soon as a tips channel is available, then publish scheduled tips at 12:00, 16:00, and 20:00 UTC. The initial tip reserves the first daily slot. Reserve each slot once before sending; do not retry failed or ambiguous sends or backfill missed slots. This at-most-once policy limits publications to three per server per UTC day.
 
 ## Functional requirements
 
@@ -36,12 +36,12 @@ Cover all four CLF-C02 domains:
 
 Questions must be original and scenario-oriented where suitable, use plausible distractors, and cover the official exam objectives. The [official AWS CLF-C02 exam guide](https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html) is the primary coverage reference. Do not copy confidential exam questions, exam dumps, or third-party question banks.
 
-Each validated question contains a unique identifier, domain, difficulty, English and `pt-BR` question text, four localized options, correct option identifier, localized explanation, related AWS services, exam objectives, and source references when available. Adding question content must not require changing application logic.
+The bank contains at least 200 original questions, weighted approximately to the official domain percentages (24%, 30%, 34%, and 12%). Each validated question contains a unique identifier and family identifier, domain, difficulty, English and `pt-BR` question text, four localized options, correct option identifier, localized explanation, related AWS services, exam objectives, and source references when available. Questions in the same family are variants of one concept; a single exam uses no more than one variant from each family. Adding question content must not require changing application logic.
 
 ### Study modes
 
 - **Daily Challenge:** One attempt per user per day, completion tracking, and daily streaks.
-- **Practice:** Ongoing sessions that record each answer and allow users to continue.
+- **Practice:** Continuous sessions that record every answer, cycle through the question bank without ending, and keep a cumulative score. A restart control abandons the current session and begins a new session with a reset score.
 - **Exam Simulation:** 65 randomized questions, 90 minutes, final score/performance, and domain breakdown.
 - **Domain Practice:** Practice a selected exam domain and track its performance separately.
 
@@ -52,7 +52,7 @@ All modes use four-option multiple-choice questions and Discord buttons. Display
 - `/language`: select and persist the preferred locale.
 - `/help`: show available commands.
 - `/question`: show a random question.
-- `/daily`, `/practice`, `/exam`: start or resume the corresponding mode as specified.
+- `/daily`, `/exam`: start or resume the corresponding mode as specified. Practice starts from the persistent practice-channel panel.
 - `/stats`: totals, correct/incorrect answers, accuracy, current and longest streak, and study sessions.
 - `/set-practice-channel`: set the server's private practice channel (Administrator permission required).
 - `/set-tips-channel`: set the server's daily learning tips channel (Administrator permission required).
@@ -62,11 +62,11 @@ All modes use four-option multiple-choice questions and Discord buttons. Display
 
 Statistics must be based on persisted answer records, not solely on cached counters. For `/stats`, count all persisted study sessions and submitted answers for the user. Accuracy is correct answers divided by submitted answers, and unanswered sessions do not affect accuracy. Activity days use UTC dates derived from persisted answer timestamps, independent of user locale. The current streak includes consecutive active UTC dates ending today, or yesterday when today has no activity yet; the longest streak is the largest consecutive run of active UTC dates. Any submitted answer counts as activity, whether correct or incorrect. Leaderboard eligibility and tie-breaking and detailed session-resume behavior require feature-level decisions before implementation.
 
-Exam simulations require 65 distinct active questions, distributed as 16, 19, 22, and 8 questions across the four domains, and end after 90 minutes. If the question bank cannot meet this distribution, do not start an incomplete exam; report that the question bank is still being populated. Persist every completed result and the per-domain breakdown. A user's best result is the highest correct-answer count; because all exams contain 65 questions, this also determines the highest accuracy. Incomplete or expired attempts do not count as completed results.
+Exam simulations require 65 active questions from distinct question families, distributed as 16, 19, 22, and 8 questions across the four domains, and end after 90 minutes with a visible countdown. If the question bank cannot meet this distribution, do not start an incomplete exam; report that the question bank is still being populated. Persist every completed result and the per-domain breakdown. A user's best result is the highest correct-answer count; because all exams contain 65 questions, this also determines the highest accuracy. Incomplete or expired attempts do not count as completed results.
 
 ## Data and persistence
 
-Persist users, preferences, questions/options, study sessions, answers, daily challenges, and exam results in PostgreSQL through Drizzle. Use migrations, relational constraints, indexes, and transactions. Store Discord IDs as identifiers. Prevent duplicate answers within a session at both application and database levels.
+Persist users, preferences, questions/options, study sessions, question presentations, answers, daily challenges, and exam results in PostgreSQL through Drizzle. Use migrations, relational constraints, indexes, and transactions. Store Discord IDs as identifiers. Prevent duplicate answers to the same presentation at both application and database levels while allowing a practice session to revisit question families.
 
 Persist per-server channel overrides and the practice introduction's message ID so configuration and panels survive restarts. Persist daily tip publications with a UTC date, server ID, and one of three scheduled slots; a unique date/server/slot constraint prevents duplicate publications and enforces the daily cap.
 

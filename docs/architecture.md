@@ -39,6 +39,7 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 - Implement repositories with Drizzle and PostgreSQL, schema migrations, indexes, and database constraints.
 - Persist per-server practice/tips channel overrides and expose optional environment defaults.
 - Load validated question-bank records without coupling question content to application logic.
+- Select exam questions across the weighted domain distribution while avoiding duplicate question families in one exam.
 - Manage the persistent practice-channel introduction and scheduled, data-driven learning tips through Discord adapters.
 - Validate environment variables, provide structured logging, and manage database/client lifecycle.
 - Provide adapters for time, randomness, and other external dependencies required by application services.
@@ -47,8 +48,8 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 
 - Initialize the Discord.js client, register slash commands, and route commands and component interactions to application use cases.
 - Restrict channel configuration commands to server administrators at registration and runtime; accept only text channels from the invoking server.
-- Restrict study commands and components to the configured practice channel, while keeping all individual study replies ephemeral.
-- Let users start a private practice session from the persistent introduction panel; display session answer counts and metadata-derived inline formatting for AWS service names.
+- Restrict study commands and components to the configured practice channel, while keeping all individual study replies ephemeral. Start practice from the introduction panel rather than a slash command.
+- Keep practice sessions continuous, persist cumulative counts, cycle through question presentations, and let users restart into a fresh session.
 - Convert Discord payloads into validated application inputs; format results as localized messages, embeds, and buttons.
 - Keep authorization, interaction ownership checks, Discord response timing, and expired-interaction handling at this boundary, backed by application/session validation.
 - Keep user-facing text in English and `pt-BR` locale resources. Slash-command names and descriptions are English.
@@ -63,12 +64,13 @@ Use normalized relational tables, with exact columns and constraints to be defin
 - `bot_channel_messages`: persistent IDs for bot-managed channel panels.
 - `daily_tip_publications`: per-server UTC slot claims that prevent duplicate tips.
 - `questions` and `question_options`: domain, difficulty, localized prompts/options/explanations, answer key, objectives, services, and source references.
-- `study_sessions`: owner, mode, state, start/end timestamps, and any persisted question order needed to resume a session consistently.
-- `user_answers`: accepted answer, correctness, and answer timestamp linked to a session and question.
+- `study_sessions`: owner, mode, state, start/end timestamps, and persisted session lifecycle.
+- `session_questions`: one row per presented question occurrence, including repeated practice questions.
+- `user_answers`: accepted answer, correctness, and answer timestamp linked to a session and question presentation.
 - `daily_challenges`: per-user/per-day challenge state and completion.
 - `exam_results`: completed exam summary and domain breakdown, linked to its session.
 
-Store Discord IDs without converting them to numeric database types. Add a unique constraint for a question within a session so retries or concurrent interactions cannot record duplicate answers. Enforce daily uniqueness per user and challenge date. Derive statistics from `user_answers`; any cached aggregate must be rebuildable and must not become the sole source of truth.
+Store Discord IDs without converting them to numeric database types. Add a unique constraint for a presentation within a session so retries or concurrent interactions cannot record duplicate answers while practice may present the same question more than once. Enforce daily uniqueness per user and challenge date. Derive statistics from `user_answers`; any cached aggregate must be rebuildable and must not become the sole source of truth.
 
 ## Key interaction flows
 

@@ -42,7 +42,7 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
 
    The seed command validates and inserts the versioned question data in `data/questions/`. Existing question IDs are not overwritten. When the Drizzle schema changes, generate a new migration with `npm run db:generate`, review the SQL, and commit both the schema and migration.
 
-   Exam simulation requires 65 active questions distributed 16/19/22/8 across the four domains. Daily tips are bilingual and scheduled for 12:00, 16:00, and 20:00 UTC per server. When a tips channel becomes available, the bot publishes an initial tip immediately and reserves the first daily slot for it; the server receives at most three tips per UTC day. Missed slots are not sent later, and failed or ambiguous posts are not retried.
+   The question bank contains more than 200 original questions, weighted to the CLF-C02 exam domains. Exam simulation selects 65 questions across the required 16/19/22/8 domain distribution, avoids duplicate question families, and runs for 90 minutes. Daily tips are published in Brazilian Portuguese at 12:00, 16:00, and 20:00 UTC per server. When a tips channel becomes available, the bot publishes an initial tip immediately and reserves the first daily slot for it; the server receives at most three tips per UTC day. Missed slots are not sent later, and failed or ambiguous posts are not retried.
 
 5. Run the available checks:
 
@@ -70,7 +70,7 @@ Server administrators can set channels without restarting the bot:
 
 These settings are stored per server and override the optional `.env` defaults. Only server administrators can run these commands, and the selected channel must be a text channel in the same server.
 
-The practice channel contains a persistent introduction panel with a **Start practice** button. Clicking it starts a private session, just like `/practice`. Questions show the session's correct and incorrect answer counts, and service names from the question metadata are highlighted with inline code formatting.
+The practice channel contains a persistent introduction panel with a **Start practice** button. Clicking it starts a private, continuous session; no `/practice` command is required. The session cycles through the question bank without ending, tracks correct and incorrect answers, and offers a **Restart practice** button to begin a fresh score. Questions show the session's answer counts, and related service names are highlighted with inline code formatting.
 
 ## Discord MCP
 

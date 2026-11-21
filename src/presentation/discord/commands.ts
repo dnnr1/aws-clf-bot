@@ -14,11 +14,10 @@ export const commandDefinitions = [
     .setName("language")
     .setDescription("Choose the language used by the bot."),
   new SlashCommandBuilder()
-    .setName("practice")
-    .setDescription("Start a practice session with AWS study questions."),
-  new SlashCommandBuilder()
     .setName("exam")
-    .setDescription("Start a 65-question AWS exam simulation."),
+    .setDescription(
+      "Start a timed 65-question AWS exam simulation (90 minutes).",
+    ),
   new SlashCommandBuilder()
     .setName("stats")
     .setDescription("Show your study statistics."),

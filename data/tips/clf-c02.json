@@ -11,7 +11,7 @@
       "pt-BR": "A AWS protege a infraestrutura da nuvem; os clientes continuam responsáveis pela segurança na nuvem, incluindo dados, identidades e configuração dos serviços."
     },
     "source": {
-      "label": "AWS Shared Responsibility Model",
+      "label": "Modelo de responsabilidade compartilhada da AWS",
       "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
     }
   },
@@ -27,7 +27,7 @@
       "pt-BR": "Conceda a uma identidade somente as permissões necessárias e revise-as regularmente. Políticas do IAM definem quais ações são permitidas em quais recursos."
     },
     "source": {
-      "label": "IAM best practices",
+      "label": "Boas práticas do IAM",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
     }
   },
@@ -43,7 +43,7 @@
       "pt-BR": "A MFA adiciona um fator de autenticação além da senha. Habilite-a especialmente para identidades privilegiadas e para o usuário raiz da conta AWS."
     },
     "source": {
-      "label": "IAM MFA",
+      "label": "MFA no IAM",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html"
     }
   },
@@ -59,7 +59,7 @@
       "pt-BR": "Uma função do IAM fornece credenciais temporárias a uma entidade confiável. Funções são usadas com frequência por serviços AWS e usuários federados, em vez de compartilhar chaves de acesso permanentes."
     },
     "source": {
-      "label": "IAM roles",
+      "label": "Funções do IAM",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
     }
   },
@@ -75,7 +75,7 @@
       "pt-BR": "O Amazon S3 é um serviço de armazenamento de objetos. Os objetos ficam em buckets e são acessados por APIs; ele não é um volume de blocos anexado a uma instância EC2."
     },
     "source": {
-      "label": "Amazon S3 User Guide",
+      "label": "Guia do usuário do Amazon S3",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
     }
   },
@@ -91,7 +91,7 @@
       "pt-BR": "O Amazon EC2 fornece servidores virtuais redimensionáveis. O cliente escolhe e gerencia o sistema operacional convidado e os aplicativos executados nas instâncias."
     },
     "source": {
-      "label": "Amazon EC2 concepts",
+      "label": "Conceitos do Amazon EC2",
       "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
     }
   },
@@ -107,7 +107,7 @@
       "pt-BR": "O AWS Lambda executa código em resposta a eventos sem exigir que o cliente provisione ou gerencie os servidores subjacentes."
     },
     "source": {
-      "label": "AWS Lambda Developer Guide",
+      "label": "Guia do desenvolvedor do AWS Lambda",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
     }
   },
@@ -123,7 +123,7 @@
       "pt-BR": "O Amazon RDS é um serviço gerenciado de banco de dados relacional. A AWS gerencia tarefas de infraestrutura, como provisionamento e manutenção suportada; o cliente continua gerenciando dados e acessos."
     },
     "source": {
-      "label": "Amazon RDS User Guide",
+      "label": "Guia do usuário do Amazon RDS",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
     }
   },
@@ -139,7 +139,7 @@
       "pt-BR": "O Amazon CloudWatch coleta e monitora métricas, logs e alarmes, ajudando equipes a observar recursos e aplicativos da AWS."
     },
     "source": {
-      "label": "Amazon CloudWatch overview",
+      "label": "Visão geral do Amazon CloudWatch",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
     }
   },
@@ -155,7 +155,7 @@
       "pt-BR": "O AWS CloudTrail registra atividades da conta e chamadas de API. Use-o para identificar quem realizou uma ação, quando ela ocorreu e quais recursos AWS foram envolvidos."
     },
     "source": {
-      "label": "AWS CloudTrail User Guide",
+      "label": "Guia do usuário do AWS CloudTrail",
       "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
     }
   },
@@ -171,7 +171,7 @@
       "pt-BR": "O AWS Budgets permite definir orçamentos de custo ou uso e receber notificações quando valores reais ou previstos ultrapassam os limites configurados."
     },
     "source": {
-      "label": "Managing costs with AWS Budgets",
+      "label": "Gerenciamento de custos com AWS Budgets",
       "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
     }
   },

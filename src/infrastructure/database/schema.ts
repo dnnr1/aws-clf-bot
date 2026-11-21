@@ -130,6 +130,7 @@ export const questions = pgTable(
   "questions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    familyId: varchar("family_id", { length: 80 }).notNull(),
     certificationId: varchar("certification_id", { length: 32 }).notNull(),
     domainId: varchar("domain_id", { length: 48 }).notNull(),
     difficulty: questionDifficulty("difficulty").notNull(),
@@ -152,6 +153,12 @@ export const questions = pgTable(
     index("questions_certification_domain_active_idx").on(
       table.certificationId,
       table.domainId,
+      table.isActive,
+    ),
+    index("questions_exam_family_idx").on(
+      table.certificationId,
+      table.domainId,
+      table.familyId,
       table.isActive,
     ),
     check(
@@ -265,6 +272,7 @@ export const studySessions = pgTable(
 export const sessionQuestions = pgTable(
   "session_questions",
   {
+    id: uuid("id").defaultRandom().primaryKey(),
     sessionId: uuid("session_id")
       .notNull()
       .references(() => studySessions.id, { onDelete: "restrict" }),
@@ -274,10 +282,14 @@ export const sessionQuestions = pgTable(
     position: integer("position").notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.questionId] }),
     unique("session_questions_position_unique").on(
       table.sessionId,
       table.position,
+    ),
+    unique("session_questions_id_session_question_unique").on(
+      table.id,
+      table.sessionId,
+      table.questionId,
     ),
     index("session_questions_question_idx").on(table.questionId),
     check("session_questions_position_positive", sql`${table.position} > 0`),
@@ -288,6 +300,7 @@ export const userAnswers = pgTable(
   "user_answers",
   {
     sessionId: uuid("session_id").notNull(),
+    sessionQuestionId: uuid("session_question_id").notNull(),
     questionId: uuid("question_id").notNull(),
     selectedOptionKey: varchar("selected_option_key", { length: 1 }).notNull(),
     isCorrect: boolean("is_correct").notNull(),
@@ -296,10 +309,14 @@ export const userAnswers = pgTable(
       .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.questionId] }),
+    primaryKey({ columns: [table.sessionId, table.sessionQuestionId] }),
     foreignKey({
-      columns: [table.sessionId, table.questionId],
-      foreignColumns: [sessionQuestions.sessionId, sessionQuestions.questionId],
+      columns: [table.sessionQuestionId, table.sessionId, table.questionId],
+      foreignColumns: [
+        sessionQuestions.id,
+        sessionQuestions.sessionId,
+        sessionQuestions.questionId,
+      ],
       name: "user_answers_session_question_fk",
     }).onDelete("restrict"),
     foreignKey({
@@ -321,6 +338,7 @@ export const dailyChallenges = pgTable(
     challengeDate: date("challenge_date", { mode: "string" }).notNull(),
     sessionId: uuid("session_id").notNull(),
     questionId: uuid("question_id").notNull(),
+    sessionQuestionId: uuid("session_question_id").notNull(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
   },
   (table) => [
@@ -332,8 +350,12 @@ export const dailyChallenges = pgTable(
       name: "daily_challenges_owned_session_fk",
     }).onDelete("restrict"),
     foreignKey({
-      columns: [table.sessionId, table.questionId],
-      foreignColumns: [sessionQuestions.sessionId, sessionQuestions.questionId],
+      columns: [table.sessionQuestionId, table.sessionId, table.questionId],
+      foreignColumns: [
+        sessionQuestions.id,
+        sessionQuestions.sessionId,
+        sessionQuestions.questionId,
+      ],
       name: "daily_challenges_session_question_fk",
     }).onDelete("restrict"),
   ],

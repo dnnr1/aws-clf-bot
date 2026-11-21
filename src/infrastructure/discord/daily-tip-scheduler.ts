@@ -203,16 +203,15 @@ function selectDailyTip(
 function renderDailyTip(tip: DailyTip): EmbedBuilder {
   return new EmbedBuilder()
     .setColor(0x3498db)
-    .setTitle(`${tip.title.en} / ${tip.title["pt-BR"]}`)
+    .setTitle(tip.title["pt-BR"])
     .addFields(
-      { name: "English", value: tip.content.en },
-      { name: "Português (Brasil)", value: tip.content["pt-BR"] },
+      { name: "Dica", value: tip.content["pt-BR"] },
       {
-        name: "Source / Fonte",
+        name: "Fonte",
         value: `[${tip.source.label}](${tip.source.url})`,
       },
     )
     .setFooter({
-      text: `CLF-C02 · ${domainNames[tip.domainId].en} / ${domainNames[tip.domainId]["pt-BR"]}`,
+      text: `CLF-C02 · ${domainNames[tip.domainId]["pt-BR"]}`,
     });
 }

@@ -34,8 +34,7 @@ const helpMessages: Record<UserLocale, string> = {
     "**Available commands**",
     "`/help` - Show this command list.",
     "`/language` - Choose English or Portuguese (Brazil).",
-    "`/practice` - Start an AWS question practice session.",
-    "`/exam` - Start a timed 65-question exam.",
+    "`/exam` - Start a timed 65-question exam (90 minutes).",
     "`/stats` - Show your study statistics.",
     "`/set-practice-channel` - Set the practice channel (server admins).",
     "`/set-tips-channel` - Set the daily tips channel (server admins).",
@@ -44,8 +43,7 @@ const helpMessages: Record<UserLocale, string> = {
     "**Comandos disponíveis**",
     "`/help` - Exibe esta lista de comandos.",
     "`/language` - Escolha English ou Português (Brasil).",
-    "`/practice` - Inicie uma sessão de prática com questões da AWS.",
-    "`/exam` - Inicie uma simulação de exame com 65 questões.",
+    "`/exam` - Inicie uma simulação de 65 questões com duração de 90 minutos.",
     "`/stats` - Exiba suas estatísticas de estudo.",
     "`/set-practice-channel` - Defina o canal de prática (administradores).",
     "`/set-tips-channel` - Defina o canal de dicas (administradores).",
@@ -69,7 +67,7 @@ const unauthorizedComponentMessage =
 const invalidSelectionMessage =
   "Choose one of the listed languages. / Escolha um dos idiomas disponíveis.";
 const invalidPracticeComponentMessage =
-  "This practice control is invalid. Run /practice again. / Este controle de prática é inválido. Use /practice novamente.";
+  "This study control is invalid. Use the practice panel to start again. / Este controle de estudo é inválido. Use o painel de prática para recomeçar.";
 const successColor = 0x2ecc71;
 const errorColor = 0xe74c3c;
 const infoColor = 0x3498db;
@@ -80,11 +78,12 @@ const practiceMessages: Record<
     answerCorrect: string;
     answerIncorrect: string;
     nextQuestion: string;
+    restartPractice: string;
     correctCount: string;
     incorrectCount: string;
     explanation: string;
     noQuestions: string;
-    exhausted: string;
+    sessionComplete: string;
     examNotAvailable: string;
     examExpired: string;
   }
@@ -93,13 +92,13 @@ const practiceMessages: Record<
     answerCorrect: "Correct.",
     answerIncorrect: "Not quite.",
     nextQuestion: "Next question",
+    restartPractice: "Restart practice",
     correctCount: "Correct",
     incorrectCount: "Incorrect",
     explanation: "Explanation",
     noQuestions:
       "No study questions are available yet. Please try again later.",
-    exhausted:
-      "You have answered every available question in this session. Run /practice to start another session.",
+    sessionComplete: "This study session is complete.",
     examNotAvailable:
       "The exam requires 65 active questions with the required domain distribution. The question bank is still being populated; please try again later.",
     examExpired: "The 90-minute exam time limit has expired.",
@@ -108,13 +107,13 @@ const practiceMessages: Record<
     answerCorrect: "Correto.",
     answerIncorrect: "Não foi dessa vez.",
     nextQuestion: "Próxima pergunta",
+    restartPractice: "Recomeçar prática",
     correctCount: "Corretas",
     incorrectCount: "Erradas",
     explanation: "Explicação",
     noQuestions:
       "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.",
-    exhausted:
-      "Você respondeu a todas as questões disponíveis nesta sessão. Use /practice para iniciar outra sessão.",
+    sessionComplete: "Esta sessão de estudos foi concluída.",
     examNotAvailable:
       "O exame exige 65 questões ativas com a distribuição necessária entre os domínios. O banco de questões ainda está sendo preenchido; tente novamente mais tarde.",
     examExpired: "O limite de 90 minutos do exame expirou.",
@@ -183,8 +182,6 @@ export async function handleDiscordInteraction(
       await handleHelpCommand(interaction, services.preferences);
     } else if (interaction.commandName === "language") {
       await handleLanguageCommand(interaction, services.preferences);
-    } else if (interaction.commandName === "practice") {
-      await handlePracticeCommand(interaction, services);
     } else if (interaction.commandName === "exam") {
       await handleExamCommand(interaction, services);
     } else if (interaction.commandName === "stats") {
@@ -201,6 +198,8 @@ export async function handleDiscordInteraction(
       await handleAnswerButton(interaction, services);
     } else if (interaction.customId.startsWith("n:")) {
       await handleNextButton(interaction, services);
+    } else if (interaction.customId.startsWith("r:")) {
+      await handleRestartButton(interaction, services);
     }
 
     return;
@@ -529,15 +528,8 @@ async function handleLanguageSelection(
   });
 }
 
-async function handlePracticeCommand(
-  interaction: ChatInputCommandInteraction,
-  services: DiscordServices,
-): Promise<void> {
-  await startPracticeSession(interaction, services);
-}
-
 async function startPracticeSession(
-  interaction: ChatInputCommandInteraction | ButtonInteraction,
+  interaction: ButtonInteraction,
   services: DiscordServices,
 ): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
@@ -636,11 +628,11 @@ async function handleAnswerButton(
     return;
   }
 
-  const [, sessionId, questionId, ownerId, optionKey] = match;
+  const [, sessionId, presentationId, ownerId, optionKey] = match;
 
   if (
     !sessionId ||
-    !questionId ||
+    !presentationId ||
     !ownerId ||
     !optionKey ||
     ownerId !== interaction.user.id
@@ -665,7 +657,7 @@ async function handleAnswerButton(
     const answer = await services.practice.answer(
       interaction.user.id,
       sessionId,
-      questionId,
+      presentationId,
       optionKey,
     );
     const messages = practiceMessages[locale];
@@ -687,9 +679,87 @@ async function handleAnswerButton(
             answer.isCorrect ? successColor : errorColor,
           ),
         ],
-        components: [renderNextButton(sessionId, interaction.user.id, locale)],
+        components:
+          answer.mode === "practice"
+            ? [renderPracticeActions(sessionId, interaction.user.id, locale)]
+            : [renderNextButton(sessionId, interaction.user.id, locale)],
       });
     }
+  } catch (error) {
+    if (error instanceof PracticeError) {
+      await interaction.editReply({
+        embeds: [
+          createStatusEmbed(
+            locale === "en" ? "Practice error" : "Erro na prática",
+            getPracticeErrorMessage(error, locale),
+            errorColor,
+          ),
+        ],
+        components: [],
+      });
+      return;
+    }
+
+    throw error;
+  }
+}
+
+async function handleRestartButton(
+  interaction: ButtonInteraction,
+  services: DiscordServices,
+): Promise<void> {
+  const match =
+    /^r:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}):(\d{17,20})$/i.exec(
+      interaction.customId,
+    );
+
+  if (!match) {
+    await interaction.reply({
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const [, sessionId, ownerId] = match;
+
+  if (!sessionId || !ownerId || ownerId !== interaction.user.id) {
+    await interaction.reply({
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  await interaction.deferUpdate();
+  const locale = await services.preferences.getLocale(interaction.user.id);
+
+  try {
+    const session = await services.practice.restart(
+      interaction.user.id,
+      sessionId,
+    );
+    await interaction.editReply(
+      renderQuestion(
+        session.sessionId,
+        interaction.user.id,
+        session.question,
+        locale,
+        session,
+      ),
+    );
   } catch (error) {
     if (error instanceof PracticeError) {
       await interaction.editReply({
@@ -762,7 +832,7 @@ async function handleNextButton(
         embeds: [
           createStatusEmbed(
             locale === "en" ? "Practice complete" : "Prática concluída",
-            practiceMessages[locale].exhausted,
+            practiceMessages[locale].sessionComplete,
             successColor,
           ),
         ],
@@ -804,7 +874,10 @@ function renderQuestion(
   discordUserId: string,
   question: StudyQuestion,
   locale: UserLocale,
-  progress: Pick<PresentedQuestion, "correctCount" | "incorrectCount"> &
+  progress: Pick<
+    PresentedQuestion,
+    "presentationId" | "correctCount" | "incorrectCount"
+  > &
     Partial<
       Pick<
         PresentedQuestion,
@@ -821,7 +894,7 @@ function renderQuestion(
   const buttons = question.options.map((option) =>
     new ButtonBuilder()
       .setCustomId(
-        `a:${sessionId}:${question.id}:${discordUserId}:${option.key}`,
+        `a:${sessionId}:${progress.presentationId}:${discordUserId}:${option.key}`,
       )
       .setLabel(option.key)
       .setStyle(ButtonStyle.Primary),
@@ -913,6 +986,26 @@ function renderNextButton(
   return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 }
 
+function renderPracticeActions(
+  sessionId: string,
+  discordUserId: string,
+  locale: UserLocale,
+) {
+  const nextButton = new ButtonBuilder()
+    .setCustomId(`n:${sessionId}:${discordUserId}`)
+    .setLabel(practiceMessages[locale].nextQuestion)
+    .setStyle(ButtonStyle.Secondary);
+  const restartButton = new ButtonBuilder()
+    .setCustomId(`r:${sessionId}:${discordUserId}`)
+    .setLabel(practiceMessages[locale].restartPractice)
+    .setStyle(ButtonStyle.Danger);
+
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    nextButton,
+    restartButton,
+  );
+}
+
 function getPracticeErrorMessage(
   error: PracticeError,
   locale: UserLocale,
@@ -932,6 +1025,6 @@ function getPracticeErrorMessage(
   }
 
   return locale === "en"
-    ? "This practice session is no longer available. Run /practice to start a new one."
-    : "Esta sessão de prática não está mais disponível. Use /practice para iniciar outra.";
+    ? "This study session is no longer available. Start a new session from the practice panel."
+    : "Esta sessão de estudos não está mais disponível. Inicie outra pelo painel de prática.";
 }

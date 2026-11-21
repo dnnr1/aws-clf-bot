@@ -73,6 +73,10 @@ describe("channel configuration commands", () => {
         PermissionFlagsBits.Administrator.toString(),
       );
     }
+
+    expect(
+      commandDefinitions.some((definition) => definition.name === "practice"),
+    ).toBe(false);
   });
 
   it("rejects non-administrators without persisting channel settings", async () => {
@@ -151,6 +155,7 @@ describe("practice panel interaction", () => {
     const questionId = "32345678-9012-3456-7890-123456789012";
     const start = vi.fn().mockResolvedValue({
       sessionId,
+      presentationId: "42345678-9012-3456-7890-123456789012",
       correctCount: 0,
       incorrectCount: 0,
       question: {
@@ -223,6 +228,131 @@ describe("practice panel interaction", () => {
         content: expect.stringContaining("`Amazon S3`"),
       }),
     );
+  });
+
+  it("restarts a session and resets its private score", async () => {
+    const userId = "12345678901234569";
+    const oldSessionId = "22345678-9012-3456-7890-123456789012";
+    const newSessionId = "52345678-9012-3456-7890-123456789012";
+    const restart = vi.fn().mockResolvedValue({
+      sessionId: newSessionId,
+      presentationId: "62345678-9012-3456-7890-123456789012",
+      correctCount: 0,
+      incorrectCount: 0,
+      question: {
+        id: "32345678-9012-3456-7890-123456789012",
+        domainId: "cloud-technology-services",
+        prompt: {
+          en: "Choose an AWS service.",
+          "pt-BR": "Escolha um serviço da AWS.",
+        },
+        options: [
+          { key: "A", text: { en: "S3", "pt-BR": "S3" } },
+          { key: "B", text: { en: "EC2", "pt-BR": "EC2" } },
+          { key: "C", text: { en: "Lambda", "pt-BR": "Lambda" } },
+          { key: "D", text: { en: "RDS", "pt-BR": "RDS" } },
+        ],
+        services: [],
+      },
+    });
+    const interaction = {
+      isChatInputCommand: () => false,
+      isButton: () => true,
+      isStringSelectMenu: () => false,
+      customId: `r:${oldSessionId}:${userId}`,
+      channelId,
+      guildId,
+      user: { id: userId },
+      deferUpdate: vi.fn().mockResolvedValue(undefined),
+      editReply: vi.fn().mockResolvedValue(undefined),
+    };
+    channelSettings.getSettings.mockResolvedValue({
+      practiceChannelId: channelId,
+      tipsChannelId: null,
+    });
+
+    await handleDiscordInteraction(interaction as unknown as Interaction, {
+      ...services,
+      practice: {
+        restart,
+      } as unknown as Parameters<
+        typeof handleDiscordInteraction
+      >[1]["practice"],
+    });
+
+    expect(restart).toHaveBeenCalledWith(userId, oldSessionId);
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.stringContaining("**Corretas:** 0 · **Erradas:** 0"),
+      }),
+    );
+  });
+
+  it("offers a restart action and displays the updated score after an answer", async () => {
+    const userId = "12345678901234569";
+    const sessionId = "22345678-9012-3456-7890-123456789012";
+    const presentationId = "42345678-9012-3456-7890-123456789012";
+    const answer = vi.fn().mockResolvedValue({
+      mode: "practice",
+      isCorrect: false,
+      correctOptionKey: "B",
+      correctOptionText: {
+        en: "Amazon S3",
+        "pt-BR": "Amazon S3",
+      },
+      explanation: {
+        en: "Amazon S3 stores objects.",
+        "pt-BR": "O Amazon S3 armazena objetos.",
+      },
+      services: ["Amazon S3"],
+      correctCount: 0,
+      incorrectCount: 1,
+    });
+    const interaction = {
+      isChatInputCommand: () => false,
+      isButton: () => true,
+      isStringSelectMenu: () => false,
+      customId: `a:${sessionId}:${presentationId}:${userId}:A`,
+      channelId,
+      guildId,
+      user: { id: userId },
+      deferUpdate: vi.fn().mockResolvedValue(undefined),
+      editReply: vi.fn().mockResolvedValue(undefined),
+    };
+    channelSettings.getSettings.mockResolvedValue({
+      practiceChannelId: channelId,
+      tipsChannelId: null,
+    });
+
+    await handleDiscordInteraction(interaction as unknown as Interaction, {
+      ...services,
+      practice: {
+        answer,
+      } as unknown as Parameters<
+        typeof handleDiscordInteraction
+      >[1]["practice"],
+    });
+
+    expect(answer).toHaveBeenCalledWith(userId, sessionId, presentationId, "A");
+    const reply = interaction.editReply.mock.calls[0]?.[0];
+    expect(reply).toEqual(
+      expect.objectContaining({
+        embeds: [
+          expect.objectContaining({
+            data: expect.objectContaining({
+              description: expect.stringContaining(
+                "**Corretas:** 0 · **Erradas:** 1",
+              ),
+            }),
+          }),
+        ],
+      }),
+    );
+    const actionRow = reply?.components?.[0]?.toJSON();
+    expect(actionRow?.components).toEqual([
+      expect.objectContaining({ label: "Próxima pergunta" }),
+      expect.objectContaining({ label: "Recomeçar prática" }),
+    ]);
   });
 });
 

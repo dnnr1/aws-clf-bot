@@ -123,7 +123,7 @@ function createPracticePanel(): EmbedBuilder {
       {
         name: "Praticar",
         value:
-          "Clique no botão abaixo ou use `/practice` para responder questões individuais.\n`/exam` inicia uma simulação de 65 questões em até 90 minutos.",
+          "Clique no botão abaixo para iniciar uma sessão contínua de questões individuais.\n`/exam` inicia uma simulação cronometrada de 65 questões em 90 minutos.",
       },
       {
         name: "Comandos",

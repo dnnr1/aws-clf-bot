@@ -28,6 +28,7 @@ const sourceSchema = z.object({
 const questionSchema = z
   .object({
     id: z.string().uuid(),
+    familyId: z.string().trim().min(1).max(80),
     certificationId: z.string().trim().min(1),
     domainId: z.string().trim().min(1),
     difficulty: z.enum(["easy", "medium", "hard"]),

@@ -6,12 +6,14 @@ import type {
 
 export interface StartedPracticeSession {
   sessionId: string;
+  presentationId: string;
   question: StudyQuestion;
   correctCount: number;
   incorrectCount: number;
 }
 
 export interface PresentedQuestion {
+  presentationId: string;
   question: StudyQuestion;
   mode: "practice" | "exam_simulation";
   position: number;
@@ -31,6 +33,10 @@ export interface StartedExamSession extends PresentedQuestion {
 
 export interface PracticeRepository {
   startSession(discordUserId: string): Promise<StartedPracticeSession>;
+  restartSession(
+    discordUserId: string,
+    sessionId: string,
+  ): Promise<StartedPracticeSession>;
   startExam(discordUserId: string): Promise<StartedExamSession>;
   getNextQuestion(
     discordUserId: string,
@@ -39,7 +45,7 @@ export interface PracticeRepository {
   submitAnswer(
     discordUserId: string,
     sessionId: string,
-    questionId: string,
+    presentationId: string,
     optionKey: AnswerOptionKey,
   ): Promise<AnswerFeedback>;
 }

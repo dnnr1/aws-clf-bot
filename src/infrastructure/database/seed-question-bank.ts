@@ -23,6 +23,7 @@ export async function seedQuestionBank(
         .insert(questions)
         .values({
           id: question.id,
+          familyId: question.familyId,
           certificationId: question.certificationId,
           domainId: question.domainId,
           difficulty: question.difficulty,

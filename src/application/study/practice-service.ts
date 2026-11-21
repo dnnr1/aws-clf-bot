@@ -15,6 +15,13 @@ export class PracticeService {
     return this.repository.startSession(discordUserId);
   }
 
+  restart(
+    discordUserId: string,
+    sessionId: string,
+  ): Promise<StartedPracticeSession> {
+    return this.repository.restartSession(discordUserId, sessionId);
+  }
+
   startExam(discordUserId: string): Promise<StartedExamSession> {
     return this.repository.startExam(discordUserId);
   }
@@ -29,7 +36,7 @@ export class PracticeService {
   async answer(
     discordUserId: string,
     sessionId: string,
-    questionId: string,
+    presentationId: string,
     optionKey: unknown,
   ): Promise<AnswerFeedback> {
     if (!isAnswerOptionKey(optionKey)) {
@@ -39,7 +46,7 @@ export class PracticeService {
     return this.repository.submitAnswer(
       discordUserId,
       sessionId,
-      questionId,
+      presentationId,
       optionKey,
     );
   }

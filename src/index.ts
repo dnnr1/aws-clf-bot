@@ -148,10 +148,17 @@ async function startBot(): Promise<void> {
       const settings = await channelSettings.getSettings(guild.id);
 
       if (settings.practiceChannelId) {
-        await services.maintainPracticePanel(
-          guild.id,
-          settings.practiceChannelId,
-        );
+        try {
+          await services.maintainPracticePanel(
+            guild.id,
+            settings.practiceChannelId,
+          );
+        } catch (error) {
+          logger.error("discord.practice_panel_maintenance_failed", error, {
+            channelId: settings.practiceChannelId,
+            guildId: guild.id,
+          });
+        }
       }
     }
     stopDailyTipScheduler = startDailyTipScheduler(
