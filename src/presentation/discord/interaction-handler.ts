@@ -69,7 +69,7 @@ const unauthorizedComponentMessage =
 const invalidSelectionMessage =
   "Choose one of the listed languages. / Escolha um dos idiomas disponíveis.";
 const invalidPracticeComponentMessage =
-  "This study control is invalid. Use the practice channel to start again. / Este controle de estudo é inválido. Use o canal de prática para recomeçar.";
+  "This study control is invalid. Use the practice panel to start again. / Este controle de estudo é inválido. Use o painel de prática para recomeçar.";
 const successColor = 0x2ecc71;
 const errorColor = 0xe74c3c;
 const infoColor = 0x3498db;
@@ -84,6 +84,7 @@ const practiceMessages: Record<
     correctCount: string;
     incorrectCount: string;
     explanation: string;
+    noQuestions: string;
     sessionComplete: string;
     examNotAvailable: string;
     examExpired: string;
@@ -97,6 +98,8 @@ const practiceMessages: Record<
     correctCount: "Correct",
     incorrectCount: "Incorrect",
     explanation: "Explanation",
+    noQuestions:
+      "No study questions are available yet. Please try again later.",
     sessionComplete: "This study session is complete.",
     examNotAvailable:
       "The exam requires 65 active questions with the required domain distribution. The question bank is still being populated; please try again later.",
@@ -110,6 +113,8 @@ const practiceMessages: Record<
     correctCount: "Corretas",
     incorrectCount: "Erradas",
     explanation: "Explicação",
+    noQuestions:
+      "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.",
     sessionComplete: "Esta sessão de estudos foi concluída.",
     examNotAvailable:
       "O exame exige 65 questões ativas com a distribuição necessária entre os domínios. O banco de questões ainda está sendo preenchido; tente novamente mais tarde.",
@@ -190,8 +195,8 @@ export async function handleDiscordInteraction(
   }
 
   if (interaction.isButton()) {
-    if (interaction.customId.startsWith("c:")) {
-      await handleChannelPracticeAnswer(interaction, services);
+    if (interaction.customId === "start-practice") {
+      await startPracticeSession(interaction, services);
     } else if (interaction.customId.startsWith("a:")) {
       await handleAnswerButton(interaction, services);
     } else if (interaction.customId.startsWith("n:")) {
@@ -210,67 +215,39 @@ export async function handleDiscordInteraction(
   }
 }
 
-async function handleChannelPracticeAnswer(
+async function startPracticeSession(
   interaction: ButtonInteraction,
   services: DiscordServices,
 ): Promise<void> {
-  const match =
-    /^c:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}):([A-D])$/i.exec(
-      interaction.customId,
-    );
-
-  if (!match?.[1] || !match[2]) {
-    await interaction.reply({
-      embeds: [
-        createStatusEmbed(
-          "Controle inválido / Invalid control",
-          invalidPracticeComponentMessage,
-          errorColor,
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const locale = await services.preferences.getLocale(interaction.user.id);
 
   try {
-    const result = await services.practice.answerChannelQuestion(
-      interaction.user.id,
-      match[1],
-      match[2],
+    const session = await services.practice.start(interaction.user.id);
+    await interaction.editReply(
+      renderQuestion(
+        session.sessionId,
+        interaction.user.id,
+        session.question,
+        locale,
+        session,
+      ),
     );
-    const { sessionId } = result;
-    const answer = result.feedback;
-    const status = answer.isCorrect
-      ? practiceMessages[locale].answerCorrect
-      : practiceMessages[locale].answerIncorrect;
-
-    await interaction.editReply({
-      embeds: [
-        createStatusEmbed(
-          status,
-          `${renderAnswerCounts(answer, locale)}\n\n${answer.correctOptionKey}. ${formatServiceMentions(answer.correctOptionText[locale], answer.services)}\n\n${practiceMessages[locale].explanation}: ${formatServiceMentions(answer.explanation[locale], answer.services)}`,
-          answer.isCorrect ? successColor : errorColor,
-        ),
-      ],
-      components: [
-        renderPracticeActions(sessionId, interaction.user.id, locale),
-      ],
-    });
   } catch (error) {
-    if (error instanceof PracticeError) {
+    if (
+      error instanceof PracticeError &&
+      error.code === "no_questions_available"
+    ) {
       await interaction.editReply({
         embeds: [
           createStatusEmbed(
-            locale === "en" ? "Practice error" : "Erro na prática",
-            getPracticeErrorMessage(error, locale),
+            locale === "en"
+              ? "No questions available"
+              : "Sem questões disponíveis",
+            practiceMessages[locale].noQuestions,
             errorColor,
           ),
         ],
-        components: [],
       });
       return;
     }

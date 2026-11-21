@@ -14,7 +14,6 @@ import { PracticeError } from "../../application/study/practice-error.js";
 import type {
   PracticeRepository,
   PresentedQuestion,
-  StartedPracticeAnswer,
   StartedExamSession,
   StartedPracticeSession,
 } from "../../application/study/practice-repository.js";
@@ -58,75 +57,10 @@ interface LoadedQuestion {
 export class DrizzlePracticeRepository implements PracticeRepository {
   constructor(private readonly database: BotDatabase) {}
 
-  async startSessionWithAnswer(
-    discordUserId: string,
-    questionId: string,
-    optionKey: AnswerOptionKey,
-  ): Promise<StartedPracticeAnswer> {
-    return this.database.transaction(async (transaction) => {
-      const session = await createPracticeSession(
-        transaction,
-        discordUserId,
-        questionId,
-      );
-      const loaded = await loadQuestion(transaction, questionId);
-      const selectedOption = loaded.question.options.find(
-        (option) => option.key === optionKey,
-      );
-
-      if (!selectedOption) {
-        throw new PracticeError("invalid_option");
-      }
-
-      const isCorrect = optionKey === loaded.correctOptionKey;
-      await transaction.insert(userAnswers).values({
-        sessionId: session.sessionId,
-        sessionQuestionId: session.presentationId,
-        questionId,
-        selectedOptionKey: optionKey,
-        isCorrect,
-      });
-
-      const answerCounts = await getSessionAnswerCounts(
-        transaction,
-        session.sessionId,
-      );
-      return {
-        sessionId: session.sessionId,
-        feedback: {
-          mode: "practice",
-          isCorrect,
-          correctOptionKey: loaded.correctOptionKey,
-          correctOptionText: loaded.correctOptionText,
-          explanation: loaded.explanation,
-          services: loaded.question.services,
-          ...answerCounts,
-        },
-      };
-    });
-  }
-
-  async getRandomQuestion(): Promise<StudyQuestion> {
-    return this.database.transaction(async (transaction) => {
-      const [candidate] = await transaction
-        .select({ id: questions.id })
-        .from(questions)
-        .where(
-          and(
-            eq(questions.certificationId, "aws-clf-c02"),
-            eq(questions.isActive, true),
-          ),
-        )
-        .orderBy(sql`random()`)
-        .limit(1);
-
-      if (!candidate) {
-        throw new PracticeError("no_questions_available");
-      }
-
-      const loaded = await loadQuestion(transaction, candidate.id);
-      return loaded.question;
-    });
+  async startSession(discordUserId: string): Promise<StartedPracticeSession> {
+    return this.database.transaction((transaction) =>
+      createPracticeSession(transaction, discordUserId),
+    );
   }
 
   async restartSession(
@@ -573,21 +507,18 @@ export class DrizzlePracticeRepository implements PracticeRepository {
 async function createPracticeSession(
   transaction: BotTransaction,
   discordUserId: string,
-  initialQuestionId?: string,
 ): Promise<StartedPracticeSession> {
-  const questionQuery = transaction
+  const [candidate] = await transaction
     .select({ id: questions.id })
     .from(questions)
     .where(
       and(
         eq(questions.certificationId, "aws-clf-c02"),
         eq(questions.isActive, true),
-        initialQuestionId ? eq(questions.id, initialQuestionId) : undefined,
       ),
-    );
-  const [candidate] = await (
-    initialQuestionId ? questionQuery : questionQuery.orderBy(sql`random()`)
-  ).limit(1);
+    )
+    .orderBy(sql`random()`)
+    .limit(1);
 
   if (!candidate) {
     throw new PracticeError("no_questions_available");

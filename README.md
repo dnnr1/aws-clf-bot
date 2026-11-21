@@ -70,7 +70,7 @@ Server administrators can set channels without restarting the bot:
 
 These settings are stored per server and override the optional `.env` defaults. Only server administrators can run these commands, and the selected channel must be a text channel in the same server.
 
-The practice channel automatically displays a question in its persistent introduction panel; there is no **Start practice** button or `/practice` command. Selecting an option starts your private, continuous session and answers that question. Correct/incorrect feedback and your score are shown only after you answer. Related service names are highlighted in question prompts, not in answer options. The session cycles through the question bank without ending and offers **Next question** and **Restart practice** controls. Moving to the next question clears the previous answer feedback.
+The practice channel contains a persistent introduction panel with an **Iniciar os exercícios / Start exercises** button. Clicking it starts your private, continuous session; no `/practice` command is required. Correct/incorrect feedback appears only after you select an answer, and moving to the next question clears the previous feedback. Related service names are highlighted in question prompts, not in answer options. The session cycles through the question bank without ending and offers **Next question** and **Restart practice** controls.
 
 The tips channel receives an initial sourced tip when the bot starts or an administrator configures the channel, followed by up to three tips per UTC day.
 

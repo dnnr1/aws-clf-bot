@@ -31,18 +31,8 @@ export interface StartedExamSession extends PresentedQuestion {
   expiresAt: Date;
 }
 
-export interface StartedPracticeAnswer {
-  sessionId: string;
-  feedback: AnswerFeedback;
-}
-
 export interface PracticeRepository {
-  startSessionWithAnswer(
-    discordUserId: string,
-    questionId: string,
-    optionKey: AnswerOptionKey,
-  ): Promise<StartedPracticeAnswer>;
-  getRandomQuestion(): Promise<StudyQuestion>;
+  startSession(discordUserId: string): Promise<StartedPracticeSession>;
   restartSession(
     discordUserId: string,
     sessionId: string,

@@ -8,16 +8,12 @@ import {
   type Client,
 } from "discord.js";
 import type { BotChannelMessageRepository } from "../../application/discord/bot-channel-message-repository.js";
-import type { PracticeService } from "../../application/study/practice-service.js";
-import type { StudyQuestion } from "../../domain/study/question.js";
-import { formatServiceMentions } from "./service-mentions.js";
 
 export async function maintainPracticeChannelPanel(
   client: Client,
   guildId: string,
   channelId: string,
   messages: BotChannelMessageRepository,
-  practice: PracticeService,
 ): Promise<void> {
   const channel = await client.channels.fetch(channelId);
 
@@ -33,8 +29,7 @@ export async function maintainPracticeChannelPanel(
 
   const practicePanelKey = `practice-introduction-${guildId}`;
   const storedMessage = await messages.findMessage(practicePanelKey);
-  const question = await practice.getRandomQuestion();
-  const panelMessage = createPracticePanelMessage(question);
+  const panelMessage = createPracticePanelMessage();
 
   if (storedMessage?.channelId === channel.id) {
     try {
@@ -104,39 +99,17 @@ async function removePreviousPanel(
   await message.delete();
 }
 
-function createPracticePanelMessage(question: StudyQuestion) {
-  const answerButtons = question.options.map((option) =>
-    new ButtonBuilder()
-      .setCustomId(`c:${question.id}:${option.key}`)
-      .setLabel(option.key)
-      .setStyle(ButtonStyle.Primary),
-  );
-  const answerRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    answerButtons,
-  );
-  const practiceQuestion = new EmbedBuilder()
-    .setColor(0x3498db)
-    .setTitle("Questão de prática / Practice question")
-    .setDescription(
-      [
-        "**Português (Brasil)**",
-        formatServiceMentions(question.prompt["pt-BR"], question.services),
-        question.options
-          .map((option) => `**${option.key}.** ${option.text["pt-BR"]}`)
-          .join("\n"),
-        "**English**",
-        formatServiceMentions(question.prompt.en, question.services),
-        question.options
-          .map((option) => `**${option.key}.** ${option.text.en}`)
-          .join("\n"),
-      ].join("\n\n"),
-    )
-    .setFooter({
-      text: "Selecione uma opção para responder em particular / Select an option to answer privately",
-    });
+function createPracticePanelMessage() {
+  const startButton = new ButtonBuilder()
+    .setCustomId("start-practice")
+    .setLabel("Iniciar os exercícios / Start exercises")
+    .setStyle(ButtonStyle.Success);
+
   return {
-    embeds: [createPracticePanel(), practiceQuestion],
-    components: [answerRow],
+    embeds: [createPracticePanel()],
+    components: [
+      new ActionRowBuilder<ButtonBuilder>().addComponents(startButton),
+    ],
     allowedMentions: { parse: [] },
   };
 }
@@ -146,7 +119,7 @@ function createPracticePanel(): EmbedBuilder {
     .setColor(0x5865f2)
     .setTitle("Boas-vindas ao AWS CLF Study Bot")
     .setDescription(
-      "A prática começa automaticamente abaixo. Selecione uma resposta para iniciar sua sessão contínua e privada.",
+      "Clique em **Iniciar os exercícios** para começar sua sessão contínua e privada.",
     )
     .addFields(
       {
@@ -162,7 +135,7 @@ function createPracticePanel(): EmbedBuilder {
       {
         name: "Welcome",
         value:
-          "Practice starts automatically. Select an option to start your own continuous private session.",
+          "Click **Start exercises** to begin your own private, continuous practice session.",
       },
     );
 }

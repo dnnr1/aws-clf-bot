@@ -120,7 +120,6 @@ async function startBot(): Promise<void> {
           guildId,
           channelId,
           botChannelMessages,
-          practice,
         ),
       publishImmediateTip: (guildId: string, channelId: string) =>
         publishImmediateDailyTip(

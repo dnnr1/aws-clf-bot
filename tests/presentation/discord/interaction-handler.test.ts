@@ -156,31 +156,35 @@ describe("channel configuration commands", () => {
 });
 
 describe("practice panel interaction", () => {
-  it("starts a private session and reveals correctness only after an option is selected", async () => {
+  it("starts a private practice session when the exercise button is clicked", async () => {
     const userId = "12345678901234569";
     const sessionId = "22345678-9012-3456-7890-123456789012";
-    const questionId = "32345678-9012-3456-7890-123456789012";
-    const answerChannelQuestion = vi.fn().mockResolvedValue({
+    const start = vi.fn().mockResolvedValue({
       sessionId,
-      feedback: {
-        mode: "practice",
-        isCorrect: false,
-        correctOptionKey: "B",
-        correctOptionText: { en: "Amazon EC2", "pt-BR": "Amazon EC2" },
-        explanation: {
-          en: "Amazon S3 stores objects.",
-          "pt-BR": "O Amazon S3 armazena objetos.",
+      presentationId: "42345678-9012-3456-7890-123456789012",
+      correctCount: 0,
+      incorrectCount: 0,
+      question: {
+        id: "32345678-9012-3456-7890-123456789012",
+        domainId: "cloud-technology-services",
+        prompt: {
+          en: "Which service stores objects in Amazon S3?",
+          "pt-BR": "Qual serviço armazena objetos no Amazon S3?",
         },
+        options: [
+          { key: "A", text: { en: "Amazon S3", "pt-BR": "Amazon S3" } },
+          { key: "B", text: { en: "Amazon EC2", "pt-BR": "Amazon EC2" } },
+          { key: "C", text: { en: "AWS Lambda", "pt-BR": "AWS Lambda" } },
+          { key: "D", text: { en: "Amazon RDS", "pt-BR": "Amazon RDS" } },
+        ],
         services: ["Amazon S3"],
-        correctCount: 0,
-        incorrectCount: 1,
       },
     });
     const interaction = {
       isChatInputCommand: () => false,
       isButton: () => true,
       isStringSelectMenu: () => false,
-      customId: `c:${questionId}:A`,
+      customId: "start-practice",
       channelId,
       guildId,
       user: { id: userId },
@@ -196,7 +200,7 @@ describe("practice panel interaction", () => {
     await handleDiscordInteraction(interaction as unknown as Interaction, {
       ...services,
       practice: {
-        answerChannelQuestion,
+        start,
       } as unknown as Parameters<
         typeof handleDiscordInteraction
       >[1]["practice"],
@@ -205,20 +209,14 @@ describe("practice panel interaction", () => {
     expect(interaction.deferReply).toHaveBeenCalledWith({
       flags: MessageFlags.Ephemeral,
     });
-    expect(answerChannelQuestion).toHaveBeenCalledWith(userId, questionId, "A");
+    expect(start).toHaveBeenCalledWith(userId);
     expect(interaction.reply).not.toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        embeds: [
-          expect.objectContaining({
-            data: expect.objectContaining({
-              title: "Não foi dessa vez.",
-              description: expect.stringContaining(
-                "**Corretas:** 0 · **Erradas:** 1",
-              ),
-            }),
-          }),
-        ],
+        content: expect.stringContaining(
+          "Qual serviço armazena objetos no `Amazon S3`?",
+        ),
+        embeds: [],
       }),
     );
   });
