@@ -2,8 +2,10 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelType,
   EmbedBuilder,
   MessageFlags,
+  PermissionFlagsBits,
   StringSelectMenuBuilder,
   type ButtonInteraction,
   type ChatInputCommandInteraction,
@@ -15,6 +17,7 @@ import {
   type UserLocale,
 } from "../../domain/users/user-locale.js";
 import type { UserPreferencesService } from "../../application/users/user-preferences-service.js";
+import type { GuildChannelSettingsService } from "../../application/discord/guild-channel-settings-service.js";
 import { PracticeError } from "../../application/study/practice-error.js";
 import type { PresentedQuestion } from "../../application/study/practice-repository.js";
 import type { PracticeService } from "../../application/study/practice-service.js";
@@ -34,6 +37,8 @@ const helpMessages: Record<UserLocale, string> = {
     "`/practice` - Start an AWS question practice session.",
     "`/exam` - Start a timed 65-question exam.",
     "`/stats` - Show your study statistics.",
+    "`/set-practice-channel` - Set the practice channel (server admins).",
+    "`/set-tips-channel` - Set the daily tips channel (server admins).",
   ].join("\n"),
   "pt-BR": [
     "**Comandos disponíveis**",
@@ -42,6 +47,8 @@ const helpMessages: Record<UserLocale, string> = {
     "`/practice` - Inicie uma sessão de prática com questões da AWS.",
     "`/exam` - Inicie uma simulação de exame com 65 questões.",
     "`/stats` - Exiba suas estatísticas de estudo.",
+    "`/set-practice-channel` - Defina o canal de prática (administradores).",
+    "`/set-tips-channel` - Defina o canal de dicas (administradores).",
   ].join("\n"),
 };
 
@@ -110,9 +117,10 @@ const practiceMessages: Record<
 
 interface DiscordServices {
   preferences: UserPreferencesService;
+  channelSettings: GuildChannelSettingsService;
   practice: PracticeService;
   statistics: StatisticsService;
-  practiceChannelId: string;
+  maintainPracticePanel: (guildId: string, channelId: string) => Promise<void>;
 }
 
 export async function handleDiscordInteraction(
@@ -120,28 +128,48 @@ export async function handleDiscordInteraction(
   services: DiscordServices,
 ): Promise<void> {
   if (
-    (interaction.isChatInputCommand() ||
-      interaction.isButton() ||
-      (interaction.isStringSelectMenu() &&
-        interaction.customId.startsWith("language:"))) &&
-    interaction.channelId !== services.practiceChannelId
+    interaction.isChatInputCommand() &&
+    (interaction.commandName === "set-practice-channel" ||
+      interaction.commandName === "set-tips-channel")
   ) {
-    const locale = await services.preferences.getLocale(interaction.user.id);
-    await interaction.reply({
-      embeds: [
-        createStatusEmbed(
-          locale === "en"
-            ? "Use the practice channel"
-            : "Use o canal de prática",
-          locale === "en"
-            ? "Study commands are available only in the configured practice channel."
-            : "Os comandos de estudo só estão disponíveis no canal de prática configurado.",
-          errorColor,
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
+    await handleSetChannelCommand(interaction, services);
     return;
+  }
+
+  const isPracticeInteraction =
+    interaction.isChatInputCommand() ||
+    interaction.isButton() ||
+    (interaction.isStringSelectMenu() &&
+      interaction.customId.startsWith("language:"));
+
+  if (isPracticeInteraction) {
+    const practiceChannelId = await getPracticeChannelId(interaction, services);
+
+    if (practiceChannelId !== interaction.channelId) {
+      const locale = await services.preferences.getLocale(interaction.user.id);
+      await interaction.reply({
+        embeds: [
+          createStatusEmbed(
+            practiceChannelId
+              ? locale === "en"
+                ? "Use the practice channel"
+                : "Use o canal de prática"
+              : locale === "en"
+                ? "Practice channel not configured"
+                : "Canal de prática não configurado",
+            practiceChannelId
+              ? locale === "en"
+                ? `Study commands are available only in <#${practiceChannelId}>.`
+                : `Os comandos de estudo só estão disponíveis em <#${practiceChannelId}>.`
+              : locale === "en"
+                ? "A server administrator must configure a practice channel with `/set-practice-channel`."
+                : "Um administrador do servidor precisa configurar o canal com `/set-practice-channel`.",
+            errorColor,
+          ),
+        ],
+      });
+      return;
+    }
   }
 
   if (interaction.isChatInputCommand()) {
@@ -176,6 +204,87 @@ export async function handleDiscordInteraction(
   ) {
     await handleLanguageSelection(interaction, services.preferences);
   }
+}
+
+async function getPracticeChannelId(
+  interaction: Interaction,
+  services: DiscordServices,
+): Promise<string | null> {
+  if (!interaction.guildId) {
+    return null;
+  }
+
+  const settings = await services.channelSettings.getSettings(
+    interaction.guildId,
+  );
+  return settings.practiceChannelId;
+}
+
+async function handleSetChannelCommand(
+  interaction: ChatInputCommandInteraction,
+  services: DiscordServices,
+): Promise<void> {
+  const guildId = interaction.guildId;
+  const isAdministrator =
+    interaction.memberPermissions?.has(PermissionFlagsBits.Administrator) ??
+    false;
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const locale = await services.preferences.getLocale(interaction.user.id);
+
+  if (!guildId || !isAdministrator) {
+    await interaction.editReply({
+      embeds: [
+        createStatusEmbed(
+          locale === "en" ? "Administrator only" : "Somente administradores",
+          locale === "en"
+            ? "Only a server administrator can configure bot channels."
+            : "Somente um administrador do servidor pode configurar os canais do bot.",
+          errorColor,
+        ),
+      ],
+    });
+    return;
+  }
+
+  const channel = interaction.options.getChannel("channel", true);
+
+  if (
+    !("guildId" in channel) ||
+    channel.type !== ChannelType.GuildText ||
+    channel.guildId !== guildId
+  ) {
+    await interaction.editReply({
+      embeds: [
+        createStatusEmbed(
+          locale === "en" ? "Invalid channel" : "Canal inválido",
+          locale === "en"
+            ? "Choose a text channel from this server."
+            : "Escolha um canal de texto deste servidor.",
+          errorColor,
+        ),
+      ],
+    });
+    return;
+  }
+
+  if (interaction.commandName === "set-practice-channel") {
+    await services.channelSettings.setPracticeChannel(guildId, channel.id);
+    await services.maintainPracticePanel(guildId, channel.id);
+  } else {
+    await services.channelSettings.setTipsChannel(guildId, channel.id);
+  }
+
+  await interaction.editReply({
+    embeds: [
+      createStatusEmbed(
+        locale === "en" ? "Channel updated" : "Canal atualizado",
+        locale === "en"
+          ? `${interaction.commandName === "set-practice-channel" ? "Practice" : "Daily tips"} channel is now <#${channel.id}>.`
+          : `O canal de ${interaction.commandName === "set-practice-channel" ? "prática" : "dicas diárias"} agora é <#${channel.id}>.`,
+        successColor,
+      ),
+    ],
+  });
 }
 
 async function handleStatsCommand(

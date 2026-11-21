@@ -6,8 +6,14 @@ const environmentSchema = z.object({
     .string()
     .regex(/^\d{17,20}$/)
     .optional(),
-  DISCORD_PRACTICE_CHANNEL_ID: z.string().regex(/^\d{17,20}$/),
-  DISCORD_TIPS_CHANNEL_ID: z.string().regex(/^\d{17,20}$/),
+  DISCORD_PRACTICE_CHANNEL_ID: z
+    .string()
+    .regex(/^\d{17,20}$/)
+    .optional(),
+  DISCORD_TIPS_CHANNEL_ID: z
+    .string()
+    .regex(/^\d{17,20}$/)
+    .optional(),
   DATABASE_URL: z
     .string()
     .url()

@@ -8,20 +8,22 @@ export class DrizzleDailyTipPublicationRepository implements DailyTipPublication
 
   async claimPublication(
     dateUtc: string,
+    guildId: string,
     slot: number,
     tipId: string,
   ): Promise<boolean> {
     const [publication] = await this.database
       .insert(dailyTipPublications)
-      .values({ tipDate: dateUtc, slot, tipId })
+      .values({ tipDate: dateUtc, guildId, slot, tipId })
       .onConflictDoNothing()
-      .returning({ tipDate: dailyTipPublications.tipDate });
+      .returning({ guildId: dailyTipPublications.guildId });
 
     return publication !== undefined;
   }
 
   async markPublicationSent(
     dateUtc: string,
+    guildId: string,
     slot: number,
     messageId: string,
   ): Promise<void> {
@@ -31,6 +33,7 @@ export class DrizzleDailyTipPublicationRepository implements DailyTipPublication
       .where(
         and(
           eq(dailyTipPublications.tipDate, dateUtc),
+          eq(dailyTipPublications.guildId, guildId),
           eq(dailyTipPublications.slot, slot),
         ),
       );

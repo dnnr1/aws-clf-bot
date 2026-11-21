@@ -29,7 +29,7 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 
 ### Application
 
-- Orchestrate use cases: start a mode, fetch the next question, submit an answer, complete a session, change locale, and query statistics.
+- Orchestrate use cases: start a mode, fetch the next question, submit an answer, complete a session, change locale, configure server channels, and query statistics.
 - Define repository and service ports needed by each use case.
 - Own transaction boundaries for operations that change related records together.
 - Return transport-independent results that the Discord presentation layer can render.
@@ -37,6 +37,7 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 ### Infrastructure
 
 - Implement repositories with Drizzle and PostgreSQL, schema migrations, indexes, and database constraints.
+- Persist per-server practice/tips channel overrides and expose optional environment defaults.
 - Load validated question-bank records without coupling question content to application logic.
 - Manage the persistent practice-channel introduction and scheduled, data-driven learning tips through Discord adapters.
 - Validate environment variables, provide structured logging, and manage database/client lifecycle.
@@ -45,6 +46,7 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 ### Discord presentation
 
 - Initialize the Discord.js client, register slash commands, and route commands and component interactions to application use cases.
+- Restrict channel configuration commands to server administrators at registration and runtime; accept only text channels from the invoking server.
 - Restrict study commands and components to the configured practice channel, while keeping all individual study replies ephemeral.
 - Convert Discord payloads into validated application inputs; format results as localized messages, embeds, and buttons.
 - Keep authorization, interaction ownership checks, Discord response timing, and expired-interaction handling at this boundary, backed by application/session validation.
@@ -56,6 +58,9 @@ Use normalized relational tables, with exact columns and constraints to be defin
 
 - `users`: Discord user identity and lifecycle metadata.
 - `user_preferences`: selected locale and other user-level settings.
+- `guild_channel_settings`: per-server practice and tips channel overrides.
+- `bot_channel_messages`: persistent IDs for bot-managed channel panels.
+- `daily_tip_publications`: per-server UTC slot claims that prevent duplicate tips.
 - `questions` and `question_options`: domain, difficulty, localized prompts/options/explanations, answer key, objectives, services, and source references.
 - `study_sessions`: owner, mode, state, start/end timestamps, and any persisted question order needed to resume a session consistently.
 - `user_answers`: accepted answer, correctness, and answer timestamp linked to a session and question.
@@ -84,6 +89,7 @@ Compute totals, accuracy, streaks, session history, and domain performance from 
 ## Cross-cutting decisions
 
 - **Localization:** Resolve a user's stored locale at the application/presentation boundary; keep domain outcomes language-neutral.
+- **Channel configuration:** Resolve per-server database overrides before optional environment defaults; cache settings after startup and update them on administrator commands.
 - **Validation:** Use Zod at environment, Discord input, and question-ingestion boundaries. Domain invariants still need enforcement in domain/application logic.
 - **Concurrency:** Back application checks with database uniqueness/transaction guarantees for answer submission and daily attempts.
 - **Reliability:** Handle Discord interaction expiry and API errors explicitly; close the database and Discord client during graceful shutdown.

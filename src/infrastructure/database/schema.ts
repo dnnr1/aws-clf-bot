@@ -51,6 +51,15 @@ export const botChannelMessages = pgTable("bot_channel_messages", {
     .defaultNow(),
 });
 
+export const guildChannelSettings = pgTable("guild_channel_settings", {
+  guildId: varchar("guild_id", { length: 20 }).primaryKey(),
+  practiceChannelId: varchar("practice_channel_id", { length: 20 }),
+  tipsChannelId: varchar("tips_channel_id", { length: 20 }),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const examDomains = pgTable(
   "exam_domains",
   {
@@ -334,6 +343,7 @@ export const dailyTipPublications = pgTable(
   "daily_tip_publications",
   {
     tipDate: date("tip_date", { mode: "string" }).notNull(),
+    guildId: varchar("guild_id", { length: 20 }).notNull(),
     slot: smallint("slot").notNull(),
     tipId: varchar("tip_id", { length: 48 }).notNull(),
     messageId: varchar("message_id", { length: 20 }),
@@ -343,9 +353,10 @@ export const dailyTipPublications = pgTable(
       .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.tipDate, table.slot] }),
+    primaryKey({ columns: [table.tipDate, table.guildId, table.slot] }),
     unique("daily_tip_publications_date_tip_unique").on(
       table.tipDate,
+      table.guildId,
       table.tipId,
     ),
     check(

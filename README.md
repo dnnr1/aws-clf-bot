@@ -23,7 +23,7 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
    Copy-Item .env.example .env
    ```
 
-   Set both channel IDs to the Discord text channels used for practice and tips. The bot needs permission to view/send messages and embed links in both channels, plus read message history in the practice channel to maintain its introduction panel. Users need permission to use application commands. Keep `.env` private. Never commit it or share the Discord token. The committed `.env.example` contains placeholders only.
+   The channel IDs are optional environment defaults. When configured, they must refer to text channels in `DISCORD_GUILD_ID` (or in the same server when that ID is omitted). Otherwise, a server administrator can configure channels in Discord. The bot needs permission to view/send messages and embed links in both channels, plus read message history in the practice channel to maintain its introduction panel. Users need permission to use application commands. Keep `.env` private. Never commit it or share the Discord token. The committed `.env.example` contains placeholders only.
 
 3. From a WSL terminal, start PostgreSQL in the project directory:
 
@@ -33,7 +33,7 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
 
    The database is bound to localhost. If port `5432` is already in use, set `POSTGRES_PORT` in `.env` to an available local port and update the port in `DATABASE_URL` to match. The Node.js commands below can run in Windows and connect through WSL's localhost forwarding.
 
-4. Apply the initial database migration:
+4. Apply database migrations:
 
    ```powershell
    npm run db:migrate
@@ -42,7 +42,7 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
 
    The seed command validates and inserts the versioned question data in `data/questions/`. Existing question IDs are not overwritten. When the Drizzle schema changes, generate a new migration with `npm run db:generate`, review the SQL, and commit both the schema and migration.
 
-   Exam simulation requires 65 active questions distributed 16/19/22/8 across the four domains. Daily tips are bilingual and scheduled for 12:00, 16:00, and 20:00 UTC; missed slots are not sent later, and failed or ambiguous posts are not retried.
+   Exam simulation requires 65 active questions distributed 16/19/22/8 across the four domains. Daily tips are bilingual and scheduled for 12:00, 16:00, and 20:00 UTC per server; missed slots are not sent later, and failed or ambiguous posts are not retried.
 
 5. Run the available checks:
 
@@ -62,6 +62,13 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
    ```
 
 On startup, the bot checks the database connection and registers its current slash commands. Set `DISCORD_GUILD_ID` to register commands to one development server; leave it unset to register global commands.
+
+Server administrators can set channels without restarting the bot:
+
+- `/set-practice-channel channel:#practice`
+- `/set-tips-channel channel:#tips`
+
+These settings are stored per server and override the optional `.env` defaults. Only server administrators can run these commands, and the selected channel must be a text channel in the same server.
 
 ## Discord MCP
 

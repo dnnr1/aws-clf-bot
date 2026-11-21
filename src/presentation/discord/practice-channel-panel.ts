@@ -1,21 +1,30 @@
-import { DiscordAPIError, EmbedBuilder, type Client } from "discord.js";
+import {
+  ChannelType,
+  DiscordAPIError,
+  EmbedBuilder,
+  type Client,
+} from "discord.js";
 import type { BotChannelMessageRepository } from "../../application/discord/bot-channel-message-repository.js";
-
-const practicePanelKey = "practice-introduction";
 
 export async function maintainPracticeChannelPanel(
   client: Client,
+  guildId: string,
   channelId: string,
   messages: BotChannelMessageRepository,
 ): Promise<void> {
   const channel = await client.channels.fetch(channelId);
 
-  if (!channel?.isSendable()) {
+  if (
+    !channel ||
+    channel.type !== ChannelType.GuildText ||
+    channel.guildId !== guildId
+  ) {
     throw new Error(
-      "DISCORD_PRACTICE_CHANNEL_ID must refer to a text channel the bot can send messages to.",
+      "The practice channel must be a sendable text channel in the configured server.",
     );
   }
 
+  const practicePanelKey = `practice-introduction-${guildId}`;
   const storedMessage = await messages.findMessage(practicePanelKey);
 
   if (storedMessage?.channelId === channel.id) {
@@ -39,6 +48,51 @@ export async function maintainPracticeChannelPanel(
 
   const message = await channel.send({ embeds: [createPracticePanel()] });
   await messages.saveMessage(practicePanelKey, channel.id, message.id);
+
+  if (storedMessage && storedMessage.channelId !== channel.id) {
+    await removePreviousPanel(client, storedMessage);
+  }
+}
+
+async function removePreviousPanel(
+  client: Client,
+  storedMessage: { channelId: string; messageId: string },
+): Promise<void> {
+  let channel;
+
+  try {
+    channel = await client.channels.fetch(storedMessage.channelId);
+  } catch (error) {
+    if (error instanceof DiscordAPIError && error.code === 10003) {
+      return;
+    }
+
+    throw error;
+  }
+
+  if (!channel || channel.type !== ChannelType.GuildText) {
+    return;
+  }
+
+  let message;
+
+  try {
+    message = await channel.messages.fetch(storedMessage.messageId);
+  } catch (error) {
+    if (error instanceof DiscordAPIError && error.code === 10008) {
+      return;
+    }
+
+    throw error;
+  }
+
+  if (message.author.id !== client.user?.id) {
+    throw new Error(
+      "The stored practice introduction message is not owned by this bot.",
+    );
+  }
+
+  await message.delete();
 }
 
 function createPracticePanel(): EmbedBuilder {

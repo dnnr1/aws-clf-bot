@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import {
+  ChannelType,
   Client,
   EmbedBuilder,
   Events,
@@ -9,7 +10,9 @@ import {
 } from "discord.js";
 import { PracticeService } from "./application/study/practice-service.js";
 import { StatisticsService } from "./application/study/statistics-service.js";
+import { GuildChannelSettingsService } from "./application/discord/guild-channel-settings-service.js";
 import { DrizzleBotChannelMessageRepository } from "./infrastructure/database/bot-channel-message-repository.js";
+import { DrizzleGuildChannelSettingsRepository } from "./infrastructure/database/guild-channel-settings-repository.js";
 import { UserPreferencesService } from "./application/users/user-preferences-service.js";
 import { parseEnvironment } from "./infrastructure/config/environment.js";
 import { createDatabase } from "./infrastructure/database/client.js";
@@ -33,6 +36,10 @@ async function startBot(): Promise<void> {
   const tips = parseDailyTipBank(JSON.parse(tipBankContents));
   const { database, pool } = createDatabase(environment.DATABASE_URL);
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+  const botChannelMessages = new DrizzleBotChannelMessageRepository(database);
+  const channelSettingsRepository = new DrizzleGuildChannelSettingsRepository(
+    database,
+  );
   const preferences = new UserPreferencesService(
     new DrizzleUserPreferencesRepository(database),
   );
@@ -40,12 +47,6 @@ async function startBot(): Promise<void> {
   const statistics = new StatisticsService(
     new DrizzleStatisticsRepository(database),
   );
-  const services = {
-    preferences,
-    practice,
-    statistics,
-    practiceChannelId: environment.DISCORD_PRACTICE_CHANNEL_ID,
-  };
   let stopDailyTipScheduler: (() => void) | undefined;
   let shutdownPromise: Promise<void> | undefined;
 
@@ -77,16 +78,6 @@ async function startBot(): Promise<void> {
   client.on(Events.Error, (error) =>
     logger.error("discord.client_error", error),
   );
-  client.on(Events.InteractionCreate, (interaction) => {
-    void handleDiscordInteraction(interaction, services).catch(
-      async (error: unknown) => {
-        logger.error("discord.interaction_failed", error, {
-          interactionId: interaction.id,
-        });
-        await replyToFailedInteraction(interaction);
-      },
-    );
-  });
 
   try {
     await pool.query("select 1");
@@ -98,19 +89,89 @@ async function startBot(): Promise<void> {
       throw new Error("Discord client connected without an application user.");
     }
 
+    const defaultGuildId = await resolveDefaultGuildId(client, environment);
+    const channelSettings = new GuildChannelSettingsService(
+      channelSettingsRepository,
+      {
+        guildId: defaultGuildId,
+        practiceChannelId: environment.DISCORD_PRACTICE_CHANNEL_ID ?? null,
+        tipsChannelId: environment.DISCORD_TIPS_CHANNEL_ID ?? null,
+      },
+    );
+    await Promise.all(
+      [...client.guilds.cache.keys()].map((guildId) =>
+        channelSettings.getSettings(guildId),
+      ),
+    );
+    const services = {
+      preferences,
+      channelSettings,
+      practice,
+      statistics,
+      maintainPracticePanel: (guildId: string, channelId: string) =>
+        maintainPracticeChannelPanel(
+          client,
+          guildId,
+          channelId,
+          botChannelMessages,
+        ),
+    };
+
+    client.on(Events.InteractionCreate, (interaction) => {
+      void handleDiscordInteraction(interaction, services).catch(
+        async (error: unknown) => {
+          logger.error("discord.interaction_failed", error, {
+            interactionId: interaction.id,
+          });
+          client.on(Events.GuildCreate, (guild) => {
+            void channelSettings.getSettings(guild.id).catch((error: unknown) =>
+              logger.error(
+                "discord.guild_channel_settings_load_failed",
+                error,
+                {
+                  guildId: guild.id,
+                },
+              ),
+            );
+          });
+          await replyToFailedInteraction(interaction);
+        },
+      );
+    });
+
     await registerSlashCommands(
       environment.DISCORD_TOKEN,
       applicationId,
       environment.DISCORD_GUILD_ID,
     );
-    await maintainPracticeChannelPanel(
-      client,
-      environment.DISCORD_PRACTICE_CHANNEL_ID,
-      new DrizzleBotChannelMessageRepository(database),
-    );
+    for (const guild of client.guilds.cache.values()) {
+      const settings = await channelSettings.getSettings(guild.id);
+
+      if (settings.practiceChannelId) {
+        await services.maintainPracticePanel(
+          guild.id,
+          settings.practiceChannelId,
+        );
+      }
+    }
     stopDailyTipScheduler = startDailyTipScheduler(
       client,
-      environment.DISCORD_TIPS_CHANNEL_ID,
+      async () => {
+        const destinations = [];
+
+        for (const guild of client.guilds.cache.values()) {
+          const settings = await channelSettings.getSettings(guild.id);
+
+          if (settings.tipsChannelId) {
+            destinations.push({
+              guildId: guild.id,
+              channelId: settings.tipsChannelId,
+            });
+          }
+        }
+
+        return destinations;
+      },
       tips,
       new DrizzleDailyTipPublicationRepository(database),
       logger,
@@ -120,6 +181,39 @@ async function startBot(): Promise<void> {
     await shutdown("startup_failure");
     throw error;
   }
+}
+
+async function resolveDefaultGuildId(
+  client: Client,
+  environment: ReturnType<typeof parseEnvironment>,
+): Promise<string | undefined> {
+  let guildId = environment.DISCORD_GUILD_ID;
+
+  for (const channelId of [
+    environment.DISCORD_PRACTICE_CHANNEL_ID,
+    environment.DISCORD_TIPS_CHANNEL_ID,
+  ]) {
+    if (!channelId) {
+      continue;
+    }
+
+    const channel = await client.channels.fetch(channelId);
+
+    if (!channel || channel.type !== ChannelType.GuildText) {
+      throw new Error(
+        "Environment default channel IDs must refer to text channels.",
+      );
+    }
+    if (guildId && channel.guildId !== guildId) {
+      throw new Error(
+        "Environment default channels must belong to the same configured server.",
+      );
+    }
+
+    guildId = channel.guildId;
+  }
+
+  return guildId;
 }
 
 async function replyToFailedInteraction(

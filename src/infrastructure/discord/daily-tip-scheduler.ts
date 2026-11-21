@@ -1,4 +1,4 @@
-import { EmbedBuilder, type Client } from "discord.js";
+import { ChannelType, EmbedBuilder, type Client } from "discord.js";
 import type { DailyTipPublicationRepository } from "../../application/study/daily-tip-publication-repository.js";
 import type { DailyTip } from "../questions/daily-tip-schema.js";
 import type { Logger } from "../logging/logger.js";
@@ -28,9 +28,14 @@ const domainNames = {
   },
 } as const;
 
+export interface DailyTipDestination {
+  guildId: string;
+  channelId: string;
+}
+
 export function startDailyTipScheduler(
   client: Client,
-  channelId: string,
+  resolveDestinations: () => Promise<DailyTipDestination[]>,
   tips: DailyTip[],
   publications: DailyTipPublicationRepository,
   logger: Logger,
@@ -54,43 +59,65 @@ export function startDailyTipScheduler(
 
       const tip = selectDailyTip(tips, now, slot);
       const dateUtc = now.toISOString().slice(0, 10);
-      const claimed = await publications.claimPublication(
-        dateUtc,
-        slot,
-        tip.id,
-      );
+      const destinations = await resolveDestinations();
 
-      if (!claimed) {
-        return;
+      for (const destination of destinations) {
+        try {
+          const claimed = await publications.claimPublication(
+            dateUtc,
+            destination.guildId,
+            slot,
+            tip.id,
+          );
+
+          if (!claimed) {
+            continue;
+          }
+
+          const channel = await client.channels.fetch(destination.channelId);
+
+          if (
+            !channel ||
+            channel.type !== ChannelType.GuildText ||
+            channel.guildId !== destination.guildId
+          ) {
+            throw new Error(
+              "The tips channel must be a sendable text channel in its configured server.",
+            );
+          }
+
+          const message = await channel.send({
+            embeds: [renderDailyTip(tip)],
+            allowedMentions: { parse: [] },
+          });
+          await publications.markPublicationSent(
+            dateUtc,
+            destination.guildId,
+            slot,
+            message.id,
+          );
+          logger.info("daily_tip.published", {
+            dateUtc,
+            guildId: destination.guildId,
+            slot: String(slot),
+            tipId: tip.id,
+          });
+        } catch (error) {
+          logger.error("daily_tip.publish_failed", error, {
+            channelId: destination.channelId,
+            guildId: destination.guildId,
+          });
+        }
       }
-
-      const channel = await client.channels.fetch(channelId);
-
-      if (!channel?.isSendable()) {
-        throw new Error(
-          "DISCORD_TIPS_CHANNEL_ID must refer to a text channel the bot can send messages to.",
-        );
-      }
-
-      const message = await channel.send({
-        embeds: [renderDailyTip(tip)],
-        allowedMentions: { parse: [] },
-      });
-      await publications.markPublicationSent(dateUtc, slot, message.id);
-      logger.info("daily_tip.published", {
-        dateUtc,
-        slot: String(slot),
-        tipId: tip.id,
-      });
     } finally {
       isPublishing = false;
     }
   };
 
   const runCheck = (): void => {
-    void checkSchedule().catch((error: unknown) => {
-      logger.error("daily_tip.publish_failed", error, { channelId });
-    });
+    void checkSchedule().catch((error: unknown) =>
+      logger.error("daily_tip.schedule_check_failed", error),
+    );
   };
 
   runCheck();

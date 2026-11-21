@@ -45,17 +45,20 @@ describe("parseEnvironment", () => {
     expect(() =>
       parseEnvironment({
         ...validEnvironment,
-        DISCORD_TIPS_CHANNEL_ID: "not-a-discord-id",
+        DISCORD_PRACTICE_CHANNEL_ID: "not-a-discord-id",
       }),
     ).toThrow();
   });
 
-  it("requires both configured channel IDs", () => {
-    expect(() =>
-      parseEnvironment({
-        ...validEnvironment,
-        DISCORD_TIPS_CHANNEL_ID: undefined,
-      }),
-    ).toThrow();
+  it("allows administrators to configure channels instead of environment defaults", () => {
+    const environmentWithoutChannelDefaults = {
+      DISCORD_TOKEN: validEnvironment.DISCORD_TOKEN,
+      DISCORD_GUILD_ID: validEnvironment.DISCORD_GUILD_ID,
+      DATABASE_URL: validEnvironment.DATABASE_URL,
+    };
+
+    expect(parseEnvironment(environmentWithoutChannelDefaults)).toEqual(
+      environmentWithoutChannelDefaults,
+    );
   });
 });

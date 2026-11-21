@@ -1,4 +1,10 @@
-import { REST, Routes, SlashCommandBuilder } from "discord.js";
+import {
+  ChannelType,
+  PermissionFlagsBits,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+} from "discord.js";
 
 export const commandDefinitions = [
   new SlashCommandBuilder()
@@ -16,6 +22,28 @@ export const commandDefinitions = [
   new SlashCommandBuilder()
     .setName("stats")
     .setDescription("Show your study statistics."),
+  new SlashCommandBuilder()
+    .setName("set-practice-channel")
+    .setDescription("Set the server's study practice channel.")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("The text channel used for private study commands.")
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true),
+    ),
+  new SlashCommandBuilder()
+    .setName("set-tips-channel")
+    .setDescription("Set the server's daily learning tips channel.")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("The text channel used for daily learning tips.")
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true),
+    ),
 ] as const;
 
 export async function registerSlashCommands(
