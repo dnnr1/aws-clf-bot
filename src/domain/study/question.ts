@@ -19,11 +19,27 @@ export interface StudyQuestion {
   options: StudyQuestionOption[];
 }
 
+export interface ExamDomainResult {
+  domainId: string;
+  domainName: LocalizedText;
+  correctCount: number;
+  questionCount: number;
+}
+
+export interface CompletedExamResult {
+  correctCount: number;
+  questionCount: number;
+  accuracyPercentage: number;
+  durationSeconds: number;
+  domainResults: ExamDomainResult[];
+}
+
 export interface AnswerFeedback {
   isCorrect: boolean;
   correctOptionKey: AnswerOptionKey;
   correctOptionText: LocalizedText;
   explanation: LocalizedText;
+  examResult?: CompletedExamResult;
 }
 
 export function isAnswerOptionKey(value: unknown): value is AnswerOptionKey {

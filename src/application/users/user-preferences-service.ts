@@ -8,7 +8,7 @@ export class UserPreferencesService {
   constructor(private readonly repository: UserPreferencesRepository) {}
 
   async getLocale(discordUserId: string): Promise<UserLocale> {
-    return (await this.repository.findLocale(discordUserId)) ?? "en";
+    return (await this.repository.findLocale(discordUserId)) ?? "pt-BR";
   }
 
   async changeLocale(discordUserId: string, locale: unknown): Promise<void> {

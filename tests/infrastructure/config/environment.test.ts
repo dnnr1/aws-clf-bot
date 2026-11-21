@@ -4,6 +4,8 @@ import { parseEnvironment } from "../../../src/infrastructure/config/environment
 const validEnvironment = {
   DISCORD_TOKEN: "test-discord-token",
   DISCORD_GUILD_ID: "1040777384711954593",
+  DISCORD_PRACTICE_CHANNEL_ID: "1040777384711954594",
+  DISCORD_TIPS_CHANNEL_ID: "1040777384711954595",
   DATABASE_URL: "postgresql://user:password@localhost:5432/aws_clf_bot",
 };
 
@@ -35,6 +37,24 @@ describe("parseEnvironment", () => {
       parseEnvironment({
         ...validEnvironment,
         DISCORD_GUILD_ID: "not-a-discord-id",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects malformed configured channel IDs", () => {
+    expect(() =>
+      parseEnvironment({
+        ...validEnvironment,
+        DISCORD_TIPS_CHANNEL_ID: "not-a-discord-id",
+      }),
+    ).toThrow();
+  });
+
+  it("requires both configured channel IDs", () => {
+    expect(() =>
+      parseEnvironment({
+        ...validEnvironment,
+        DISCORD_TIPS_CHANNEL_ID: undefined,
       }),
     ).toThrow();
   });

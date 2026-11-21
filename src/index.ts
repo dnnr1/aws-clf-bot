@@ -1,5 +1,7 @@
+import { readFile } from "node:fs/promises";
 import {
   Client,
+  EmbedBuilder,
   Events,
   GatewayIntentBits,
   MessageFlags,
@@ -7,18 +9,28 @@ import {
 } from "discord.js";
 import { PracticeService } from "./application/study/practice-service.js";
 import { StatisticsService } from "./application/study/statistics-service.js";
+import { DrizzleBotChannelMessageRepository } from "./infrastructure/database/bot-channel-message-repository.js";
 import { UserPreferencesService } from "./application/users/user-preferences-service.js";
 import { parseEnvironment } from "./infrastructure/config/environment.js";
 import { createDatabase } from "./infrastructure/database/client.js";
+import { DrizzleDailyTipPublicationRepository } from "./infrastructure/database/daily-tip-publication-repository.js";
 import { DrizzlePracticeRepository } from "./infrastructure/database/practice-repository.js";
 import { DrizzleStatisticsRepository } from "./infrastructure/database/statistics-repository.js";
 import { DrizzleUserPreferencesRepository } from "./infrastructure/database/user-preferences-repository.js";
 import { logger } from "./infrastructure/logging/logger.js";
+import { startDailyTipScheduler } from "./infrastructure/discord/daily-tip-scheduler.js";
+import { parseDailyTipBank } from "./infrastructure/questions/daily-tip-schema.js";
 import { handleDiscordInteraction } from "./presentation/discord/interaction-handler.js";
 import { registerSlashCommands } from "./presentation/discord/commands.js";
+import { maintainPracticeChannelPanel } from "./presentation/discord/practice-channel-panel.js";
 
 async function startBot(): Promise<void> {
   const environment = parseEnvironment(process.env);
+  const tipBankContents = await readFile(
+    new URL("../data/tips/clf-c02.json", import.meta.url),
+    "utf8",
+  );
+  const tips = parseDailyTipBank(JSON.parse(tipBankContents));
   const { database, pool } = createDatabase(environment.DATABASE_URL);
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
   const preferences = new UserPreferencesService(
@@ -28,7 +40,13 @@ async function startBot(): Promise<void> {
   const statistics = new StatisticsService(
     new DrizzleStatisticsRepository(database),
   );
-  const services = { preferences, practice, statistics };
+  const services = {
+    preferences,
+    practice,
+    statistics,
+    practiceChannelId: environment.DISCORD_PRACTICE_CHANNEL_ID,
+  };
+  let stopDailyTipScheduler: (() => void) | undefined;
   let shutdownPromise: Promise<void> | undefined;
 
   const shutdown = (signal: string): Promise<void> => {
@@ -38,6 +56,7 @@ async function startBot(): Promise<void> {
 
     shutdownPromise = (async () => {
       logger.info("application.shutting_down", { signal });
+      stopDailyTipScheduler?.();
       client.destroy();
 
       try {
@@ -84,6 +103,18 @@ async function startBot(): Promise<void> {
       applicationId,
       environment.DISCORD_GUILD_ID,
     );
+    await maintainPracticeChannelPanel(
+      client,
+      environment.DISCORD_PRACTICE_CHANNEL_ID,
+      new DrizzleBotChannelMessageRepository(database),
+    );
+    stopDailyTipScheduler = startDailyTipScheduler(
+      client,
+      environment.DISCORD_TIPS_CHANNEL_ID,
+      tips,
+      new DrizzleDailyTipPublicationRepository(database),
+      logger,
+    );
     logger.info("discord.bot_ready");
   } catch (error) {
     await shutdown("startup_failure");
@@ -99,8 +130,14 @@ async function replyToFailedInteraction(
   }
 
   const response = {
-    content:
-      "An unexpected error occurred. Please try again. / Ocorreu um erro inesperado. Tente novamente.",
+    embeds: [
+      new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle("Erro / Error")
+        .setDescription(
+          "Ocorreu um erro inesperado. Tente novamente. / An unexpected error occurred. Please try again.",
+        ),
+    ],
     flags: MessageFlags.Ephemeral,
   } satisfies InteractionReplyOptions;
 

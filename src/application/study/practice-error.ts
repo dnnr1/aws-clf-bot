@@ -1,5 +1,7 @@
 export type PracticeErrorCode =
   | "already_answered"
+  | "exam_expired"
+  | "exam_not_available"
   | "invalid_option"
   | "no_questions_available"
   | "question_not_in_session"

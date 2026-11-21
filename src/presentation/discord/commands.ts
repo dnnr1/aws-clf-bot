@@ -11,6 +11,9 @@ export const commandDefinitions = [
     .setName("practice")
     .setDescription("Start a practice session with AWS study questions."),
   new SlashCommandBuilder()
+    .setName("exam")
+    .setDescription("Start a 65-question AWS exam simulation."),
+  new SlashCommandBuilder()
     .setName("stats")
     .setDescription("Show your study statistics."),
 ] as const;

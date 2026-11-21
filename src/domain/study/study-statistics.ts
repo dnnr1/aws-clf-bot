@@ -4,6 +4,9 @@ export interface StudyStatisticsSnapshot {
   totalAnswers: number;
   correctAnswers: number;
   totalSessions: number;
+  completedExams: number;
+  bestExamCorrectCount: number | null;
+  bestExamAccuracyPercentage: number | null;
   activityDatesUtc: string[];
 }
 
@@ -13,6 +16,9 @@ export interface StudyStatistics {
   incorrectAnswers: number;
   accuracyPercentage: number;
   totalSessions: number;
+  completedExams: number;
+  bestExamCorrectCount: number | null;
+  bestExamAccuracyPercentage: number | null;
   currentStreakDays: number;
   longestStreakDays: number;
 }
@@ -66,6 +72,9 @@ export function calculateStudyStatistics(
         ? 0
         : (snapshot.correctAnswers / snapshot.totalAnswers) * 100,
     totalSessions: snapshot.totalSessions,
+    completedExams: snapshot.completedExams,
+    bestExamCorrectCount: snapshot.bestExamCorrectCount,
+    bestExamAccuracyPercentage: snapshot.bestExamAccuracyPercentage,
     currentStreakDays,
     longestStreakDays,
   };

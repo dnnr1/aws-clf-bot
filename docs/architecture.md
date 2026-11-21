@@ -38,12 +38,14 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 
 - Implement repositories with Drizzle and PostgreSQL, schema migrations, indexes, and database constraints.
 - Load validated question-bank records without coupling question content to application logic.
+- Manage the persistent practice-channel introduction and scheduled, data-driven learning tips through Discord adapters.
 - Validate environment variables, provide structured logging, and manage database/client lifecycle.
 - Provide adapters for time, randomness, and other external dependencies required by application services.
 
 ### Discord presentation
 
 - Initialize the Discord.js client, register slash commands, and route commands and component interactions to application use cases.
+- Restrict study commands and components to the configured practice channel, while keeping all individual study replies ephemeral.
 - Convert Discord payloads into validated application inputs; format results as localized messages, embeds, and buttons.
 - Keep authorization, interaction ownership checks, Discord response timing, and expired-interaction handling at this boundary, backed by application/session validation.
 - Keep user-facing text in English and `pt-BR` locale resources. Slash-command names and descriptions are English.

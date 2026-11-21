@@ -1,6 +1,19 @@
-import { and, asc, eq, isNull, max, notExists, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNull,
+  max,
+  notExists,
+  sql,
+} from "drizzle-orm";
 import { PracticeError } from "../../application/study/practice-error.js";
-import type { PracticeRepository } from "../../application/study/practice-repository.js";
+import type {
+  PracticeRepository,
+  PresentedQuestion,
+  StartedExamSession,
+} from "../../application/study/practice-repository.js";
 import {
   isAnswerOptionKey,
   type AnswerFeedback,
@@ -8,8 +21,16 @@ import {
   type LocalizedText,
   type StudyQuestion,
 } from "../../domain/study/question.js";
+import {
+  examDurationMinutes,
+  examQuestionCount,
+  examQuestionDistribution,
+} from "../../domain/study/exam-simulation.js";
 import type { BotDatabase } from "./client.js";
 import {
+  examDomainResults,
+  examDomains,
+  examResults,
   questionOptions,
   questions,
   sessionQuestions,
@@ -79,16 +100,95 @@ export class DrizzlePracticeRepository implements PracticeRepository {
     });
   }
 
+  async startExam(discordUserId: string): Promise<StartedExamSession> {
+    return this.database.transaction(async (transaction) => {
+      const selectedQuestionIds: string[] = [];
+
+      for (const domain of examQuestionDistribution) {
+        const domainQuestions = await transaction
+          .select({ id: questions.id })
+          .from(questions)
+          .where(
+            and(
+              eq(questions.certificationId, "aws-clf-c02"),
+              eq(questions.domainId, domain.domainId),
+              eq(questions.isActive, true),
+            ),
+          )
+          .orderBy(sql`random()`)
+          .limit(domain.questionCount);
+
+        if (domainQuestions.length < domain.questionCount) {
+          throw new PracticeError("exam_not_available");
+        }
+
+        selectedQuestionIds.push(...domainQuestions.map(({ id }) => id));
+      }
+
+      const examQuestions = await transaction
+        .select({ id: questions.id })
+        .from(questions)
+        .where(inArray(questions.id, selectedQuestionIds))
+        .orderBy(sql`random()`);
+      await transaction
+        .insert(users)
+        .values({ discordUserId })
+        .onConflictDoNothing();
+
+      const expiresAt = new Date(Date.now() + examDurationMinutes * 60_000);
+      const [session] = await transaction
+        .insert(studySessions)
+        .values({
+          userId: discordUserId,
+          certificationId: "aws-clf-c02",
+          mode: "exam_simulation" as const,
+          expiresAt,
+        })
+        .returning({ id: studySessions.id });
+
+      if (!session) {
+        throw new Error("The exam session was not created.");
+      }
+
+      await transaction.insert(sessionQuestions).values(
+        examQuestions.map((question, index) => ({
+          sessionId: session.id,
+          questionId: question.id,
+          position: index + 1,
+        })),
+      );
+
+      const firstQuestion = examQuestions[0];
+
+      if (!firstQuestion) {
+        throw new Error("The exam question pool changed unexpectedly.");
+      }
+
+      const loaded = await loadQuestion(transaction, firstQuestion.id);
+      return {
+        sessionId: session.id,
+        question: loaded.question,
+        mode: "exam_simulation" as const,
+        position: 1,
+        totalQuestions: examQuestionCount,
+        expiresAt,
+        questionCount: examQuestionCount,
+      };
+    });
+  }
+
   async getNextQuestion(
     discordUserId: string,
     sessionId: string,
-  ): Promise<StudyQuestion | null> {
-    return this.database.transaction(async (transaction) => {
+  ): Promise<PresentedQuestion | null> {
+    const result = await this.database.transaction(async (transaction) => {
       const [session] = await transaction
         .select({
           userId: studySessions.userId,
           certificationId: studySessions.certificationId,
           status: studySessions.status,
+          mode: studySessions.mode,
+          expiresAt: studySessions.expiresAt,
         })
         .from(studySessions)
         .where(eq(studySessions.id, sessionId))
@@ -97,12 +197,29 @@ export class DrizzlePracticeRepository implements PracticeRepository {
       if (!session || session.userId !== discordUserId) {
         throw new PracticeError("session_not_found");
       }
+      if (
+        session.mode === "exam_simulation" &&
+        session.expiresAt &&
+        session.expiresAt.getTime() <= Date.now()
+      ) {
+        await transaction
+          .update(studySessions)
+          .set({ status: "expired", completedAt: new Date() })
+          .where(eq(studySessions.id, sessionId));
+        return "exam_expired" as const;
+      }
       if (session.status !== "in_progress") {
+        throw new PracticeError("session_closed");
+      }
+      if (session.mode !== "practice" && session.mode !== "exam_simulation") {
         throw new PracticeError("session_closed");
       }
 
       const [pendingQuestion] = await transaction
-        .select({ questionId: sessionQuestions.questionId })
+        .select({
+          questionId: sessionQuestions.questionId,
+          position: sessionQuestions.position,
+        })
         .from(sessionQuestions)
         .leftJoin(
           userAnswers,
@@ -125,7 +242,18 @@ export class DrizzlePracticeRepository implements PracticeRepository {
           transaction,
           pendingQuestion.questionId,
         );
-        return loaded.question;
+        return {
+          question: loaded.question,
+          mode: session.mode,
+          position: pendingQuestion.position,
+          totalQuestions:
+            session.mode === "exam_simulation" ? examQuestionCount : null,
+          expiresAt: session.expiresAt,
+        };
+      }
+
+      if (session.mode === "exam_simulation") {
+        return null;
       }
 
       const [candidate] = await transaction
@@ -164,15 +292,28 @@ export class DrizzlePracticeRepository implements PracticeRepository {
         .from(sessionQuestions)
         .where(eq(sessionQuestions.sessionId, sessionId));
 
+      const position = (lastPosition?.value ?? 0) + 1;
       await transaction.insert(sessionQuestions).values({
         sessionId,
         questionId: candidate.id,
-        position: (lastPosition?.value ?? 0) + 1,
+        position,
       });
 
       const loaded = await loadQuestion(transaction, candidate.id);
-      return loaded.question;
+      return {
+        question: loaded.question,
+        mode: "practice" as const,
+        position,
+        totalQuestions: null,
+        expiresAt: null,
+      };
     });
+
+    if (result === "exam_expired") {
+      throw new PracticeError("exam_expired");
+    }
+
+    return result;
   }
 
   async submitAnswer(
@@ -181,11 +322,14 @@ export class DrizzlePracticeRepository implements PracticeRepository {
     questionId: string,
     optionKey: AnswerOptionKey,
   ): Promise<AnswerFeedback> {
-    return this.database.transaction(async (transaction) => {
+    const result = await this.database.transaction(async (transaction) => {
       const [session] = await transaction
         .select({
           userId: studySessions.userId,
           status: studySessions.status,
+          mode: studySessions.mode,
+          startedAt: studySessions.startedAt,
+          expiresAt: studySessions.expiresAt,
         })
         .from(studySessions)
         .where(eq(studySessions.id, sessionId))
@@ -193,6 +337,17 @@ export class DrizzlePracticeRepository implements PracticeRepository {
 
       if (!session || session.userId !== discordUserId) {
         throw new PracticeError("session_not_found");
+      }
+      if (
+        session.mode === "exam_simulation" &&
+        session.expiresAt &&
+        session.expiresAt.getTime() <= Date.now()
+      ) {
+        await transaction
+          .update(studySessions)
+          .set({ status: "expired", completedAt: new Date() })
+          .where(eq(studySessions.id, sessionId));
+        return { expired: true as const };
       }
       if (session.status !== "in_progress") {
         throw new PracticeError("session_closed");
@@ -246,14 +401,113 @@ export class DrizzlePracticeRepository implements PracticeRepository {
         isCorrect,
       });
 
-      return {
+      const feedback: AnswerFeedback = {
         isCorrect,
         correctOptionKey: loaded.correctOptionKey,
         correctOptionText: loaded.correctOptionText,
         explanation: loaded.explanation,
       };
+
+      if (session.mode !== "exam_simulation") {
+        return feedback;
+      }
+
+      const examResult = await completeExamIfAnswered(
+        transaction,
+        sessionId,
+        session.startedAt,
+      );
+
+      return examResult ? { ...feedback, examResult } : feedback;
     });
+
+    if ("expired" in result) {
+      throw new PracticeError("exam_expired");
+    }
+
+    return result;
   }
+}
+
+async function completeExamIfAnswered(
+  transaction: BotTransaction,
+  sessionId: string,
+  startedAt: Date,
+) {
+  const [summary] = await transaction
+    .select({
+      answerCount: sql<number>`count(*)::int`,
+      correctCount: sql<number>`count(*) filter (where ${userAnswers.isCorrect})::int`,
+    })
+    .from(userAnswers)
+    .where(eq(userAnswers.sessionId, sessionId));
+
+  if (!summary || summary.answerCount < examQuestionCount) {
+    return null;
+  }
+  if (summary.answerCount > examQuestionCount) {
+    throw new Error("The exam contains more answers than questions.");
+  }
+
+  const domainResults = await transaction
+    .select({
+      domainId: examDomains.id,
+      nameEn: examDomains.nameEn,
+      namePtBr: examDomains.namePtBr,
+      correctCount: sql<number>`count(*) filter (where ${userAnswers.isCorrect})::int`,
+      questionCount: sql<number>`count(*)::int`,
+    })
+    .from(sessionQuestions)
+    .innerJoin(questions, eq(questions.id, sessionQuestions.questionId))
+    .innerJoin(
+      userAnswers,
+      and(
+        eq(userAnswers.sessionId, sessionQuestions.sessionId),
+        eq(userAnswers.questionId, sessionQuestions.questionId),
+      ),
+    )
+    .innerJoin(examDomains, eq(examDomains.id, questions.domainId))
+    .where(eq(sessionQuestions.sessionId, sessionId))
+    .groupBy(examDomains.id, examDomains.nameEn, examDomains.namePtBr)
+    .orderBy(examDomains.id);
+  const completedAt = new Date();
+  const accuracyPercentage = (summary.correctCount / examQuestionCount) * 100;
+  const durationSeconds = Math.floor(
+    (completedAt.getTime() - startedAt.getTime()) / 1000,
+  );
+
+  await transaction.insert(examResults).values({
+    sessionId,
+    correctCount: summary.correctCount,
+    questionCount: examQuestionCount,
+    accuracy: accuracyPercentage.toFixed(2),
+    completedAt,
+  });
+  await transaction.insert(examDomainResults).values(
+    domainResults.map((result) => ({
+      sessionId,
+      domainId: result.domainId,
+      correctCount: result.correctCount,
+      questionCount: result.questionCount,
+    })),
+  );
+  await transaction
+    .update(studySessions)
+    .set({ status: "completed", completedAt })
+    .where(eq(studySessions.id, sessionId));
+
+  return {
+    correctCount: summary.correctCount,
+    questionCount: examQuestionCount,
+    accuracyPercentage,
+    durationSeconds,
+    domainResults: domainResults.map((result) => ({
+      domainId: result.domainId,
+      domainName: { en: result.nameEn, "pt-BR": result.namePtBr },
+      correctCount: result.correctCount,
+      questionCount: result.questionCount,
+    })),
+  };
 }
 
 async function loadQuestion(

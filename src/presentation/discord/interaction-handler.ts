@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
   MessageFlags,
   StringSelectMenuBuilder,
   type ButtonInteraction,
@@ -15,8 +16,13 @@ import {
 } from "../../domain/users/user-locale.js";
 import type { UserPreferencesService } from "../../application/users/user-preferences-service.js";
 import { PracticeError } from "../../application/study/practice-error.js";
+import type { PresentedQuestion } from "../../application/study/practice-repository.js";
 import type { PracticeService } from "../../application/study/practice-service.js";
 import type { StatisticsService } from "../../application/study/statistics-service.js";
+import type {
+  AnswerFeedback,
+  CompletedExamResult,
+} from "../../domain/study/question.js";
 import type { StudyStatistics } from "../../domain/study/study-statistics.js";
 import type { StudyQuestion } from "../../domain/study/question.js";
 
@@ -26,6 +32,7 @@ const helpMessages: Record<UserLocale, string> = {
     "`/help` - Show this command list.",
     "`/language` - Choose English or Portuguese (Brazil).",
     "`/practice` - Start an AWS question practice session.",
+    "`/exam` - Start a timed 65-question exam.",
     "`/stats` - Show your study statistics.",
   ].join("\n"),
   "pt-BR": [
@@ -33,6 +40,7 @@ const helpMessages: Record<UserLocale, string> = {
     "`/help` - Exibe esta lista de comandos.",
     "`/language` - Escolha English ou Português (Brasil).",
     "`/practice` - Inicie uma sessão de prática com questões da AWS.",
+    "`/exam` - Inicie uma simulação de exame com 65 questões.",
     "`/stats` - Exiba suas estatísticas de estudo.",
   ].join("\n"),
 };
@@ -55,6 +63,9 @@ const invalidSelectionMessage =
   "Choose one of the listed languages. / Escolha um dos idiomas disponíveis.";
 const invalidPracticeComponentMessage =
   "This practice control is invalid. Run /practice again. / Este controle de prática é inválido. Use /practice novamente.";
+const successColor = 0x2ecc71;
+const errorColor = 0xe74c3c;
+const infoColor = 0x3498db;
 
 const practiceMessages: Record<
   UserLocale,
@@ -65,6 +76,8 @@ const practiceMessages: Record<
     explanation: string;
     noQuestions: string;
     exhausted: string;
+    examNotAvailable: string;
+    examExpired: string;
   }
 > = {
   en: {
@@ -76,6 +89,9 @@ const practiceMessages: Record<
       "No study questions are available yet. Please try again later.",
     exhausted:
       "You have answered every available question in this session. Run /practice to start another session.",
+    examNotAvailable:
+      "The exam requires 65 active questions with the required domain distribution. The question bank is still being populated; please try again later.",
+    examExpired: "The 90-minute exam time limit has expired.",
   },
   "pt-BR": {
     answerCorrect: "Correto.",
@@ -86,6 +102,9 @@ const practiceMessages: Record<
       "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.",
     exhausted:
       "Você respondeu a todas as questões disponíveis nesta sessão. Use /practice para iniciar outra sessão.",
+    examNotAvailable:
+      "O exame exige 65 questões ativas com a distribuição necessária entre os domínios. O banco de questões ainda está sendo preenchido; tente novamente mais tarde.",
+    examExpired: "O limite de 90 minutos do exame expirou.",
   },
 };
 
@@ -93,12 +112,38 @@ interface DiscordServices {
   preferences: UserPreferencesService;
   practice: PracticeService;
   statistics: StatisticsService;
+  practiceChannelId: string;
 }
 
 export async function handleDiscordInteraction(
   interaction: Interaction,
   services: DiscordServices,
 ): Promise<void> {
+  if (
+    (interaction.isChatInputCommand() ||
+      interaction.isButton() ||
+      (interaction.isStringSelectMenu() &&
+        interaction.customId.startsWith("language:"))) &&
+    interaction.channelId !== services.practiceChannelId
+  ) {
+    const locale = await services.preferences.getLocale(interaction.user.id);
+    await interaction.reply({
+      embeds: [
+        createStatusEmbed(
+          locale === "en"
+            ? "Use the practice channel"
+            : "Use o canal de prática",
+          locale === "en"
+            ? "Study commands are available only in the configured practice channel."
+            : "Os comandos de estudo só estão disponíveis no canal de prática configurado.",
+          errorColor,
+        ),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName === "help") {
       await handleHelpCommand(interaction, services.preferences);
@@ -106,6 +151,8 @@ export async function handleDiscordInteraction(
       await handleLanguageCommand(interaction, services.preferences);
     } else if (interaction.commandName === "practice") {
       await handlePracticeCommand(interaction, services);
+    } else if (interaction.commandName === "exam") {
+      await handleExamCommand(interaction, services);
     } else if (interaction.commandName === "stats") {
       await handleStatsCommand(interaction, services);
     }
@@ -141,7 +188,15 @@ async function handleStatsCommand(
     interaction.user.id,
   );
 
-  await interaction.editReply(renderStudyStatistics(statistics, locale));
+  await interaction.editReply({
+    embeds: [
+      createStatusEmbed(
+        locale === "en" ? "Study statistics" : "Estatísticas de estudo",
+        renderStudyStatistics(statistics, locale),
+        infoColor,
+      ),
+    ],
+  });
 }
 
 async function handleHelpCommand(
@@ -164,27 +219,108 @@ function renderStudyStatistics(
 
   if (locale === "en") {
     return [
-      "**Study statistics**",
       `Questions answered: ${statistics.totalAnswers}`,
       `Correct: ${statistics.correctAnswers}`,
       `Incorrect: ${statistics.incorrectAnswers}`,
       `Accuracy: ${accuracy}`,
       `Study sessions: ${statistics.totalSessions}`,
+      `Completed exams: ${statistics.completedExams}`,
+      `Best exam: ${formatBestExam(statistics, locale)}`,
       `Current streak: ${statistics.currentStreakDays} day${statistics.currentStreakDays === 1 ? "" : "s"}`,
       `Longest streak: ${statistics.longestStreakDays} day${statistics.longestStreakDays === 1 ? "" : "s"}`,
     ].join("\n");
   }
 
   return [
-    "**Estatísticas de estudo**",
     `Questões respondidas: ${statistics.totalAnswers}`,
     `Corretas: ${statistics.correctAnswers}`,
     `Incorretas: ${statistics.incorrectAnswers}`,
     `Precisão: ${accuracy}`,
     `Sessões de estudo: ${statistics.totalSessions}`,
+    `Exames concluídos: ${statistics.completedExams}`,
+    `Melhor resultado: ${formatBestExam(statistics, locale)}`,
     `Sequência atual: ${statistics.currentStreakDays} dia${statistics.currentStreakDays === 1 ? "" : "s"}`,
     `Maior sequência: ${statistics.longestStreakDays} dia${statistics.longestStreakDays === 1 ? "" : "s"}`,
   ].join("\n");
+}
+
+function formatBestExam(
+  statistics: StudyStatistics,
+  locale: UserLocale,
+): string {
+  if (
+    statistics.bestExamCorrectCount === null ||
+    statistics.bestExamAccuracyPercentage === null
+  ) {
+    return locale === "en" ? "No completed exams" : "Nenhum exame concluído";
+  }
+
+  const accuracy = new Intl.NumberFormat(locale, {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(statistics.bestExamAccuracyPercentage / 100);
+
+  return `${statistics.bestExamCorrectCount}/65 (${accuracy})`;
+}
+
+function renderExamResult(
+  result: CompletedExamResult,
+  locale: UserLocale,
+  lastAnswerStatus: string,
+  lastAnswer: AnswerFeedback,
+): EmbedBuilder {
+  const accuracy = new Intl.NumberFormat(locale, {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(result.accuracyPercentage / 100);
+  const durationMinutes = Math.floor(result.durationSeconds / 60);
+  const durationSeconds = result.durationSeconds % 60;
+  const domainResults = result.domainResults
+    .map((domain) => {
+      const domainAccuracy = new Intl.NumberFormat(locale, {
+        style: "percent",
+        maximumFractionDigits: 1,
+      }).format(domain.correctCount / domain.questionCount);
+
+      return `${domain.domainName[locale]}: ${domain.correctCount}/${domain.questionCount} (${domainAccuracy})`;
+    })
+    .join("\n");
+  const description =
+    locale === "en"
+      ? `${lastAnswerStatus} Last answer: ${lastAnswer.correctOptionKey}. ${lastAnswer.correctOptionText.en}\n\n${lastAnswer.explanation.en}`
+      : `${lastAnswerStatus} Última resposta: ${lastAnswer.correctOptionKey}. ${lastAnswer.correctOptionText["pt-BR"]}\n\n${lastAnswer.explanation["pt-BR"]}`;
+
+  return new EmbedBuilder()
+    .setColor(successColor)
+    .setTitle(locale === "en" ? "Exam completed" : "Exame concluído")
+    .setDescription(description)
+    .addFields(
+      {
+        name: locale === "en" ? "Result" : "Resultado",
+        value: `${result.correctCount}/${result.questionCount} (${accuracy})`,
+        inline: true,
+      },
+      {
+        name: locale === "en" ? "Duration" : "Duração",
+        value: `${durationMinutes}m ${durationSeconds}s`,
+        inline: true,
+      },
+      {
+        name: locale === "en" ? "By exam domain" : "Por domínio da prova",
+        value: domainResults,
+      },
+    );
+}
+
+function createStatusEmbed(
+  title: string,
+  description: string,
+  color: number,
+): EmbedBuilder {
+  return new EmbedBuilder()
+    .setColor(color)
+    .setTitle(title)
+    .setDescription(description);
 }
 
 async function handleLanguageCommand(
@@ -220,7 +356,13 @@ async function handleLanguageSelection(
 
   if (!ownerId) {
     await interaction.reply({
-      content: invalidComponentMessage,
+      embeds: [
+        createStatusEmbed(
+          "Menu inválido / Invalid menu",
+          invalidComponentMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -228,7 +370,13 @@ async function handleLanguageSelection(
 
   if (ownerId !== interaction.user.id) {
     await interaction.reply({
-      content: unauthorizedComponentMessage,
+      embeds: [
+        createStatusEmbed(
+          "Menu não autorizado / Unauthorized menu",
+          unauthorizedComponentMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -238,7 +386,13 @@ async function handleLanguageSelection(
 
   if (!isUserLocale(selectedLocale)) {
     await interaction.reply({
-      content: invalidSelectionMessage,
+      embeds: [
+        createStatusEmbed(
+          "Idioma inválido / Invalid language",
+          invalidSelectionMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -247,7 +401,13 @@ async function handleLanguageSelection(
   await interaction.deferUpdate();
   await preferences.changeLocale(interaction.user.id, selectedLocale);
   await interaction.editReply({
-    content: languageSavedMessages[selectedLocale],
+    embeds: [
+      createStatusEmbed(
+        selectedLocale === "en" ? "Language updated" : "Idioma atualizado",
+        languageSavedMessages[selectedLocale],
+        successColor,
+      ),
+    ],
     components: [],
   });
 }
@@ -274,7 +434,53 @@ async function handlePracticeCommand(
       error instanceof PracticeError &&
       error.code === "no_questions_available"
     ) {
-      await interaction.editReply(practiceMessages[locale].noQuestions);
+      await interaction.editReply({
+        embeds: [
+          createStatusEmbed(
+            locale === "en"
+              ? "No questions available"
+              : "Sem questões disponíveis",
+            practiceMessages[locale].noQuestions,
+            errorColor,
+          ),
+        ],
+      });
+      return;
+    }
+
+    throw error;
+  }
+}
+
+async function handleExamCommand(
+  interaction: ChatInputCommandInteraction,
+  services: DiscordServices,
+): Promise<void> {
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const locale = await services.preferences.getLocale(interaction.user.id);
+
+  try {
+    const exam = await services.practice.startExam(interaction.user.id);
+    await interaction.editReply(
+      renderQuestion(
+        exam.sessionId,
+        interaction.user.id,
+        exam.question,
+        locale,
+        exam,
+      ),
+    );
+  } catch (error) {
+    if (error instanceof PracticeError && error.code === "exam_not_available") {
+      await interaction.editReply({
+        embeds: [
+          createStatusEmbed(
+            locale === "en" ? "Exam unavailable" : "Exame indisponível",
+            practiceMessages[locale].examNotAvailable,
+            errorColor,
+          ),
+        ],
+      });
       return;
     }
 
@@ -293,7 +499,13 @@ async function handleAnswerButton(
 
   if (!match) {
     await interaction.reply({
-      content: invalidPracticeComponentMessage,
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -309,7 +521,13 @@ async function handleAnswerButton(
     ownerId !== interaction.user.id
   ) {
     await interaction.reply({
-      content: invalidPracticeComponentMessage,
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -330,18 +548,33 @@ async function handleAnswerButton(
       ? messages.answerCorrect
       : messages.answerIncorrect;
 
-    await interaction.editReply({
-      content: [
-        `**${status}**`,
-        `**${answer.correctOptionKey}. ${answer.correctOptionText[locale]}**`,
-        `**${messages.explanation}:** ${answer.explanation[locale]}`,
-      ].join("\n\n"),
-      components: [renderNextButton(sessionId, interaction.user.id, locale)],
-    });
+    if (answer.examResult) {
+      await interaction.editReply({
+        embeds: [renderExamResult(answer.examResult, locale, status, answer)],
+        components: [],
+      });
+    } else {
+      await interaction.editReply({
+        embeds: [
+          createStatusEmbed(
+            status,
+            `${answer.correctOptionKey}. ${answer.correctOptionText[locale]}\n\n${messages.explanation}: ${answer.explanation[locale]}`,
+            answer.isCorrect ? successColor : errorColor,
+          ),
+        ],
+        components: [renderNextButton(sessionId, interaction.user.id, locale)],
+      });
+    }
   } catch (error) {
     if (error instanceof PracticeError) {
       await interaction.editReply({
-        content: getPracticeErrorMessage(error, locale),
+        embeds: [
+          createStatusEmbed(
+            locale === "en" ? "Practice error" : "Erro na prática",
+            getPracticeErrorMessage(error, locale),
+            errorColor,
+          ),
+        ],
         components: [],
       });
       return;
@@ -362,7 +595,13 @@ async function handleNextButton(
 
   if (!match) {
     await interaction.reply({
-      content: invalidPracticeComponentMessage,
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -372,7 +611,13 @@ async function handleNextButton(
 
   if (!sessionId || !ownerId || ownerId !== interaction.user.id) {
     await interaction.reply({
-      content: invalidPracticeComponentMessage,
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -389,19 +634,37 @@ async function handleNextButton(
 
     if (!question) {
       await interaction.editReply({
-        content: practiceMessages[locale].exhausted,
+        embeds: [
+          createStatusEmbed(
+            locale === "en" ? "Practice complete" : "Prática concluída",
+            practiceMessages[locale].exhausted,
+            successColor,
+          ),
+        ],
         components: [],
       });
       return;
     }
 
     await interaction.editReply(
-      renderQuestion(sessionId, interaction.user.id, question, locale),
+      renderQuestion(
+        sessionId,
+        interaction.user.id,
+        question.question,
+        locale,
+        question,
+      ),
     );
   } catch (error) {
     if (error instanceof PracticeError) {
       await interaction.editReply({
-        content: getPracticeErrorMessage(error, locale),
+        embeds: [
+          createStatusEmbed(
+            locale === "en" ? "Practice error" : "Erro na prática",
+            getPracticeErrorMessage(error, locale),
+            errorColor,
+          ),
+        ],
         components: [],
       });
       return;
@@ -416,6 +679,10 @@ function renderQuestion(
   discordUserId: string,
   question: StudyQuestion,
   locale: UserLocale,
+  progress?: Pick<
+    PresentedQuestion,
+    "mode" | "position" | "totalQuestions" | "expiresAt"
+  >,
 ) {
   const options = question.options
     .map((option) => `**${option.key}.** ${option.text[locale]}`)
@@ -430,8 +697,17 @@ function renderQuestion(
   );
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
 
+  const progressMessage =
+    progress?.mode === "exam_simulation" &&
+    progress.totalQuestions !== null &&
+    progress.expiresAt
+      ? locale === "en"
+        ? `**Exam question ${progress.position} of ${progress.totalQuestions} · ${Math.max(0, Math.ceil((progress.expiresAt.getTime() - Date.now()) / 60_000))} minutes remaining**\n\n`
+        : `**Questão ${progress.position} de ${progress.totalQuestions} · ${Math.max(0, Math.ceil((progress.expiresAt.getTime() - Date.now()) / 60_000))} minutos restantes**\n\n`
+      : "";
+
   return {
-    content: `${question.prompt[locale]}\n\n${options}`,
+    content: `${progressMessage}${question.prompt[locale]}\n\n${options}`,
     components: [row],
   };
 }
@@ -453,6 +729,14 @@ function getPracticeErrorMessage(
   error: PracticeError,
   locale: UserLocale,
 ): string {
+  if (error.code === "exam_expired") {
+    return practiceMessages[locale].examExpired;
+  }
+
+  if (error.code === "exam_not_available") {
+    return practiceMessages[locale].examNotAvailable;
+  }
+
   if (error.code === "already_answered") {
     return locale === "en"
       ? "This question has already been answered."

@@ -5,6 +5,7 @@ import type { PracticeRepository } from "../../../src/application/study/practice
 function createRepository(): PracticeRepository {
   return {
     startSession: vi.fn(),
+    startExam: vi.fn(),
     getNextQuestion: vi.fn(),
     submitAnswer: vi.fn(),
   };
@@ -24,6 +25,15 @@ describe("PracticeService", () => {
       ),
     ).rejects.toMatchObject({ code: "invalid_option" });
     expect(repository.submitAnswer).not.toHaveBeenCalled();
+  });
+
+  it("delegates exam creation to the study repository", async () => {
+    const repository = createRepository();
+    const service = new PracticeService(repository);
+
+    await service.startExam("12345678901234567");
+
+    expect(repository.startExam).toHaveBeenCalledWith("12345678901234567");
   });
 
   it("delegates supported answers to the session repository", async () => {

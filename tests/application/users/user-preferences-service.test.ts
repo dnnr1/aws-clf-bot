@@ -10,11 +10,11 @@ function createRepository(): UserPreferencesRepository {
 }
 
 describe("UserPreferencesService", () => {
-  it("defaults users without a saved preference to English", async () => {
+  it("defaults users without a saved preference to Brazilian Portuguese", async () => {
     const repository = createRepository();
     const service = new UserPreferencesService(repository);
 
-    await expect(service.getLocale("12345678901234567")).resolves.toBe("en");
+    await expect(service.getLocale("12345678901234567")).resolves.toBe("pt-BR");
   });
 
   it("persists a supported locale", async () => {

@@ -1,11 +1,10 @@
 import { isAnswerOptionKey } from "../../domain/study/question.js";
-import type {
-  AnswerFeedback,
-  StudyQuestion,
-} from "../../domain/study/question.js";
+import type { AnswerFeedback } from "../../domain/study/question.js";
 import { PracticeError } from "./practice-error.js";
 import type {
   PracticeRepository,
+  PresentedQuestion,
+  StartedExamSession,
   StartedPracticeSession,
 } from "./practice-repository.js";
 
@@ -16,10 +15,14 @@ export class PracticeService {
     return this.repository.startSession(discordUserId);
   }
 
+  startExam(discordUserId: string): Promise<StartedExamSession> {
+    return this.repository.startExam(discordUserId);
+  }
+
   next(
     discordUserId: string,
     sessionId: string,
-  ): Promise<StudyQuestion | null> {
+  ): Promise<PresentedQuestion | null> {
     return this.repository.getNextQuestion(discordUserId, sessionId);
   }
 

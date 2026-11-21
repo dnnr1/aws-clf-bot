@@ -9,9 +9,17 @@ Help members of a private Discord server prepare for the AWS Certified Cloud Pra
 ## Users and language
 
 - Identify users by Discord user ID.
-- Let each user choose English or Brazilian Portuguese (`pt-BR`) with `/language`; persist the preference and allow changes at any time.
+- Default new users to Brazilian Portuguese (`pt-BR`); let each user choose English or Brazilian Portuguese with `/language`, persist the preference, and allow changes at any time.
 - Localize all user-facing questions, explanations, feedback, and statistics.
 - Keep slash-command names and descriptions in English.
+
+## Discord channels and interactions
+
+- Configure one practice text channel and one daily-tips text channel using `DISCORD_PRACTICE_CHANNEL_ID` and `DISCORD_TIPS_CHANNEL_ID`.
+- Maintain one bot-authored introduction panel in the practice channel; update the same message on startup rather than posting duplicates.
+- Accept study commands and component interactions only in the configured practice channel.
+- Keep each command response, question, answer, explanation, and error private to the invoking user with ephemeral interaction replies. The shared practice channel contains only the introduction panel.
+- Publish bilingual, sourced learning tips to the separate tips channel at 12:00, 16:00, and 20:00 UTC. Reserve each slot once before sending; do not retry failed or ambiguous sends or backfill missed slots. This at-most-once policy limits publications to three per UTC day.
 
 ## Functional requirements
 
@@ -50,13 +58,18 @@ All modes use four-option multiple-choice questions and Discord buttons. After a
 
 Statistics must be based on persisted answer records, not solely on cached counters. For `/stats`, count all persisted study sessions and submitted answers for the user. Accuracy is correct answers divided by submitted answers, and unanswered sessions do not affect accuracy. Activity days use UTC dates derived from persisted answer timestamps, independent of user locale. The current streak includes consecutive active UTC dates ending today, or yesterday when today has no activity yet; the longest streak is the largest consecutive run of active UTC dates. Any submitted answer counts as activity, whether correct or incorrect. Leaderboard eligibility and tie-breaking and detailed session-resume behavior require feature-level decisions before implementation.
 
+Exam simulations require 65 distinct active questions, distributed as 16, 19, 22, and 8 questions across the four domains, and end after 90 minutes. If the question bank cannot meet this distribution, do not start an incomplete exam; report that the question bank is still being populated. Persist every completed result and the per-domain breakdown. A user's best result is the highest correct-answer count; because all exams contain 65 questions, this also determines the highest accuracy. Incomplete or expired attempts do not count as completed results.
+
 ## Data and persistence
 
 Persist users, preferences, questions/options, study sessions, answers, daily challenges, and exam results in PostgreSQL through Drizzle. Use migrations, relational constraints, indexes, and transactions. Store Discord IDs as identifiers. Prevent duplicate answers within a session at both application and database levels.
 
+Persist the practice introduction's message ID so restarts edit the existing panel. Persist daily tip publications with a UTC date and one of three scheduled slots; a unique date/slot constraint prevents duplicate publications and enforces the daily cap.
+
 ## Quality and security requirements
 
 - TypeScript strict mode; validate external inputs and environment configuration with Zod.
+- Require valid Discord channel IDs for both configured channels.
 - Keep business logic independent of Discord.js.
 - Verify the user owns each interactive study session; never trust interaction payloads alone.
 - Handle interaction expiry, Discord API failures, and database failures explicitly.

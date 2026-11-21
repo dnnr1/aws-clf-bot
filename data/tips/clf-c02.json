@@ -1,0 +1,194 @@
+[
+  {
+    "id": "shared-responsibility",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Shared responsibility",
+      "pt-BR": "Responsabilidade compartilhada"
+    },
+    "content": {
+      "en": "AWS secures the cloud infrastructure; customers remain responsible for security in the cloud, including their data, identities, and service configuration.",
+      "pt-BR": "A AWS protege a infraestrutura da nuvem; os clientes continuam responsáveis pela segurança na nuvem, incluindo dados, identidades e configuração dos serviços."
+    },
+    "source": {
+      "label": "AWS Shared Responsibility Model",
+      "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
+    }
+  },
+  {
+    "id": "iam-least-privilege",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Least privilege",
+      "pt-BR": "Menor privilégio"
+    },
+    "content": {
+      "en": "Grant an identity only the permissions it needs, and review those permissions regularly. IAM policies define which actions are allowed on which resources.",
+      "pt-BR": "Conceda a uma identidade somente as permissões necessárias e revise-as regularmente. Políticas do IAM definem quais ações são permitidas em quais recursos."
+    },
+    "source": {
+      "label": "IAM best practices",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  {
+    "id": "mfa",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Multi-factor authentication",
+      "pt-BR": "Autenticação multifator"
+    },
+    "content": {
+      "en": "MFA adds an authentication factor beyond a password. Enable it especially for privileged identities and the AWS account root user.",
+      "pt-BR": "A MFA adiciona um fator de autenticação além da senha. Habilite-a especialmente para identidades privilegiadas e para o usuário raiz da conta AWS."
+    },
+    "source": {
+      "label": "IAM MFA",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html"
+    }
+  },
+  {
+    "id": "iam-roles",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "IAM roles",
+      "pt-BR": "Funções do IAM"
+    },
+    "content": {
+      "en": "An IAM role provides temporary credentials to a trusted entity. Roles are commonly used by AWS services and federated users instead of sharing long-term access keys.",
+      "pt-BR": "Uma função do IAM fornece credenciais temporárias a uma entidade confiável. Funções são usadas com frequência por serviços AWS e usuários federados, em vez de compartilhar chaves de acesso permanentes."
+    },
+    "source": {
+      "label": "IAM roles",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
+    }
+  },
+  {
+    "id": "s3-object-storage",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon S3",
+      "pt-BR": "Amazon S3"
+    },
+    "content": {
+      "en": "Amazon S3 is object storage. Objects are stored in buckets and can be accessed through APIs; it is not a block-storage volume attached to an EC2 instance.",
+      "pt-BR": "O Amazon S3 é um serviço de armazenamento de objetos. Os objetos ficam em buckets e são acessados por APIs; ele não é um volume de blocos anexado a uma instância EC2."
+    },
+    "source": {
+      "label": "Amazon S3 User Guide",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+    }
+  },
+  {
+    "id": "ec2-compute",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon EC2",
+      "pt-BR": "Amazon EC2"
+    },
+    "content": {
+      "en": "Amazon EC2 provides resizable virtual servers. Customers choose and manage the guest operating system and applications running on their instances.",
+      "pt-BR": "O Amazon EC2 fornece servidores virtuais redimensionáveis. O cliente escolhe e gerencia o sistema operacional convidado e os aplicativos executados nas instâncias."
+    },
+    "source": {
+      "label": "Amazon EC2 concepts",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
+    }
+  },
+  {
+    "id": "lambda-serverless",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Lambda",
+      "pt-BR": "AWS Lambda"
+    },
+    "content": {
+      "en": "AWS Lambda runs code in response to events without requiring customers to provision or manage the underlying servers.",
+      "pt-BR": "O AWS Lambda executa código em resposta a eventos sem exigir que o cliente provisione ou gerencie os servidores subjacentes."
+    },
+    "source": {
+      "label": "AWS Lambda Developer Guide",
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
+    }
+  },
+  {
+    "id": "rds-managed-database",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon RDS",
+      "pt-BR": "Amazon RDS"
+    },
+    "content": {
+      "en": "Amazon RDS is a managed relational database service. AWS manages infrastructure tasks such as provisioning and supported maintenance; customers still manage their data and access.",
+      "pt-BR": "O Amazon RDS é um serviço gerenciado de banco de dados relacional. A AWS gerencia tarefas de infraestrutura, como provisionamento e manutenção suportada; o cliente continua gerenciando dados e acessos."
+    },
+    "source": {
+      "label": "Amazon RDS User Guide",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
+    }
+  },
+  {
+    "id": "cloudwatch-monitoring",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon CloudWatch",
+      "pt-BR": "Amazon CloudWatch"
+    },
+    "content": {
+      "en": "Amazon CloudWatch collects and monitors metrics, logs, and alarms, helping teams observe AWS resources and applications.",
+      "pt-BR": "O Amazon CloudWatch coleta e monitora métricas, logs e alarmes, ajudando equipes a observar recursos e aplicativos da AWS."
+    },
+    "source": {
+      "label": "Amazon CloudWatch overview",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+    }
+  },
+  {
+    "id": "cloudtrail-audit",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS CloudTrail",
+      "pt-BR": "AWS CloudTrail"
+    },
+    "content": {
+      "en": "AWS CloudTrail records account activity and API calls. Use it to answer who performed an action, when it happened, and which AWS resources were involved.",
+      "pt-BR": "O AWS CloudTrail registra atividades da conta e chamadas de API. Use-o para identificar quem realizou uma ação, quando ela ocorreu e quais recursos AWS foram envolvidos."
+    },
+    "source": {
+      "label": "AWS CloudTrail User Guide",
+      "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
+    }
+  },
+  {
+    "id": "aws-budgets",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Budgets",
+      "pt-BR": "AWS Budgets"
+    },
+    "content": {
+      "en": "AWS Budgets lets customers set cost or usage budgets and receive notifications when actual or forecasted amounts exceed configured thresholds.",
+      "pt-BR": "O AWS Budgets permite definir orçamentos de custo ou uso e receber notificações quando valores reais ou previstos ultrapassam os limites configurados."
+    },
+    "source": {
+      "label": "Managing costs with AWS Budgets",
+      "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
+    }
+  },
+  {
+    "id": "cost-explorer",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Cost Explorer",
+      "pt-BR": "AWS Cost Explorer"
+    },
+    "content": {
+      "en": "AWS Cost Explorer helps visualize, understand, and manage historical AWS costs and usage through reports and forecasts.",
+      "pt-BR": "O AWS Cost Explorer ajuda a visualizar, entender e gerenciar custos e uso históricos da AWS por meio de relatórios e previsões."
+    },
+    "source": {
+      "label": "AWS Cost Explorer",
+      "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html"
+    }
+  }
+]

@@ -42,6 +42,15 @@ export const certifications = pgTable("certifications", {
   name: text("name").notNull(),
 });
 
+export const botChannelMessages = pgTable("bot_channel_messages", {
+  key: varchar("key", { length: 48 }).primaryKey(),
+  channelId: varchar("channel_id", { length: 20 }).notNull(),
+  messageId: varchar("message_id", { length: 20 }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const examDomains = pgTable(
   "exam_domains",
   {
@@ -102,7 +111,7 @@ export const userPreferences = pgTable("user_preferences", {
   userId: varchar("user_id", { length: 20 })
     .primaryKey()
     .references(() => users.discordUserId, { onDelete: "cascade" }),
-  locale: userLocale("locale").notNull().default("en"),
+  locale: userLocale("locale").notNull().default("pt-BR"),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -318,6 +327,31 @@ export const dailyChallenges = pgTable(
       foreignColumns: [sessionQuestions.sessionId, sessionQuestions.questionId],
       name: "daily_challenges_session_question_fk",
     }).onDelete("restrict"),
+  ],
+);
+
+export const dailyTipPublications = pgTable(
+  "daily_tip_publications",
+  {
+    tipDate: date("tip_date", { mode: "string" }).notNull(),
+    slot: smallint("slot").notNull(),
+    tipId: varchar("tip_id", { length: 48 }).notNull(),
+    messageId: varchar("message_id", { length: 20 }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    reservedAt: timestamp("reserved_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.tipDate, table.slot] }),
+    unique("daily_tip_publications_date_tip_unique").on(
+      table.tipDate,
+      table.tipId,
+    ),
+    check(
+      "daily_tip_publications_slot_valid",
+      sql`${table.slot} between 1 and 3`,
+    ),
   ],
 );
 

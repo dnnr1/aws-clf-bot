@@ -23,7 +23,7 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
    Copy-Item .env.example .env
    ```
 
-   Keep `.env` private. Never commit it or share the Discord token. The committed `.env.example` contains placeholders only.
+   Set both channel IDs to the Discord text channels used for practice and tips. The bot needs permission to view/send messages and embed links in both channels, plus read message history in the practice channel to maintain its introduction panel. Users need permission to use application commands. Keep `.env` private. Never commit it or share the Discord token. The committed `.env.example` contains placeholders only.
 
 3. From a WSL terminal, start PostgreSQL in the project directory:
 
@@ -41,6 +41,8 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
    ```
 
    The seed command validates and inserts the versioned question data in `data/questions/`. Existing question IDs are not overwritten. When the Drizzle schema changes, generate a new migration with `npm run db:generate`, review the SQL, and commit both the schema and migration.
+
+   Exam simulation requires 65 active questions distributed 16/19/22/8 across the four domains. Daily tips are bilingual and scheduled for 12:00, 16:00, and 20:00 UTC; missed slots are not sent later, and failed or ambiguous posts are not retried.
 
 5. Run the available checks:
 
