@@ -49,7 +49,14 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
    npm run format:check
    ```
 
-The initial setup provides the TypeScript toolchain, environment validation, and local database service. Bot commands and application startup will be added in later implementation phases.
+6. Build and start the bot:
+
+   ```powershell
+   npm run build
+   npm start
+   ```
+
+On startup, the bot checks the database connection and registers its current slash commands. Set `DISCORD_GUILD_ID` to register commands to one development server; leave it unset to register global commands.
 
 ## Discord MCP
 
