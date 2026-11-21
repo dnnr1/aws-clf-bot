@@ -52,17 +52,36 @@ export function startDailyTipScheduler(
     try {
       const now = new Date();
       const slot = getDueDailyTipSlot(now);
-
-      if (slot === null) {
-        return;
-      }
-
-      const tip = selectDailyTip(tips, now, slot);
       const dateUtc = now.toISOString().slice(0, 10);
       const destinations = await resolveDestinations();
 
       for (const destination of destinations) {
         try {
+          const initialTip = selectDailyTip(tips, now, 1);
+          const initialClaimed = await publications.claimInitialPublication(
+            dateUtc,
+            destination.guildId,
+            initialTip.id,
+          );
+
+          if (initialClaimed) {
+            await publishTip(
+              client,
+              destination,
+              dateUtc,
+              1,
+              initialTip,
+              publications,
+              logger,
+              "initial",
+            );
+          }
+
+          if (slot === null) {
+            continue;
+          }
+
+          const tip = selectDailyTip(tips, now, slot);
           const claimed = await publications.claimPublication(
             dateUtc,
             destination.guildId,
@@ -70,38 +89,18 @@ export function startDailyTipScheduler(
             tip.id,
           );
 
-          if (!claimed) {
-            continue;
-          }
-
-          const channel = await client.channels.fetch(destination.channelId);
-
-          if (
-            !channel ||
-            channel.type !== ChannelType.GuildText ||
-            channel.guildId !== destination.guildId
-          ) {
-            throw new Error(
-              "The tips channel must be a sendable text channel in its configured server.",
+          if (claimed) {
+            await publishTip(
+              client,
+              destination,
+              dateUtc,
+              slot,
+              tip,
+              publications,
+              logger,
+              "scheduled",
             );
           }
-
-          const message = await channel.send({
-            embeds: [renderDailyTip(tip)],
-            allowedMentions: { parse: [] },
-          });
-          await publications.markPublicationSent(
-            dateUtc,
-            destination.guildId,
-            slot,
-            message.id,
-          );
-          logger.info("daily_tip.published", {
-            dateUtc,
-            guildId: destination.guildId,
-            slot: String(slot),
-            tipId: tip.id,
-          });
         } catch (error) {
           logger.error("daily_tip.publish_failed", error, {
             channelId: destination.channelId,
@@ -124,6 +123,51 @@ export function startDailyTipScheduler(
   const interval = setInterval(runCheck, dailyTipCheckIntervalMilliseconds);
 
   return () => clearInterval(interval);
+}
+
+async function publishTip(
+  client: Client,
+  destination: DailyTipDestination,
+  dateUtc: string,
+  slot: number,
+  tip: DailyTip,
+  publications: DailyTipPublicationRepository,
+  logger: Logger,
+  publicationType: "initial" | "scheduled",
+): Promise<void> {
+  const channel = await client.channels.fetch(destination.channelId);
+
+  if (
+    !channel ||
+    channel.type !== ChannelType.GuildText ||
+    channel.guildId !== destination.guildId
+  ) {
+    throw new Error(
+      "The tips channel must be a text channel in its configured server.",
+    );
+  }
+
+  const message = await channel.send({
+    embeds: [renderDailyTip(tip)],
+    allowedMentions: { parse: [] },
+  });
+  await publications.markPublicationSent(
+    dateUtc,
+    destination.guildId,
+    slot,
+    message.id,
+  );
+  logger.info(
+    publicationType === "initial"
+      ? "daily_tip.initial_published"
+      : "daily_tip.published",
+    {
+      dateUtc,
+      guildId: destination.guildId,
+      slot: String(slot),
+      tipId: tip.id,
+    },
+  );
 }
 
 export function getDueDailyTipSlot(

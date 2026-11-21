@@ -13,6 +13,7 @@ import type {
   PracticeRepository,
   PresentedQuestion,
   StartedExamSession,
+  StartedPracticeSession,
 } from "../../application/study/practice-repository.js";
 import {
   isAnswerOptionKey,
@@ -28,10 +29,12 @@ import {
 } from "../../domain/study/exam-simulation.js";
 import type { BotDatabase } from "./client.js";
 import {
+  awsServices,
   examDomainResults,
   examDomains,
   examResults,
   questionOptions,
+  questionServices,
   questions,
   sessionQuestions,
   studySessions,
@@ -51,9 +54,7 @@ interface LoadedQuestion {
 export class DrizzlePracticeRepository implements PracticeRepository {
   constructor(private readonly database: BotDatabase) {}
 
-  async startSession(
-    discordUserId: string,
-  ): Promise<{ sessionId: string; question: StudyQuestion }> {
+  async startSession(discordUserId: string): Promise<StartedPracticeSession> {
     return this.database.transaction(async (transaction) => {
       const [candidate] = await transaction
         .select({ id: questions.id })
@@ -96,7 +97,12 @@ export class DrizzlePracticeRepository implements PracticeRepository {
       });
 
       const loaded = await loadQuestion(transaction, candidate.id);
-      return { sessionId: session.id, question: loaded.question };
+      return {
+        sessionId: session.id,
+        question: loaded.question,
+        correctCount: 0,
+        incorrectCount: 0,
+      };
     });
   }
 
@@ -172,6 +178,8 @@ export class DrizzlePracticeRepository implements PracticeRepository {
         position: 1,
         totalQuestions: examQuestionCount,
         expiresAt,
+        correctCount: 0,
+        incorrectCount: 0,
         questionCount: examQuestionCount,
       };
     });
@@ -215,6 +223,7 @@ export class DrizzlePracticeRepository implements PracticeRepository {
         throw new PracticeError("session_closed");
       }
 
+      const answerCounts = await getSessionAnswerCounts(transaction, sessionId);
       const [pendingQuestion] = await transaction
         .select({
           questionId: sessionQuestions.questionId,
@@ -249,6 +258,7 @@ export class DrizzlePracticeRepository implements PracticeRepository {
           totalQuestions:
             session.mode === "exam_simulation" ? examQuestionCount : null,
           expiresAt: session.expiresAt,
+          ...answerCounts,
         };
       }
 
@@ -306,6 +316,7 @@ export class DrizzlePracticeRepository implements PracticeRepository {
         position,
         totalQuestions: null,
         expiresAt: null,
+        ...answerCounts,
       };
     });
 
@@ -401,11 +412,14 @@ export class DrizzlePracticeRepository implements PracticeRepository {
         isCorrect,
       });
 
+      const answerCounts = await getSessionAnswerCounts(transaction, sessionId);
       const feedback: AnswerFeedback = {
         isCorrect,
         correctOptionKey: loaded.correctOptionKey,
         correctOptionText: loaded.correctOptionText,
         explanation: loaded.explanation,
+        services: loaded.question.services,
+        ...answerCounts,
       };
 
       if (session.mode !== "exam_simulation") {
@@ -427,6 +441,21 @@ export class DrizzlePracticeRepository implements PracticeRepository {
 
     return result;
   }
+}
+
+async function getSessionAnswerCounts(
+  transaction: BotTransaction,
+  sessionId: string,
+): Promise<{ correctCount: number; incorrectCount: number }> {
+  const [counts] = await transaction
+    .select({
+      correctCount: sql<number>`count(*) filter (where ${userAnswers.isCorrect})::int`,
+      incorrectCount: sql<number>`count(*) filter (where not ${userAnswers.isCorrect})::int`,
+    })
+    .from(userAnswers)
+    .where(eq(userAnswers.sessionId, sessionId));
+
+  return counts ?? { correctCount: 0, incorrectCount: 0 };
 }
 
 async function completeExamIfAnswered(
@@ -541,6 +570,12 @@ async function loadQuestion(
     .from(questionOptions)
     .where(eq(questionOptions.questionId, questionId))
     .orderBy(asc(questionOptions.optionKey));
+  const relatedServices = await transaction
+    .select({ name: awsServices.name })
+    .from(questionServices)
+    .innerJoin(awsServices, eq(awsServices.id, questionServices.serviceId))
+    .where(eq(questionServices.questionId, questionId))
+    .orderBy(asc(awsServices.name));
 
   if (storedOptions.length !== 4) {
     throw new Error(
@@ -590,6 +625,7 @@ async function loadQuestion(
         "pt-BR": question.promptPtBr,
       },
       options,
+      services: relatedServices.map(({ name }) => name),
     },
     correctOptionKey,
     correctOptionText: correctOption.text,

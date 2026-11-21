@@ -7,6 +7,8 @@ import type {
 export interface StartedPracticeSession {
   sessionId: string;
   question: StudyQuestion;
+  correctCount: number;
+  incorrectCount: number;
 }
 
 export interface PresentedQuestion {
@@ -15,6 +17,8 @@ export interface PresentedQuestion {
   position: number;
   totalQuestions: number | null;
   expiresAt: Date | null;
+  correctCount: number;
+  incorrectCount: number;
 }
 
 export interface StartedExamSession extends PresentedQuestion {

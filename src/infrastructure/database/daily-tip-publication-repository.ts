@@ -6,6 +6,37 @@ import { dailyTipPublications } from "./schema.js";
 export class DrizzleDailyTipPublicationRepository implements DailyTipPublicationRepository {
   constructor(private readonly database: BotDatabase) {}
 
+  async claimInitialPublication(
+    dateUtc: string,
+    guildId: string,
+    tipId: string,
+  ): Promise<boolean> {
+    return this.database.transaction(async (transaction) => {
+      const [existingPublication] = await transaction
+        .select({ slot: dailyTipPublications.slot })
+        .from(dailyTipPublications)
+        .where(
+          and(
+            eq(dailyTipPublications.tipDate, dateUtc),
+            eq(dailyTipPublications.guildId, guildId),
+          ),
+        )
+        .limit(1);
+
+      if (existingPublication) {
+        return false;
+      }
+
+      const [publication] = await transaction
+        .insert(dailyTipPublications)
+        .values({ tipDate: dateUtc, guildId, slot: 1, tipId })
+        .onConflictDoNothing()
+        .returning({ guildId: dailyTipPublications.guildId });
+
+      return publication !== undefined;
+    });
+  }
+
   async claimPublication(
     dateUtc: string,
     guildId: string,

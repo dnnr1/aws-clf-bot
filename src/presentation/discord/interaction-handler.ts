@@ -79,7 +79,9 @@ const practiceMessages: Record<
   {
     answerCorrect: string;
     answerIncorrect: string;
-    continue: string;
+    nextQuestion: string;
+    correctCount: string;
+    incorrectCount: string;
     explanation: string;
     noQuestions: string;
     exhausted: string;
@@ -90,7 +92,9 @@ const practiceMessages: Record<
   en: {
     answerCorrect: "Correct.",
     answerIncorrect: "Not quite.",
-    continue: "Continue practice",
+    nextQuestion: "Next question",
+    correctCount: "Correct",
+    incorrectCount: "Incorrect",
     explanation: "Explanation",
     noQuestions:
       "No study questions are available yet. Please try again later.",
@@ -103,7 +107,9 @@ const practiceMessages: Record<
   "pt-BR": {
     answerCorrect: "Correto.",
     answerIncorrect: "Não foi dessa vez.",
-    continue: "Continuar prática",
+    nextQuestion: "Próxima pergunta",
+    correctCount: "Corretas",
+    incorrectCount: "Erradas",
     explanation: "Explicação",
     noQuestions:
       "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.",
@@ -189,7 +195,9 @@ export async function handleDiscordInteraction(
   }
 
   if (interaction.isButton()) {
-    if (interaction.customId.startsWith("a:")) {
+    if (interaction.customId === "start-practice") {
+      await startPracticeSession(interaction, services);
+    } else if (interaction.customId.startsWith("a:")) {
       await handleAnswerButton(interaction, services);
     } else if (interaction.customId.startsWith("n:")) {
       await handleNextButton(interaction, services);
@@ -396,8 +404,8 @@ function renderExamResult(
     .join("\n");
   const description =
     locale === "en"
-      ? `${lastAnswerStatus} Last answer: ${lastAnswer.correctOptionKey}. ${lastAnswer.correctOptionText.en}\n\n${lastAnswer.explanation.en}`
-      : `${lastAnswerStatus} Última resposta: ${lastAnswer.correctOptionKey}. ${lastAnswer.correctOptionText["pt-BR"]}\n\n${lastAnswer.explanation["pt-BR"]}`;
+      ? `${renderAnswerCounts(lastAnswer, locale)}\n\n${lastAnswerStatus} Last answer: ${lastAnswer.correctOptionKey}. ${formatServiceMentions(lastAnswer.correctOptionText.en, lastAnswer.services)}\n\n${formatServiceMentions(lastAnswer.explanation.en, lastAnswer.services)}`
+      : `${renderAnswerCounts(lastAnswer, locale)}\n\n${lastAnswerStatus} Última resposta: ${lastAnswer.correctOptionKey}. ${formatServiceMentions(lastAnswer.correctOptionText["pt-BR"], lastAnswer.services)}\n\n${formatServiceMentions(lastAnswer.explanation["pt-BR"], lastAnswer.services)}`;
 
   return new EmbedBuilder()
     .setColor(successColor)
@@ -525,6 +533,13 @@ async function handlePracticeCommand(
   interaction: ChatInputCommandInteraction,
   services: DiscordServices,
 ): Promise<void> {
+  await startPracticeSession(interaction, services);
+}
+
+async function startPracticeSession(
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
+  services: DiscordServices,
+): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const locale = await services.preferences.getLocale(interaction.user.id);
 
@@ -536,6 +551,7 @@ async function handlePracticeCommand(
         interaction.user.id,
         session.question,
         locale,
+        session,
       ),
     );
   } catch (error) {
@@ -667,7 +683,7 @@ async function handleAnswerButton(
         embeds: [
           createStatusEmbed(
             status,
-            `${answer.correctOptionKey}. ${answer.correctOptionText[locale]}\n\n${messages.explanation}: ${answer.explanation[locale]}`,
+            `${renderAnswerCounts(answer, locale)}\n\n${answer.correctOptionKey}. ${formatServiceMentions(answer.correctOptionText[locale], answer.services)}\n\n${messages.explanation}: ${formatServiceMentions(answer.explanation[locale], answer.services)}`,
             answer.isCorrect ? successColor : errorColor,
           ),
         ],
@@ -788,13 +804,19 @@ function renderQuestion(
   discordUserId: string,
   question: StudyQuestion,
   locale: UserLocale,
-  progress?: Pick<
-    PresentedQuestion,
-    "mode" | "position" | "totalQuestions" | "expiresAt"
-  >,
+  progress: Pick<PresentedQuestion, "correctCount" | "incorrectCount"> &
+    Partial<
+      Pick<
+        PresentedQuestion,
+        "mode" | "position" | "totalQuestions" | "expiresAt"
+      >
+    >,
 ) {
   const options = question.options
-    .map((option) => `**${option.key}.** ${option.text[locale]}`)
+    .map(
+      (option) =>
+        `**${option.key}.** ${formatServiceMentions(option.text[locale], question.services)}`,
+    )
     .join("\n");
   const buttons = question.options.map((option) =>
     new ButtonBuilder()
@@ -816,9 +838,66 @@ function renderQuestion(
       : "";
 
   return {
-    content: `${progressMessage}${question.prompt[locale]}\n\n${options}`,
+    content: `${renderAnswerCounts(progress, locale)}\n\n${progressMessage}${formatServiceMentions(question.prompt[locale], question.services)}\n\n${options}`,
     components: [row],
   };
+}
+
+function renderAnswerCounts(
+  counts: Pick<PresentedQuestion, "correctCount" | "incorrectCount">,
+  locale: UserLocale,
+): string {
+  const labels = practiceMessages[locale];
+  return `**${labels.correctCount}:** ${counts.correctCount} · **${labels.incorrectCount}:** ${counts.incorrectCount}`;
+}
+
+export function formatServiceMentions(
+  text: string,
+  services: string[],
+): string {
+  const terms = new Set<string>();
+
+  for (const service of services) {
+    terms.add(service);
+
+    const baseName = service.replace(/\s*\([^)]*\)/g, "");
+    if (baseName !== service) {
+      terms.add(baseName);
+    }
+
+    for (const [, acronym] of service.matchAll(/\(([^)]+)\)/g)) {
+      if (acronym) {
+        terms.add(acronym);
+      }
+    }
+
+    const words = baseName.split(/\s+/);
+    const lastWord = words.at(-1);
+    const hasProductPrefix =
+      words.length === 2 && /^(Amazon|AWS)$/i.test(words[0] ?? "");
+    if (lastWord && (hasProductPrefix || /^[A-Z0-9.-]{2,8}$/.test(lastWord))) {
+      terms.add(lastWord);
+    }
+  }
+
+  const alternatives = [...terms]
+    .sort((left, right) => right.length - left.length)
+    .map(escapeRegularExpression)
+    .join("|");
+
+  if (!alternatives) {
+    return text;
+  }
+
+  const servicePattern = new RegExp(
+    `(?<![\\w\`])(?:${alternatives})(?![\\w\`])`,
+    "gi",
+  );
+  return text.replace(servicePattern, (match) => `\`${match}\``);
+}
+
+function escapeRegularExpression(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function renderNextButton(
@@ -828,7 +907,7 @@ function renderNextButton(
 ) {
   const button = new ButtonBuilder()
     .setCustomId(`n:${sessionId}:${discordUserId}`)
-    .setLabel(practiceMessages[locale].continue)
+    .setLabel(practiceMessages[locale].nextQuestion)
     .setStyle(ButtonStyle.Secondary);
 
   return new ActionRowBuilder<ButtonBuilder>().addComponents(button);

@@ -17,6 +17,7 @@ export interface StudyQuestion {
   domainId: string;
   prompt: LocalizedText;
   options: StudyQuestionOption[];
+  services: string[];
 }
 
 export interface ExamDomainResult {
@@ -39,6 +40,9 @@ export interface AnswerFeedback {
   correctOptionKey: AnswerOptionKey;
   correctOptionText: LocalizedText;
   explanation: LocalizedText;
+  correctCount: number;
+  incorrectCount: number;
+  services: string[];
   examResult?: CompletedExamResult;
 }
 

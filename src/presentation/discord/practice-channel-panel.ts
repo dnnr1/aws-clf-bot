@@ -1,4 +1,7 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   ChannelType,
   DiscordAPIError,
   EmbedBuilder,
@@ -37,7 +40,7 @@ export async function maintainPracticeChannelPanel(
         );
       }
 
-      await message.edit({ embeds: [createPracticePanel()] });
+      await message.edit(createPracticePanelMessage());
       return;
     } catch (error) {
       if (!(error instanceof DiscordAPIError) || error.code !== 10008) {
@@ -46,7 +49,7 @@ export async function maintainPracticeChannelPanel(
     }
   }
 
-  const message = await channel.send({ embeds: [createPracticePanel()] });
+  const message = await channel.send(createPracticePanelMessage());
   await messages.saveMessage(practicePanelKey, channel.id, message.id);
 
   if (storedMessage && storedMessage.channelId !== channel.id) {
@@ -95,6 +98,20 @@ async function removePreviousPanel(
   await message.delete();
 }
 
+function createPracticePanelMessage() {
+  const startPracticeButton = new ButtonBuilder()
+    .setCustomId("start-practice")
+    .setLabel("Iniciar prática / Start practice")
+    .setStyle(ButtonStyle.Success);
+
+  return {
+    embeds: [createPracticePanel()],
+    components: [
+      new ActionRowBuilder<ButtonBuilder>().addComponents(startPracticeButton),
+    ],
+  };
+}
+
 function createPracticePanel(): EmbedBuilder {
   return new EmbedBuilder()
     .setColor(0x5865f2)
@@ -106,7 +123,7 @@ function createPracticePanel(): EmbedBuilder {
       {
         name: "Praticar",
         value:
-          "`/practice` responde questões individuais.\n`/exam` inicia uma simulação de 65 questões em até 90 minutos.",
+          "Clique no botão abaixo ou use `/practice` para responder questões individuais.\n`/exam` inicia uma simulação de 65 questões em até 90 minutos.",
       },
       {
         name: "Comandos",
