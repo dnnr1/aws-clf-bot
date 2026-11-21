@@ -10,6 +10,9 @@ export const commandDefinitions = [
   new SlashCommandBuilder()
     .setName("practice")
     .setDescription("Start a practice session with AWS study questions."),
+  new SlashCommandBuilder()
+    .setName("stats")
+    .setDescription("Show your study statistics."),
 ] as const;
 
 export async function registerSlashCommands(

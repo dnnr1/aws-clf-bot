@@ -16,6 +16,8 @@ import {
 import type { UserPreferencesService } from "../../application/users/user-preferences-service.js";
 import { PracticeError } from "../../application/study/practice-error.js";
 import type { PracticeService } from "../../application/study/practice-service.js";
+import type { StatisticsService } from "../../application/study/statistics-service.js";
+import type { StudyStatistics } from "../../domain/study/study-statistics.js";
 import type { StudyQuestion } from "../../domain/study/question.js";
 
 const helpMessages: Record<UserLocale, string> = {
@@ -24,12 +26,14 @@ const helpMessages: Record<UserLocale, string> = {
     "`/help` - Show this command list.",
     "`/language` - Choose English or Portuguese (Brazil).",
     "`/practice` - Start an AWS question practice session.",
+    "`/stats` - Show your study statistics.",
   ].join("\n"),
   "pt-BR": [
     "**Comandos disponíveis**",
     "`/help` - Exibe esta lista de comandos.",
     "`/language` - Escolha English ou Português (Brasil).",
     "`/practice` - Inicie uma sessão de prática com questões da AWS.",
+    "`/stats` - Exiba suas estatísticas de estudo.",
   ].join("\n"),
 };
 
@@ -88,6 +92,7 @@ const practiceMessages: Record<
 interface DiscordServices {
   preferences: UserPreferencesService;
   practice: PracticeService;
+  statistics: StatisticsService;
 }
 
 export async function handleDiscordInteraction(
@@ -101,6 +106,8 @@ export async function handleDiscordInteraction(
       await handleLanguageCommand(interaction, services.preferences);
     } else if (interaction.commandName === "practice") {
       await handlePracticeCommand(interaction, services);
+    } else if (interaction.commandName === "stats") {
+      await handleStatsCommand(interaction, services);
     }
 
     return;
@@ -124,6 +131,19 @@ export async function handleDiscordInteraction(
   }
 }
 
+async function handleStatsCommand(
+  interaction: ChatInputCommandInteraction,
+  services: DiscordServices,
+): Promise<void> {
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const locale = await services.preferences.getLocale(interaction.user.id);
+  const statistics = await services.statistics.getStudyStatistics(
+    interaction.user.id,
+  );
+
+  await interaction.editReply(renderStudyStatistics(statistics, locale));
+}
+
 async function handleHelpCommand(
   interaction: ChatInputCommandInteraction,
   preferences: UserPreferencesService,
@@ -131,6 +151,40 @@ async function handleHelpCommand(
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const locale = await preferences.getLocale(interaction.user.id);
   await interaction.editReply(helpMessages[locale]);
+}
+
+function renderStudyStatistics(
+  statistics: StudyStatistics,
+  locale: UserLocale,
+): string {
+  const accuracy = new Intl.NumberFormat(locale, {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(statistics.accuracyPercentage / 100);
+
+  if (locale === "en") {
+    return [
+      "**Study statistics**",
+      `Questions answered: ${statistics.totalAnswers}`,
+      `Correct: ${statistics.correctAnswers}`,
+      `Incorrect: ${statistics.incorrectAnswers}`,
+      `Accuracy: ${accuracy}`,
+      `Study sessions: ${statistics.totalSessions}`,
+      `Current streak: ${statistics.currentStreakDays} day${statistics.currentStreakDays === 1 ? "" : "s"}`,
+      `Longest streak: ${statistics.longestStreakDays} day${statistics.longestStreakDays === 1 ? "" : "s"}`,
+    ].join("\n");
+  }
+
+  return [
+    "**Estatísticas de estudo**",
+    `Questões respondidas: ${statistics.totalAnswers}`,
+    `Corretas: ${statistics.correctAnswers}`,
+    `Incorretas: ${statistics.incorrectAnswers}`,
+    `Precisão: ${accuracy}`,
+    `Sessões de estudo: ${statistics.totalSessions}`,
+    `Sequência atual: ${statistics.currentStreakDays} dia${statistics.currentStreakDays === 1 ? "" : "s"}`,
+    `Maior sequência: ${statistics.longestStreakDays} dia${statistics.longestStreakDays === 1 ? "" : "s"}`,
+  ].join("\n");
 }
 
 async function handleLanguageCommand(

@@ -6,10 +6,12 @@ import {
   type InteractionReplyOptions,
 } from "discord.js";
 import { PracticeService } from "./application/study/practice-service.js";
+import { StatisticsService } from "./application/study/statistics-service.js";
 import { UserPreferencesService } from "./application/users/user-preferences-service.js";
 import { parseEnvironment } from "./infrastructure/config/environment.js";
 import { createDatabase } from "./infrastructure/database/client.js";
 import { DrizzlePracticeRepository } from "./infrastructure/database/practice-repository.js";
+import { DrizzleStatisticsRepository } from "./infrastructure/database/statistics-repository.js";
 import { DrizzleUserPreferencesRepository } from "./infrastructure/database/user-preferences-repository.js";
 import { logger } from "./infrastructure/logging/logger.js";
 import { handleDiscordInteraction } from "./presentation/discord/interaction-handler.js";
@@ -23,7 +25,10 @@ async function startBot(): Promise<void> {
     new DrizzleUserPreferencesRepository(database),
   );
   const practice = new PracticeService(new DrizzlePracticeRepository(database));
-  const services = { preferences, practice };
+  const statistics = new StatisticsService(
+    new DrizzleStatisticsRepository(database),
+  );
+  const services = { preferences, practice, statistics };
   let shutdownPromise: Promise<void> | undefined;
 
   const shutdown = (signal: string): Promise<void> => {

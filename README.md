@@ -6,7 +6,7 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
 
 - Node.js 22.12 or newer
 - npm
-- Docker Desktop for the local PostgreSQL database
+- Docker Engine accessible from WSL for the local PostgreSQL database
 - A Discord bot application and token for running the bot
 
 ## Local setup
@@ -25,11 +25,13 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
 
    Keep `.env` private. Never commit it or share the Discord token. The committed `.env.example` contains placeholders only.
 
-3. Start PostgreSQL:
+3. From a WSL terminal, start PostgreSQL in the project directory:
 
-   ```powershell
+   ```sh
    docker compose up -d
    ```
+
+   The database is bound to localhost. If port `5432` is already in use, set `POSTGRES_PORT` in `.env` to an available local port and update the port in `DATABASE_URL` to match. The Node.js commands below can run in Windows and connect through WSL's localhost forwarding.
 
 4. Apply the initial database migration:
 

@@ -48,7 +48,7 @@ All modes use four-option multiple-choice questions and Discord buttons. After a
 - `/progress`: show performance over time and by exam domain, including weak areas.
 - `/history`: show recent study sessions and prior exam results.
 
-Statistics must be based on persisted answer records, not solely on cached counters. Leaderboard eligibility and tie-breaking, streak day boundaries, and detailed session-resume behavior require feature-level decisions before implementation.
+Statistics must be based on persisted answer records, not solely on cached counters. For `/stats`, count all persisted study sessions and submitted answers for the user. Accuracy is correct answers divided by submitted answers, and unanswered sessions do not affect accuracy. Activity days use UTC dates derived from persisted answer timestamps, independent of user locale. The current streak includes consecutive active UTC dates ending today, or yesterday when today has no activity yet; the longest streak is the largest consecutive run of active UTC dates. Any submitted answer counts as activity, whether correct or incorrect. Leaderboard eligibility and tie-breaking and detailed session-resume behavior require feature-level decisions before implementation.
 
 ## Data and persistence
 
