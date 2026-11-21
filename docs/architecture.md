@@ -48,7 +48,7 @@ The domain must not import Discord.js, Drizzle, or transport-specific types. App
 
 - Initialize the Discord.js client, register slash commands, and route commands and component interactions to application use cases.
 - Restrict channel configuration commands to server administrators at registration and runtime; accept only text channels from the invoking server.
-- Restrict study commands and components to the configured practice channel, while keeping all individual study replies ephemeral. Start practice from the introduction panel rather than a slash command.
+- Restrict study commands and components to the configured practice channel. Maintain an automatically displayed channel question in the introduction panel; selecting an option starts that user's private session and answers the displayed question. Keep correctness feedback, scores, and follow-up questions ephemeral.
 - Keep practice sessions continuous, persist cumulative counts, cycle through question presentations, and let users restart into a fresh session.
 - Convert Discord payloads into validated application inputs; format results as localized messages, embeds, and buttons.
 - Keep authorization, interaction ownership checks, Discord response timing, and expired-interaction handling at this boundary, backed by application/session validation.

@@ -6,9 +6,30 @@ import { dailyTipPublications } from "./schema.js";
 export class DrizzleDailyTipPublicationRepository implements DailyTipPublicationRepository {
   constructor(private readonly database: BotDatabase) {}
 
+  async hasPublicationForChannel(
+    dateUtc: string,
+    guildId: string,
+    channelId: string,
+  ): Promise<boolean> {
+    const [publication] = await this.database
+      .select({ slot: dailyTipPublications.slot })
+      .from(dailyTipPublications)
+      .where(
+        and(
+          eq(dailyTipPublications.tipDate, dateUtc),
+          eq(dailyTipPublications.guildId, guildId),
+          eq(dailyTipPublications.channelId, channelId),
+        ),
+      )
+      .limit(1);
+
+    return publication !== undefined;
+  }
+
   async claimInitialPublication(
     dateUtc: string,
     guildId: string,
+    channelId: string,
     tipId: string,
   ): Promise<boolean> {
     return this.database.transaction(async (transaction) => {
@@ -29,7 +50,7 @@ export class DrizzleDailyTipPublicationRepository implements DailyTipPublication
 
       const [publication] = await transaction
         .insert(dailyTipPublications)
-        .values({ tipDate: dateUtc, guildId, slot: 1, tipId })
+        .values({ tipDate: dateUtc, guildId, slot: 1, channelId, tipId })
         .onConflictDoNothing()
         .returning({ guildId: dailyTipPublications.guildId });
 
@@ -41,11 +62,12 @@ export class DrizzleDailyTipPublicationRepository implements DailyTipPublication
     dateUtc: string,
     guildId: string,
     slot: number,
+    channelId: string,
     tipId: string,
   ): Promise<boolean> {
     const [publication] = await this.database
       .insert(dailyTipPublications)
-      .values({ tipDate: dateUtc, guildId, slot, tipId })
+      .values({ tipDate: dateUtc, guildId, slot, channelId, tipId })
       .onConflictDoNothing()
       .returning({ guildId: dailyTipPublications.guildId });
 

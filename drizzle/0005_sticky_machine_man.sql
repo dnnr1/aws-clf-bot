@@ -1,0 +1,1 @@
+ALTER TABLE "daily_tip_publications" ADD COLUMN "channel_id" varchar(20);

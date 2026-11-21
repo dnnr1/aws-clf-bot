@@ -17,10 +17,10 @@ Help members of a private Discord server prepare for the AWS Certified Cloud Pra
 
 - Use `DISCORD_PRACTICE_CHANNEL_ID` and `DISCORD_TIPS_CHANNEL_ID` as optional default channel IDs. A server administrator can override them at runtime with `/set-practice-channel` and `/set-tips-channel`; store overrides per server, take precedence over environment defaults, and apply them without restarting the bot.
 - Restrict both channel-setting commands to users with the Discord Administrator permission, enforced in command registration and rechecked for each interaction. Accept only text channels belonging to the invoking server.
-- Maintain one bot-authored introduction panel in the practice channel; update the same message on startup and remove the previous panel when an administrator changes channels.
-- Include a button on the introduction panel that starts a private, continuous practice session for the clicking user; practice is started from the panel, not a slash command.
+- Maintain one bot-authored introduction panel with an active question and answer options in the practice channel; update the same message on startup and remove the previous panel when an administrator changes channels.
+- Display the practice question automatically; selecting an option starts a private, continuous session for that user and records the selected option as their first answer. Do not provide a separate practice-start button or `/practice` command.
 - Accept study commands and component interactions only in the configured practice channel.
-- Keep each command response, question, answer, explanation, and error private to the invoking user with ephemeral interaction replies. The shared practice channel contains only the introduction panel.
+- Keep each user's correctness feedback, explanation, score, and follow-up questions private with ephemeral interaction replies. The shared practice channel contains the introduction panel and its active question, but never answer results.
 - Publish one sourced learning tip in Brazilian Portuguese as soon as a tips channel is available, then publish scheduled tips at 12:00, 16:00, and 20:00 UTC. The initial tip reserves the first daily slot. Reserve each slot once before sending; do not retry failed or ambiguous sends or backfill missed slots. This at-most-once policy limits publications to three per server per UTC day.
 
 ## Functional requirements
@@ -45,7 +45,7 @@ The bank contains at least 200 original questions, weighted approximately to the
 - **Exam Simulation:** 65 randomized questions, 90 minutes, final score/performance, and domain breakdown.
 - **Domain Practice:** Practice a selected exam domain and track its performance separately.
 
-All modes use four-option multiple-choice questions and Discord buttons. Display correct and incorrect answer counts for the current session above each question and after each answer. Highlight related service names in question text and options with inline code formatting, deriving names and aliases from question metadata. After an answer, indicate correctness, identify the correct option, provide a concise localized explanation, update persisted progress, and prevent a second answer to the same question in the same attempt.
+All modes use four-option multiple-choice questions and Discord buttons. Display correct and incorrect answer counts for the current session above each question and after each answer. Highlight related service names in question prompts with inline code formatting, deriving names and aliases from question metadata; do not format answer options as inline code. Show correctness only after an option is selected; after the user advances, remove the previous answer feedback from the displayed message. After an answer, identify the correct option, provide a concise localized explanation, update persisted progress, and prevent a second answer to the same question in the same attempt.
 
 ### Commands and progress
 

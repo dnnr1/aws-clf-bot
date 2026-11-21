@@ -1,9 +1,13 @@
 import { isAnswerOptionKey } from "../../domain/study/question.js";
-import type { AnswerFeedback } from "../../domain/study/question.js";
+import type {
+  AnswerFeedback,
+  StudyQuestion,
+} from "../../domain/study/question.js";
 import { PracticeError } from "./practice-error.js";
 import type {
   PracticeRepository,
   PresentedQuestion,
+  StartedPracticeAnswer,
   StartedExamSession,
   StartedPracticeSession,
 } from "./practice-repository.js";
@@ -11,8 +15,24 @@ import type {
 export class PracticeService {
   constructor(private readonly repository: PracticeRepository) {}
 
-  start(discordUserId: string): Promise<StartedPracticeSession> {
-    return this.repository.startSession(discordUserId);
+  async answerChannelQuestion(
+    discordUserId: string,
+    questionId: string,
+    optionKey: unknown,
+  ): Promise<StartedPracticeAnswer> {
+    if (!isAnswerOptionKey(optionKey)) {
+      throw new PracticeError("invalid_option");
+    }
+
+    return this.repository.startSessionWithAnswer(
+      discordUserId,
+      questionId,
+      optionKey,
+    );
+  }
+
+  getRandomQuestion(): Promise<StudyQuestion> {
+    return this.repository.getRandomQuestion();
   }
 
   restart(

@@ -19,6 +19,7 @@ const channelSettings = {
   setTipsChannel: vi.fn().mockResolvedValue(undefined),
 };
 const maintainPracticePanel = vi.fn().mockResolvedValue(undefined);
+const publishImmediateTip = vi.fn().mockResolvedValue(true);
 const services: Parameters<typeof handleDiscordInteraction>[1] = {
   preferences: {
     getLocale: vi.fn().mockResolvedValue("pt-BR"),
@@ -31,6 +32,7 @@ const services: Parameters<typeof handleDiscordInteraction>[1] = {
     typeof handleDiscordInteraction
   >[1]["statistics"],
   maintainPracticePanel,
+  publishImmediateTip,
 };
 
 function createSetPracticeInteraction(
@@ -112,6 +114,10 @@ describe("channel configuration commands", () => {
   });
 
   it("persists an administrator's tips channel without moving the practice panel", async () => {
+    channelSettings.getSettings.mockResolvedValue({
+      practiceChannelId: null,
+      tipsChannelId: null,
+    });
     const interaction = createSetPracticeInteraction(
       true,
       guildId,
@@ -127,6 +133,7 @@ describe("channel configuration commands", () => {
       guildId,
       channelId,
     );
+    expect(publishImmediateTip).toHaveBeenCalledWith(guildId, channelId);
     expect(channelSettings.setPracticeChannel).not.toHaveBeenCalled();
     expect(maintainPracticePanel).not.toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalled();
@@ -149,54 +156,35 @@ describe("channel configuration commands", () => {
 });
 
 describe("practice panel interaction", () => {
-  it("starts a private session with initial counts and highlighted services", async () => {
+  it("starts a private session and reveals correctness only after an option is selected", async () => {
     const userId = "12345678901234569";
     const sessionId = "22345678-9012-3456-7890-123456789012";
     const questionId = "32345678-9012-3456-7890-123456789012";
-    const start = vi.fn().mockResolvedValue({
+    const answerChannelQuestion = vi.fn().mockResolvedValue({
       sessionId,
-      presentationId: "42345678-9012-3456-7890-123456789012",
-      correctCount: 0,
-      incorrectCount: 0,
-      question: {
-        id: questionId,
-        domainId: "cloud-technology-services",
-        prompt: {
-          en: "Which service stores objects in Amazon S3?",
-          "pt-BR": "Qual serviço armazena objetos no Amazon S3?",
+      feedback: {
+        mode: "practice",
+        isCorrect: false,
+        correctOptionKey: "B",
+        correctOptionText: { en: "Amazon EC2", "pt-BR": "Amazon EC2" },
+        explanation: {
+          en: "Amazon S3 stores objects.",
+          "pt-BR": "O Amazon S3 armazena objetos.",
         },
-        options: [
-          {
-            key: "A",
-            text: {
-              en: "AWS Identity and Access Management (IAM)",
-              "pt-BR": "AWS Identity and Access Management (IAM)",
-            },
-          },
-          {
-            key: "B",
-            text: { en: "Amazon EC2", "pt-BR": "Amazon EC2" },
-          },
-          {
-            key: "C",
-            text: { en: "AWS Lambda", "pt-BR": "AWS Lambda" },
-          },
-          {
-            key: "D",
-            text: { en: "Amazon RDS", "pt-BR": "Amazon RDS" },
-          },
-        ],
-        services: ["Amazon S3", "AWS Identity and Access Management (IAM)"],
+        services: ["Amazon S3"],
+        correctCount: 0,
+        incorrectCount: 1,
       },
     });
     const interaction = {
       isChatInputCommand: () => false,
       isButton: () => true,
       isStringSelectMenu: () => false,
-      customId: "start-practice",
+      customId: `c:${questionId}:A`,
       channelId,
       guildId,
       user: { id: userId },
+      reply: vi.fn().mockResolvedValue(undefined),
       deferReply: vi.fn().mockResolvedValue(undefined),
       editReply: vi.fn().mockResolvedValue(undefined),
     };
@@ -208,7 +196,7 @@ describe("practice panel interaction", () => {
     await handleDiscordInteraction(interaction as unknown as Interaction, {
       ...services,
       practice: {
-        start,
+        answerChannelQuestion,
       } as unknown as Parameters<
         typeof handleDiscordInteraction
       >[1]["practice"],
@@ -217,15 +205,20 @@ describe("practice panel interaction", () => {
     expect(interaction.deferReply).toHaveBeenCalledWith({
       flags: MessageFlags.Ephemeral,
     });
-    expect(start).toHaveBeenCalledWith(userId);
+    expect(answerChannelQuestion).toHaveBeenCalledWith(userId, questionId, "A");
+    expect(interaction.reply).not.toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalledWith(
       expect.objectContaining({
-        content: expect.stringContaining("**Corretas:** 0 · **Erradas:** 0"),
-      }),
-    );
-    expect(interaction.editReply).toHaveBeenCalledWith(
-      expect.objectContaining({
-        content: expect.stringContaining("`Amazon S3`"),
+        embeds: [
+          expect.objectContaining({
+            data: expect.objectContaining({
+              title: "Não foi dessa vez.",
+              description: expect.stringContaining(
+                "**Corretas:** 0 · **Erradas:** 1",
+              ),
+            }),
+          }),
+        ],
       }),
     );
   });
@@ -285,6 +278,75 @@ describe("practice panel interaction", () => {
       expect.objectContaining({
         content: expect.stringContaining("**Corretas:** 0 · **Erradas:** 0"),
       }),
+    );
+  });
+
+  it("clears the previous answer feedback when displaying the next question", async () => {
+    const userId = "12345678901234569";
+    const sessionId = "22345678-9012-3456-7890-123456789012";
+    const next = vi.fn().mockResolvedValue({
+      presentationId: "42345678-9012-3456-7890-123456789012",
+      question: {
+        id: "32345678-9012-3456-7890-123456789012",
+        domainId: "cloud-technology-services",
+        prompt: {
+          en: "Which service stores objects in Amazon S3?",
+          "pt-BR": "Qual serviço armazena objetos no Amazon S3?",
+        },
+        options: [
+          { key: "A", text: { en: "Amazon S3", "pt-BR": "Amazon S3" } },
+          { key: "B", text: { en: "Amazon EC2", "pt-BR": "Amazon EC2" } },
+          { key: "C", text: { en: "AWS Lambda", "pt-BR": "AWS Lambda" } },
+          { key: "D", text: { en: "Amazon RDS", "pt-BR": "Amazon RDS" } },
+        ],
+        services: ["Amazon S3"],
+      },
+      mode: "practice",
+      position: 2,
+      totalQuestions: null,
+      expiresAt: null,
+      correctCount: 1,
+      incorrectCount: 0,
+    });
+    const interaction = {
+      isChatInputCommand: () => false,
+      isButton: () => true,
+      isStringSelectMenu: () => false,
+      customId: `n:${sessionId}:${userId}`,
+      channelId,
+      guildId,
+      user: { id: userId },
+      deferUpdate: vi.fn().mockResolvedValue(undefined),
+      editReply: vi.fn().mockResolvedValue(undefined),
+    };
+    channelSettings.getSettings.mockResolvedValue({
+      practiceChannelId: channelId,
+      tipsChannelId: null,
+    });
+
+    await handleDiscordInteraction(interaction as unknown as Interaction, {
+      ...services,
+      practice: {
+        next,
+      } as unknown as Parameters<
+        typeof handleDiscordInteraction
+      >[1]["practice"],
+    });
+
+    expect(next).toHaveBeenCalledWith(userId, sessionId);
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: [],
+        content: expect.stringContaining(
+          "Qual serviço armazena objetos no `Amazon S3`?",
+        ),
+      }),
+    );
+    expect(interaction.editReply.mock.calls[0]?.[0].content).toContain(
+      "`Amazon S3`",
+    );
+    expect(interaction.editReply.mock.calls[0]?.[0].content).not.toContain(
+      "**A.** `Amazon S3`",
     );
   });
 

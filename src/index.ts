@@ -21,7 +21,10 @@ import { DrizzlePracticeRepository } from "./infrastructure/database/practice-re
 import { DrizzleStatisticsRepository } from "./infrastructure/database/statistics-repository.js";
 import { DrizzleUserPreferencesRepository } from "./infrastructure/database/user-preferences-repository.js";
 import { logger } from "./infrastructure/logging/logger.js";
-import { startDailyTipScheduler } from "./infrastructure/discord/daily-tip-scheduler.js";
+import {
+  publishImmediateDailyTip,
+  startDailyTipScheduler,
+} from "./infrastructure/discord/daily-tip-scheduler.js";
 import { parseDailyTipBank } from "./infrastructure/questions/daily-tip-schema.js";
 import { handleDiscordInteraction } from "./presentation/discord/interaction-handler.js";
 import { registerSlashCommands } from "./presentation/discord/commands.js";
@@ -42,6 +45,9 @@ async function startBot(): Promise<void> {
   );
   const preferences = new UserPreferencesService(
     new DrizzleUserPreferencesRepository(database),
+  );
+  const dailyTipPublications = new DrizzleDailyTipPublicationRepository(
+    database,
   );
   const practice = new PracticeService(new DrizzlePracticeRepository(database));
   const statistics = new StatisticsService(
@@ -114,6 +120,15 @@ async function startBot(): Promise<void> {
           guildId,
           channelId,
           botChannelMessages,
+          practice,
+        ),
+      publishImmediateTip: (guildId: string, channelId: string) =>
+        publishImmediateDailyTip(
+          client,
+          { guildId, channelId },
+          tips,
+          dailyTipPublications,
+          logger,
         ),
     };
 
@@ -180,7 +195,7 @@ async function startBot(): Promise<void> {
         return destinations;
       },
       tips,
-      new DrizzleDailyTipPublicationRepository(database),
+      dailyTipPublications,
       logger,
     );
     logger.info("discord.bot_ready");

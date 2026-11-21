@@ -8,12 +8,16 @@ import {
   type Client,
 } from "discord.js";
 import type { BotChannelMessageRepository } from "../../application/discord/bot-channel-message-repository.js";
+import type { PracticeService } from "../../application/study/practice-service.js";
+import type { StudyQuestion } from "../../domain/study/question.js";
+import { formatServiceMentions } from "./service-mentions.js";
 
 export async function maintainPracticeChannelPanel(
   client: Client,
   guildId: string,
   channelId: string,
   messages: BotChannelMessageRepository,
+  practice: PracticeService,
 ): Promise<void> {
   const channel = await client.channels.fetch(channelId);
 
@@ -29,6 +33,8 @@ export async function maintainPracticeChannelPanel(
 
   const practicePanelKey = `practice-introduction-${guildId}`;
   const storedMessage = await messages.findMessage(practicePanelKey);
+  const question = await practice.getRandomQuestion();
+  const panelMessage = createPracticePanelMessage(question);
 
   if (storedMessage?.channelId === channel.id) {
     try {
@@ -40,7 +46,7 @@ export async function maintainPracticeChannelPanel(
         );
       }
 
-      await message.edit(createPracticePanelMessage());
+      await message.edit(panelMessage);
       return;
     } catch (error) {
       if (!(error instanceof DiscordAPIError) || error.code !== 10008) {
@@ -49,7 +55,7 @@ export async function maintainPracticeChannelPanel(
     }
   }
 
-  const message = await channel.send(createPracticePanelMessage());
+  const message = await channel.send(panelMessage);
   await messages.saveMessage(practicePanelKey, channel.id, message.id);
 
   if (storedMessage && storedMessage.channelId !== channel.id) {
@@ -98,17 +104,40 @@ async function removePreviousPanel(
   await message.delete();
 }
 
-function createPracticePanelMessage() {
-  const startPracticeButton = new ButtonBuilder()
-    .setCustomId("start-practice")
-    .setLabel("Iniciar prática / Start practice")
-    .setStyle(ButtonStyle.Success);
-
+function createPracticePanelMessage(question: StudyQuestion) {
+  const answerButtons = question.options.map((option) =>
+    new ButtonBuilder()
+      .setCustomId(`c:${question.id}:${option.key}`)
+      .setLabel(option.key)
+      .setStyle(ButtonStyle.Primary),
+  );
+  const answerRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    answerButtons,
+  );
+  const practiceQuestion = new EmbedBuilder()
+    .setColor(0x3498db)
+    .setTitle("Questão de prática / Practice question")
+    .setDescription(
+      [
+        "**Português (Brasil)**",
+        formatServiceMentions(question.prompt["pt-BR"], question.services),
+        question.options
+          .map((option) => `**${option.key}.** ${option.text["pt-BR"]}`)
+          .join("\n"),
+        "**English**",
+        formatServiceMentions(question.prompt.en, question.services),
+        question.options
+          .map((option) => `**${option.key}.** ${option.text.en}`)
+          .join("\n"),
+      ].join("\n\n"),
+    )
+    .setFooter({
+      text: "Selecione uma opção para responder em particular / Select an option to answer privately",
+    });
   return {
-    embeds: [createPracticePanel()],
-    components: [
-      new ActionRowBuilder<ButtonBuilder>().addComponents(startPracticeButton),
-    ],
+    embeds: [createPracticePanel(), practiceQuestion],
+    components: [answerRow],
+    allowedMentions: { parse: [] },
   };
 }
 
@@ -117,13 +146,13 @@ function createPracticePanel(): EmbedBuilder {
     .setColor(0x5865f2)
     .setTitle("Boas-vindas ao AWS CLF Study Bot")
     .setDescription(
-      "Use os comandos abaixo para estudar. Questões, respostas, estatísticas e erros são visíveis somente para você.",
+      "A prática começa automaticamente abaixo. Selecione uma resposta para iniciar sua sessão contínua e privada.",
     )
     .addFields(
       {
         name: "Praticar",
         value:
-          "Clique no botão abaixo para iniciar uma sessão contínua de questões individuais.\n`/exam` inicia uma simulação cronometrada de 65 questões em 90 minutos.",
+          "Sua resposta, resultado e sequência de questões são privados. `/exam` inicia uma simulação cronometrada de 65 questões em 90 minutos.",
       },
       {
         name: "Comandos",
@@ -133,7 +162,7 @@ function createPracticePanel(): EmbedBuilder {
       {
         name: "Welcome",
         value:
-          "Study commands send private replies, so your questions and progress do not clutter this channel.",
+          "Practice starts automatically. Select an option to start your own continuous private session.",
       },
     );
 }

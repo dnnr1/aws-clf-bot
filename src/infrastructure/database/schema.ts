@@ -367,6 +367,7 @@ export const dailyTipPublications = pgTable(
     tipDate: date("tip_date", { mode: "string" }).notNull(),
     guildId: varchar("guild_id", { length: 20 }).notNull(),
     slot: smallint("slot").notNull(),
+    channelId: varchar("channel_id", { length: 20 }),
     tipId: varchar("tip_id", { length: 48 }).notNull(),
     messageId: varchar("message_id", { length: 20 }),
     sentAt: timestamp("sent_at", { withTimezone: true }),

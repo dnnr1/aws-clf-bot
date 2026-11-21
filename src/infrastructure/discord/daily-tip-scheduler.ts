@@ -57,25 +57,14 @@ export function startDailyTipScheduler(
 
       for (const destination of destinations) {
         try {
-          const initialTip = selectDailyTip(tips, now, 1);
-          const initialClaimed = await publications.claimInitialPublication(
-            dateUtc,
-            destination.guildId,
-            initialTip.id,
+          await publishImmediateDailyTip(
+            client,
+            destination,
+            tips,
+            publications,
+            logger,
+            now,
           );
-
-          if (initialClaimed) {
-            await publishTip(
-              client,
-              destination,
-              dateUtc,
-              1,
-              initialTip,
-              publications,
-              logger,
-              "initial",
-            );
-          }
 
           if (slot === null) {
             continue;
@@ -86,6 +75,7 @@ export function startDailyTipScheduler(
             dateUtc,
             destination.guildId,
             slot,
+            destination.channelId,
             tip.id,
           );
 
@@ -123,6 +113,87 @@ export function startDailyTipScheduler(
   const interval = setInterval(runCheck, dailyTipCheckIntervalMilliseconds);
 
   return () => clearInterval(interval);
+}
+
+export async function publishImmediateDailyTip(
+  client: Client,
+  destination: DailyTipDestination,
+  tips: DailyTip[],
+  publications: DailyTipPublicationRepository,
+  logger: Logger,
+  now = new Date(),
+): Promise<boolean> {
+  const dateUtc = now.toISOString().slice(0, 10);
+  if (
+    await publications.hasPublicationForChannel(
+      dateUtc,
+      destination.guildId,
+      destination.channelId,
+    )
+  ) {
+    return false;
+  }
+
+  const initialTip = selectDailyTip(tips, now, 1);
+  const initialClaimed = await publications.claimInitialPublication(
+    dateUtc,
+    destination.guildId,
+    destination.channelId,
+    initialTip.id,
+  );
+
+  if (initialClaimed) {
+    await publishTip(
+      client,
+      destination,
+      dateUtc,
+      1,
+      initialTip,
+      publications,
+      logger,
+      "initial",
+    );
+    return true;
+  }
+
+  if (
+    await publications.hasPublicationForChannel(
+      dateUtc,
+      destination.guildId,
+      destination.channelId,
+    )
+  ) {
+    return false;
+  }
+
+  for (const { slot } of dailyTipScheduleUtc) {
+    const tip = selectDailyTip(tips, now, slot);
+    const claimed = await publications.claimPublication(
+      dateUtc,
+      destination.guildId,
+      slot,
+      destination.channelId,
+      tip.id,
+    );
+
+    if (!claimed) {
+      continue;
+    }
+
+    await publishTip(
+      client,
+      destination,
+      dateUtc,
+      slot,
+      tip,
+      publications,
+      logger,
+      "initial",
+    );
+    return true;
+  }
+
+  return false;
 }
 
 async function publishTip(

@@ -21,6 +21,8 @@ import type { GuildChannelSettingsService } from "../../application/discord/guil
 import { PracticeError } from "../../application/study/practice-error.js";
 import type { PresentedQuestion } from "../../application/study/practice-repository.js";
 import type { PracticeService } from "../../application/study/practice-service.js";
+import { formatServiceMentions } from "./service-mentions.js";
+export { formatServiceMentions } from "./service-mentions.js";
 import type { StatisticsService } from "../../application/study/statistics-service.js";
 import type {
   AnswerFeedback,
@@ -67,7 +69,7 @@ const unauthorizedComponentMessage =
 const invalidSelectionMessage =
   "Choose one of the listed languages. / Escolha um dos idiomas disponíveis.";
 const invalidPracticeComponentMessage =
-  "This study control is invalid. Use the practice panel to start again. / Este controle de estudo é inválido. Use o painel de prática para recomeçar.";
+  "This study control is invalid. Use the practice channel to start again. / Este controle de estudo é inválido. Use o canal de prática para recomeçar.";
 const successColor = 0x2ecc71;
 const errorColor = 0xe74c3c;
 const infoColor = 0x3498db;
@@ -82,7 +84,6 @@ const practiceMessages: Record<
     correctCount: string;
     incorrectCount: string;
     explanation: string;
-    noQuestions: string;
     sessionComplete: string;
     examNotAvailable: string;
     examExpired: string;
@@ -96,8 +97,6 @@ const practiceMessages: Record<
     correctCount: "Correct",
     incorrectCount: "Incorrect",
     explanation: "Explanation",
-    noQuestions:
-      "No study questions are available yet. Please try again later.",
     sessionComplete: "This study session is complete.",
     examNotAvailable:
       "The exam requires 65 active questions with the required domain distribution. The question bank is still being populated; please try again later.",
@@ -111,8 +110,6 @@ const practiceMessages: Record<
     correctCount: "Corretas",
     incorrectCount: "Erradas",
     explanation: "Explicação",
-    noQuestions:
-      "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.",
     sessionComplete: "Esta sessão de estudos foi concluída.",
     examNotAvailable:
       "O exame exige 65 questões ativas com a distribuição necessária entre os domínios. O banco de questões ainda está sendo preenchido; tente novamente mais tarde.",
@@ -126,6 +123,7 @@ interface DiscordServices {
   practice: PracticeService;
   statistics: StatisticsService;
   maintainPracticePanel: (guildId: string, channelId: string) => Promise<void>;
+  publishImmediateTip: (guildId: string, channelId: string) => Promise<boolean>;
 }
 
 export async function handleDiscordInteraction(
@@ -192,8 +190,8 @@ export async function handleDiscordInteraction(
   }
 
   if (interaction.isButton()) {
-    if (interaction.customId === "start-practice") {
-      await startPracticeSession(interaction, services);
+    if (interaction.customId.startsWith("c:")) {
+      await handleChannelPracticeAnswer(interaction, services);
     } else if (interaction.customId.startsWith("a:")) {
       await handleAnswerButton(interaction, services);
     } else if (interaction.customId.startsWith("n:")) {
@@ -201,7 +199,6 @@ export async function handleDiscordInteraction(
     } else if (interaction.customId.startsWith("r:")) {
       await handleRestartButton(interaction, services);
     }
-
     return;
   }
 
@@ -210,6 +207,75 @@ export async function handleDiscordInteraction(
     interaction.customId.startsWith("language:")
   ) {
     await handleLanguageSelection(interaction, services.preferences);
+  }
+}
+
+async function handleChannelPracticeAnswer(
+  interaction: ButtonInteraction,
+  services: DiscordServices,
+): Promise<void> {
+  const match =
+    /^c:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}):([A-D])$/i.exec(
+      interaction.customId,
+    );
+
+  if (!match?.[1] || !match[2]) {
+    await interaction.reply({
+      embeds: [
+        createStatusEmbed(
+          "Controle inválido / Invalid control",
+          invalidPracticeComponentMessage,
+          errorColor,
+        ),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const locale = await services.preferences.getLocale(interaction.user.id);
+
+  try {
+    const result = await services.practice.answerChannelQuestion(
+      interaction.user.id,
+      match[1],
+      match[2],
+    );
+    const { sessionId } = result;
+    const answer = result.feedback;
+    const status = answer.isCorrect
+      ? practiceMessages[locale].answerCorrect
+      : practiceMessages[locale].answerIncorrect;
+
+    await interaction.editReply({
+      embeds: [
+        createStatusEmbed(
+          status,
+          `${renderAnswerCounts(answer, locale)}\n\n${answer.correctOptionKey}. ${formatServiceMentions(answer.correctOptionText[locale], answer.services)}\n\n${practiceMessages[locale].explanation}: ${formatServiceMentions(answer.explanation[locale], answer.services)}`,
+          answer.isCorrect ? successColor : errorColor,
+        ),
+      ],
+      components: [
+        renderPracticeActions(sessionId, interaction.user.id, locale),
+      ],
+    });
+  } catch (error) {
+    if (error instanceof PracticeError) {
+      await interaction.editReply({
+        embeds: [
+          createStatusEmbed(
+            locale === "en" ? "Practice error" : "Erro na prática",
+            getPracticeErrorMessage(error, locale),
+            errorColor,
+          ),
+        ],
+        components: [],
+      });
+      return;
+    }
+
+    throw error;
   }
 }
 
@@ -274,20 +340,35 @@ async function handleSetChannelCommand(
     return;
   }
 
+  let tipPublished: boolean | null = null;
+
   if (interaction.commandName === "set-practice-channel") {
     await services.channelSettings.setPracticeChannel(guildId, channel.id);
     await services.maintainPracticePanel(guildId, channel.id);
   } else {
+    const currentSettings = await services.channelSettings.getSettings(guildId);
     await services.channelSettings.setTipsChannel(guildId, channel.id);
+    if (currentSettings.tipsChannelId !== channel.id) {
+      tipPublished = await services.publishImmediateTip(guildId, channel.id);
+    }
   }
+
+  const channelDescription =
+    locale === "en"
+      ? `${interaction.commandName === "set-practice-channel" ? "Practice" : "Daily tips"} channel is now <#${channel.id}>.`
+      : `O canal de ${interaction.commandName === "set-practice-channel" ? "prática" : "dicas diárias"} agora é <#${channel.id}>.`;
+  const tipLimitMessage =
+    tipPublished === false
+      ? locale === "en"
+        ? "\nToday's three-tip limit has already been reached."
+        : "\nO limite de três dicas de hoje já foi atingido."
+      : "";
 
   await interaction.editReply({
     embeds: [
       createStatusEmbed(
         locale === "en" ? "Channel updated" : "Canal atualizado",
-        locale === "en"
-          ? `${interaction.commandName === "set-practice-channel" ? "Practice" : "Daily tips"} channel is now <#${channel.id}>.`
-          : `O canal de ${interaction.commandName === "set-practice-channel" ? "prática" : "dicas diárias"} agora é <#${channel.id}>.`,
+        `${channelDescription}${tipLimitMessage}`,
         successColor,
       ),
     ],
@@ -526,47 +607,6 @@ async function handleLanguageSelection(
     ],
     components: [],
   });
-}
-
-async function startPracticeSession(
-  interaction: ButtonInteraction,
-  services: DiscordServices,
-): Promise<void> {
-  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-  const locale = await services.preferences.getLocale(interaction.user.id);
-
-  try {
-    const session = await services.practice.start(interaction.user.id);
-    await interaction.editReply(
-      renderQuestion(
-        session.sessionId,
-        interaction.user.id,
-        session.question,
-        locale,
-        session,
-      ),
-    );
-  } catch (error) {
-    if (
-      error instanceof PracticeError &&
-      error.code === "no_questions_available"
-    ) {
-      await interaction.editReply({
-        embeds: [
-          createStatusEmbed(
-            locale === "en"
-              ? "No questions available"
-              : "Sem questões disponíveis",
-            practiceMessages[locale].noQuestions,
-            errorColor,
-          ),
-        ],
-      });
-      return;
-    }
-
-    throw error;
-  }
 }
 
 async function handleExamCommand(
@@ -886,10 +926,7 @@ function renderQuestion(
     >,
 ) {
   const options = question.options
-    .map(
-      (option) =>
-        `**${option.key}.** ${formatServiceMentions(option.text[locale], question.services)}`,
-    )
+    .map((option) => `**${option.key}.** ${option.text[locale]}`)
     .join("\n");
   const buttons = question.options.map((option) =>
     new ButtonBuilder()
@@ -912,6 +949,7 @@ function renderQuestion(
 
   return {
     content: `${renderAnswerCounts(progress, locale)}\n\n${progressMessage}${formatServiceMentions(question.prompt[locale], question.services)}\n\n${options}`,
+    embeds: [],
     components: [row],
   };
 }
@@ -922,55 +960,6 @@ function renderAnswerCounts(
 ): string {
   const labels = practiceMessages[locale];
   return `**${labels.correctCount}:** ${counts.correctCount} · **${labels.incorrectCount}:** ${counts.incorrectCount}`;
-}
-
-export function formatServiceMentions(
-  text: string,
-  services: string[],
-): string {
-  const terms = new Set<string>();
-
-  for (const service of services) {
-    terms.add(service);
-
-    const baseName = service.replace(/\s*\([^)]*\)/g, "");
-    if (baseName !== service) {
-      terms.add(baseName);
-    }
-
-    for (const [, acronym] of service.matchAll(/\(([^)]+)\)/g)) {
-      if (acronym) {
-        terms.add(acronym);
-      }
-    }
-
-    const words = baseName.split(/\s+/);
-    const lastWord = words.at(-1);
-    const hasProductPrefix =
-      words.length === 2 && /^(Amazon|AWS)$/i.test(words[0] ?? "");
-    if (lastWord && (hasProductPrefix || /^[A-Z0-9.-]{2,8}$/.test(lastWord))) {
-      terms.add(lastWord);
-    }
-  }
-
-  const alternatives = [...terms]
-    .sort((left, right) => right.length - left.length)
-    .map(escapeRegularExpression)
-    .join("|");
-
-  if (!alternatives) {
-    return text;
-  }
-
-  const servicePattern = new RegExp(
-    `(?<![\\w\`])(?:${alternatives})(?![\\w\`])`,
-    "gi",
-  );
-  return text.replace(servicePattern, (match) => `\`${match}\``);
-}
-
-function escapeRegularExpression(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function renderNextButton(
@@ -1025,6 +1014,6 @@ function getPracticeErrorMessage(
   }
 
   return locale === "en"
-    ? "This study session is no longer available. Start a new session from the practice panel."
-    : "Esta sessão de estudos não está mais disponível. Inicie outra pelo painel de prática.";
+    ? "This study session is no longer available. Select an option in the practice channel to start a new one."
+    : "Esta sessão de estudos não está mais disponível. Selecione uma opção no canal de prática para iniciar outra.";
 }

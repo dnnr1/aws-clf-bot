@@ -5,6 +5,7 @@ import type { Logger } from "../../../src/infrastructure/logging/logger.js";
 import type { DailyTip } from "../../../src/infrastructure/questions/daily-tip-schema.js";
 import {
   getDueDailyTipSlot,
+  publishImmediateDailyTip,
   startDailyTipScheduler,
 } from "../../../src/infrastructure/discord/daily-tip-scheduler.js";
 
@@ -49,6 +50,7 @@ describe("startDailyTipScheduler", () => {
       source: { label: "AWS", url: "https://aws.amazon.com/" },
     };
     const publications: DailyTipPublicationRepository = {
+      hasPublicationForChannel: vi.fn().mockResolvedValue(false),
       claimInitialPublication: vi.fn().mockResolvedValue(true),
       claimPublication: vi.fn().mockResolvedValue(false),
       markPublicationSent: vi.fn().mockImplementation(async () => {
@@ -73,6 +75,7 @@ describe("startDailyTipScheduler", () => {
       expect(publications.claimInitialPublication).toHaveBeenCalledWith(
         "2026-11-21",
         "guild-id",
+        "channel-id",
         "initial-tip",
       );
       expect(publications.claimPublication).not.toHaveBeenCalled();
@@ -86,5 +89,114 @@ describe("startDailyTipScheduler", () => {
       stop();
       vi.useRealTimers();
     }
+  });
+});
+
+describe("publishImmediateDailyTip", () => {
+  it("uses the next available daily slot when a channel is configured after startup", async () => {
+    const channelSend = vi.fn().mockResolvedValue({ id: "message-id" });
+    const client = {
+      channels: {
+        fetch: vi.fn().mockResolvedValue({
+          type: ChannelType.GuildText,
+          guildId: "guild-id",
+          send: channelSend,
+        }),
+      },
+    };
+    const tip: DailyTip = {
+      id: "immediate-tip",
+      domainId: "cloud-concepts",
+      title: { en: "Cloud value", "pt-BR": "Valor da nuvem" },
+      content: { en: "Tip", "pt-BR": "Dica" },
+      source: { label: "AWS", url: "https://aws.amazon.com/" },
+    };
+    const publications: DailyTipPublicationRepository = {
+      hasPublicationForChannel: vi.fn().mockResolvedValue(false),
+      claimInitialPublication: vi.fn().mockResolvedValue(false),
+      claimPublication: vi
+        .fn()
+        .mockImplementation(async (_date, _guildId, slot) => slot === 2),
+      markPublicationSent: vi.fn().mockResolvedValue(undefined),
+    };
+    const logger: Logger = {
+      info: vi.fn(),
+      error: vi.fn(),
+    };
+
+    await expect(
+      publishImmediateDailyTip(
+        client as unknown as Client,
+        { guildId: "guild-id", channelId: "channel-id" },
+        [tip],
+        publications,
+        logger,
+        new Date("2026-11-21T10:00:00.000Z"),
+      ),
+    ).resolves.toBe(true);
+
+    expect(publications.claimInitialPublication).toHaveBeenCalledWith(
+      "2026-11-21",
+      "guild-id",
+      "channel-id",
+      "immediate-tip",
+    );
+    expect(publications.claimPublication).toHaveBeenNthCalledWith(
+      1,
+      "2026-11-21",
+      "guild-id",
+      1,
+      "channel-id",
+      "immediate-tip",
+    );
+    expect(publications.claimPublication).toHaveBeenNthCalledWith(
+      2,
+      "2026-11-21",
+      "guild-id",
+      2,
+      "channel-id",
+      "immediate-tip",
+    );
+    expect(publications.markPublicationSent).toHaveBeenCalledWith(
+      "2026-11-21",
+      "guild-id",
+      2,
+      "message-id",
+    );
+    expect(channelSend).toHaveBeenCalledOnce();
+  });
+
+  it("does not exceed the three-tip daily cap", async () => {
+    const channelSend = vi.fn();
+    const client = {
+      channels: { fetch: vi.fn() },
+    };
+    const tip: DailyTip = {
+      id: "immediate-tip",
+      domainId: "cloud-concepts",
+      title: { en: "Cloud value", "pt-BR": "Valor da nuvem" },
+      content: { en: "Tip", "pt-BR": "Dica" },
+      source: { label: "AWS", url: "https://aws.amazon.com/" },
+    };
+    const publications: DailyTipPublicationRepository = {
+      hasPublicationForChannel: vi.fn().mockResolvedValue(false),
+      claimInitialPublication: vi.fn().mockResolvedValue(false),
+      claimPublication: vi.fn().mockResolvedValue(false),
+      markPublicationSent: vi.fn(),
+    };
+
+    await expect(
+      publishImmediateDailyTip(
+        client as unknown as Client,
+        { guildId: "guild-id", channelId: "channel-id" },
+        [tip],
+        publications,
+        { info: vi.fn(), error: vi.fn() },
+        new Date("2026-11-21T10:00:00.000Z"),
+      ),
+    ).resolves.toBe(false);
+
+    expect(publications.claimPublication).toHaveBeenCalledTimes(3);
+    expect(channelSend).not.toHaveBeenCalled();
   });
 });
