@@ -43,6 +43,8 @@ Use these `package.json` scripts:
 - `npm test -- path/to/test-file` for one test file
 - `npm run lint`
 - `npm run format:check`
+- `npm run db:generate` to generate a Drizzle migration
+- `npm run db:migrate` to apply migrations
 
 Check the package manifest and tool configuration before assuming any additional tool is installed.
 

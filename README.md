@@ -31,7 +31,15 @@ A Discord study bot for members preparing for the AWS Certified Cloud Practition
    docker compose up -d
    ```
 
-4. Run the available checks:
+4. Apply the initial database migration:
+
+   ```powershell
+   npm run db:migrate
+   ```
+
+   When the Drizzle schema changes, generate a new migration with `npm run db:generate`, review the SQL, and commit both the schema and migration.
+
+5. Run the available checks:
 
    ```powershell
    npm run build
