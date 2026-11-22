@@ -963,7 +963,7 @@ export function renderQuestion(
       : "";
 
   return {
-    content: `${renderAnswerCounts(progress, locale)}\n\n${progressMessage}${formatServiceMentions(question.prompt[locale], question.services)}\n\n${options}`,
+    content: `${renderAnswerCounts(progress, locale)}\n\n${progressMessage}${formatServiceMentions(question.prompt[locale], question.services)}\n\n${options}\n\u200B\n\u200B`,
     embeds: [],
     components: [row],
   };
