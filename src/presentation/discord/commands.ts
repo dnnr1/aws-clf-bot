@@ -22,6 +22,9 @@ export const commandDefinitions = [
     .setName("stats")
     .setDescription("Show your study statistics."),
   new SlashCommandBuilder()
+    .setName("leaderboard")
+    .setDescription("Show the top study performers."),
+  new SlashCommandBuilder()
     .setName("set-practice-channel")
     .setDescription("Set the server's study practice channel.")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)

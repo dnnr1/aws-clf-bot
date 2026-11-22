@@ -23,6 +23,41 @@ export interface StudyStatistics {
   longestStreakDays: number;
 }
 
+export interface LeaderboardEntrySnapshot {
+  discordUserId: string;
+  totalAnswers: number;
+  correctAnswers: number;
+}
+
+export interface LeaderboardEntry extends LeaderboardEntrySnapshot {
+  accuracyPercentage: number;
+}
+
+export const leaderboardMinimumAnswers = 10;
+export const leaderboardEntryLimit = 10;
+
+export function calculateLeaderboard(
+  snapshots: LeaderboardEntrySnapshot[],
+): LeaderboardEntry[] {
+  return snapshots
+    .filter((entry) => entry.totalAnswers >= leaderboardMinimumAnswers)
+    .map((entry) => ({
+      ...entry,
+      accuracyPercentage:
+        entry.totalAnswers === 0
+          ? 0
+          : (entry.correctAnswers / entry.totalAnswers) * 100,
+    }))
+    .sort(
+      (left, right) =>
+        right.accuracyPercentage - left.accuracyPercentage ||
+        right.totalAnswers - left.totalAnswers ||
+        right.correctAnswers - left.correctAnswers ||
+        left.discordUserId.localeCompare(right.discordUserId),
+    )
+    .slice(0, leaderboardEntryLimit);
+}
+
 export function calculateStudyStatistics(
   snapshot: StudyStatisticsSnapshot,
   todayUtc: string,

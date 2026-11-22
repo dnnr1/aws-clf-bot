@@ -1,5 +1,40 @@
 import { describe, expect, it } from "vitest";
-import { calculateStudyStatistics } from "../../../src/domain/study/study-statistics.js";
+import {
+  calculateLeaderboard,
+  calculateStudyStatistics,
+} from "../../../src/domain/study/study-statistics.js";
+
+describe("calculateLeaderboard", () => {
+  it("filters ineligible users and applies ranking tie-breakers", () => {
+    expect(
+      calculateLeaderboard([
+        { discordUserId: "2", totalAnswers: 9, correctAnswers: 9 },
+        { discordUserId: "3", totalAnswers: 20, correctAnswers: 15 },
+        { discordUserId: "1", totalAnswers: 30, correctAnswers: 24 },
+        { discordUserId: "4", totalAnswers: 10, correctAnswers: 8 },
+      ]),
+    ).toEqual([
+      {
+        discordUserId: "1",
+        totalAnswers: 30,
+        correctAnswers: 24,
+        accuracyPercentage: 80,
+      },
+      {
+        discordUserId: "4",
+        totalAnswers: 10,
+        correctAnswers: 8,
+        accuracyPercentage: 80,
+      },
+      {
+        discordUserId: "3",
+        totalAnswers: 20,
+        correctAnswers: 15,
+        accuracyPercentage: 75,
+      },
+    ]);
+  });
+});
 
 describe("calculateStudyStatistics", () => {
   it("calculates totals, accuracy, and streaks from UTC activity dates", () => {

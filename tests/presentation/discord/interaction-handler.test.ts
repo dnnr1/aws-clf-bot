@@ -159,6 +159,59 @@ describe("channel configuration commands", () => {
   });
 });
 
+describe("leaderboard command", () => {
+  it("registers and renders the persisted leaderboard", async () => {
+    expect(
+      commandDefinitions.some(
+        (definition) => definition.name === "leaderboard",
+      ),
+    ).toBe(true);
+
+    const getLeaderboard = vi.fn().mockResolvedValue([
+      {
+        discordUserId: "12345678901234569",
+        totalAnswers: 20,
+        correctAnswers: 18,
+        accuracyPercentage: 90,
+      },
+    ]);
+    const interaction = {
+      isChatInputCommand: () => true,
+      isButton: () => false,
+      isStringSelectMenu: () => false,
+      commandName: "leaderboard",
+      channelId,
+      guildId,
+      user: { id: "12345678901234569" },
+      deferReply: vi.fn().mockResolvedValue(undefined),
+      editReply: vi.fn().mockResolvedValue(undefined),
+    };
+    channelSettings.getSettings.mockResolvedValue({
+      practiceChannelId: channelId,
+      tipsChannelId: null,
+    });
+
+    await handleDiscordInteraction(interaction as unknown as Interaction, {
+      ...services,
+      statistics: {
+        getLeaderboard,
+      } as unknown as Parameters<
+        typeof handleDiscordInteraction
+      >[1]["statistics"],
+    });
+
+    expect(interaction.deferReply).toHaveBeenCalledWith({
+      flags: MessageFlags.Ephemeral,
+    });
+    expect(getLeaderboard).toHaveBeenCalled();
+    expect(interaction.editReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embeds: expect.any(Array),
+      }),
+    );
+  });
+});
+
 describe("practice panel interaction", () => {
   it("starts a private practice session when the exercise button is clicked", async () => {
     const userId = "12345678901234569";

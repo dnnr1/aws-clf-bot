@@ -38,6 +38,7 @@ const helpMessages: Record<UserLocale, string> = {
     "`/language` - Choose English or Portuguese (Brazil).",
     "`/exam` - Start a timed 65-question exam (90 minutes).",
     "`/stats` - Show your study statistics.",
+    "`/leaderboard` - Show the top study performers.",
     "`/set-practice-channel` - Set the practice channel (server admins).",
     "`/set-tips-channel` - Set the daily tips channel (server admins).",
   ].join("\n"),
@@ -47,6 +48,7 @@ const helpMessages: Record<UserLocale, string> = {
     "`/language` - Escolha English ou Português (Brasil).",
     "`/exam` - Inicie uma simulação de 65 questões com duração de 90 minutos.",
     "`/stats` - Exiba suas estatísticas de estudo.",
+    "`/leaderboard` - Exiba os melhores estudantes.",
     "`/set-practice-channel` - Defina o canal de prática (administradores).",
     "`/set-tips-channel` - Defina o canal de dicas (administradores).",
   ].join("\n"),
@@ -193,6 +195,8 @@ export async function handleDiscordInteraction(
       await handleExamCommand(interaction, services);
     } else if (interaction.commandName === "stats") {
       await handleStatsCommand(interaction, services);
+    } else if (interaction.commandName === "leaderboard") {
+      await handleLeaderboardCommand(interaction, services);
     }
 
     return;
@@ -375,6 +379,53 @@ async function handleStatsCommand(
       createStatusEmbed(
         locale === "en" ? "Study statistics" : "Estatísticas de estudo",
         renderStudyStatistics(statistics, locale),
+        infoColor,
+      ),
+    ],
+  });
+}
+
+async function handleLeaderboardCommand(
+  interaction: ChatInputCommandInteraction,
+  services: DiscordServices,
+): Promise<void> {
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+  const locale = await services.preferences.getLocale(interaction.user.id);
+  const entries = await services.statistics.getLeaderboard();
+
+  if (entries.length === 0) {
+    await interaction.editReply({
+      embeds: [
+        createStatusEmbed(
+          locale === "en" ? "Leaderboard" : "Classificação",
+          locale === "en"
+            ? "No eligible users yet. At least 10 answered questions are required."
+            : "Ainda não há usuários elegíveis. É necessário responder pelo menos 10 questões.",
+          infoColor,
+        ),
+      ],
+    });
+    return;
+  }
+
+  const description = entries
+    .map((entry, index) => {
+      const accuracy = new Intl.NumberFormat(locale, {
+        style: "percent",
+        maximumFractionDigits: 1,
+      }).format(entry.accuracyPercentage / 100);
+
+      return locale === "en"
+        ? `${index + 1}. <@${entry.discordUserId}> — ${accuracy} (${entry.correctAnswers}/${entry.totalAnswers})`
+        : `${index + 1}. <@${entry.discordUserId}> — ${accuracy} (${entry.correctAnswers}/${entry.totalAnswers})`;
+    })
+    .join("\n");
+
+  await interaction.editReply({
+    embeds: [
+      createStatusEmbed(
+        locale === "en" ? "Leaderboard" : "Classificação",
+        description,
         infoColor,
       ),
     ],

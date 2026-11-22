@@ -87,7 +87,7 @@ Create a 65-question, 90-minute session with a persisted question order. Validat
 
 ### Statistics
 
-Compute totals, accuracy, streaks, session history, and domain performance from persisted answers and sessions. Define leaderboard minimum-activity rules in the application policy and exclude users who do not meet that threshold.
+Compute totals, accuracy, streaks, session history, and domain performance from persisted answers and sessions. The leaderboard application policy requires at least 10 answered questions, ranks the top 10 by accuracy, answer count, correct count, and Discord user ID, and uses persisted answers as its source of truth.
 
 ## Cross-cutting decisions
 

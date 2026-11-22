@@ -55,4 +55,18 @@ export class DrizzleStatisticsRepository implements StatisticsRepository {
       ),
     };
   }
+
+  async getLeaderboardEntries() {
+    const entries = await this.database
+      .select({
+        discordUserId: studySessions.userId,
+        totalAnswers: sql<number>`count(*)::int`,
+        correctAnswers: sql<number>`count(*) filter (where ${userAnswers.isCorrect})::int`,
+      })
+      .from(userAnswers)
+      .innerJoin(studySessions, eq(studySessions.id, userAnswers.sessionId))
+      .groupBy(studySessions.userId);
+
+    return entries;
+  }
 }
