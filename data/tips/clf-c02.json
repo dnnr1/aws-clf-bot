@@ -3,15 +3,15 @@
     "id": "shared-responsibility",
     "domainId": "security-compliance",
     "title": {
-      "en": "Shared responsibility",
-      "pt-BR": "Responsabilidade compartilhada"
+      "en": "Shared Responsibility Model",
+      "pt-BR": "Modelo de Responsabilidade Compartilhada"
     },
     "content": {
-      "en": "AWS secures the cloud infrastructure; customers remain responsible for security in the cloud, including their data, identities, and service configuration.",
-      "pt-BR": "A AWS protege a infraestrutura da nuvem; os clientes continuam responsáveis pela segurança na nuvem, incluindo dados, identidades e configuração dos serviços."
+      "en": "AWS is responsible for security OF the cloud (physical hardware, facilities, network, hypervisor). Customers are responsible for security IN the cloud (customer data, IAM, encryption, security groups, and OS patching on EC2).",
+      "pt-BR": "A AWS é responsável pela segurança DA nuvem (hardware físico, data centers, rede, hypervisor). O cliente é responsável pela segurança NA nuvem (dados, IAM, criptografia, security groups e patches de SO no EC2)."
     },
     "source": {
-      "label": "Modelo de responsabilidade compartilhada da AWS",
+      "label": "AWS Shared Responsibility Model",
       "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
     }
   },
@@ -19,15 +19,15 @@
     "id": "iam-least-privilege",
     "domainId": "security-compliance",
     "title": {
-      "en": "Least privilege",
-      "pt-BR": "Menor privilégio"
+      "en": "Principle of Least Privilege",
+      "pt-BR": "Princípio do Menor Privilégio"
     },
     "content": {
-      "en": "Grant an identity only the permissions it needs, and review those permissions regularly. IAM policies define which actions are allowed on which resources.",
-      "pt-BR": "Conceda a uma identidade somente as permissões necessárias e revise-as regularmente. Políticas do IAM definem quais ações são permitidas em quais recursos."
+      "en": "Grant an identity only the minimum permissions required to perform its task, and audit them regularly using IAM Access Analyzer. Use IAM groups and policies instead of attaching policies directly to users.",
+      "pt-BR": "Conceda a uma identidade apenas as permissões mínimas necessárias para sua tarefa e audite-as regularmente com o IAM Access Analyzer. Use grupos e políticas do IAM em vez de anexar permissões direto a usuários."
     },
     "source": {
-      "label": "Boas práticas do IAM",
+      "label": "IAM Best Practices",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
     }
   },
@@ -35,15 +35,15 @@
     "id": "mfa",
     "domainId": "security-compliance",
     "title": {
-      "en": "Multi-factor authentication",
-      "pt-BR": "Autenticação multifator"
+      "en": "Multi-Factor Authentication (MFA)",
+      "pt-BR": "Autenticação Multifator (MFA)"
     },
     "content": {
-      "en": "MFA adds an authentication factor beyond a password. Enable it especially for privileged identities and the AWS account root user.",
-      "pt-BR": "A MFA adiciona um fator de autenticação além da senha. Habilite-a especialmente para identidades privilegiadas e para o usuário raiz da conta AWS."
+      "en": "MFA adds a second authentication layer beyond username and password. Enabling MFA on the AWS account root user and avoiding root user access keys are top security best practices.",
+      "pt-BR": "A MFA adiciona uma segunda camada de autenticação além de usuário e senha. Habilitar MFA no usuário raiz (root) da conta AWS e não criar chaves de acesso para o root são regras críticas de segurança."
     },
     "source": {
-      "label": "MFA no IAM",
+      "label": "MFA in IAM",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html"
     }
   },
@@ -51,15 +51,15 @@
     "id": "iam-roles",
     "domainId": "security-compliance",
     "title": {
-      "en": "IAM roles",
-      "pt-BR": "Funções do IAM"
+      "en": "IAM Roles",
+      "pt-BR": "Funções do IAM (IAM Roles)"
     },
     "content": {
-      "en": "An IAM role provides temporary credentials to a trusted entity. Roles are commonly used by AWS services and federated users instead of sharing long-term access keys.",
-      "pt-BR": "Uma função do IAM fornece credenciais temporárias a uma entidade confiável. Funções são usadas com frequência por serviços AWS e usuários federados, em vez de compartilhar chaves de acesso permanentes."
+      "en": "IAM roles provide short-term, temporary security credentials to trusted entities. Always use IAM roles for EC2 instances, Lambda functions, and cross-account access instead of hardcoding long-term access keys.",
+      "pt-BR": "As IAM Roles fornecem credenciais temporárias e de curta duração para entidades confiáveis. Use sempre roles para instâncias EC2, funções Lambda e acesso entre contas, nunca chaves de acesso fixas no código."
     },
     "source": {
-      "label": "Funções do IAM",
+      "label": "IAM Roles",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
     }
   },
@@ -71,11 +71,11 @@
       "pt-BR": "Amazon S3"
     },
     "content": {
-      "en": "Amazon S3 is object storage. Objects are stored in buckets and can be accessed through APIs; it is not a block-storage volume attached to an EC2 instance.",
-      "pt-BR": "O Amazon S3 é um serviço de armazenamento de objetos. Os objetos ficam em buckets e são acessados por APIs; ele não é um volume de blocos anexado a uma instância EC2."
+      "en": "Amazon S3 is unlimited, serverless object storage designed for 99.999999999% (11 nines) of durability. Objects are stored in globally uniquely named buckets; it cannot be mounted as an OS boot volume.",
+      "pt-BR": "O Amazon S3 é um armazenamento de objetos ilimitado e serverless projetado para 99,999999999% (11 noves) de durabilidade. Objetos ficam em buckets com nomes globalmente únicos; não serve como volume de boot de SO."
     },
     "source": {
-      "label": "Guia do usuário do Amazon S3",
+      "label": "Amazon S3 User Guide",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
     }
   },
@@ -87,11 +87,11 @@
       "pt-BR": "Amazon EC2"
     },
     "content": {
-      "en": "Amazon EC2 provides resizable virtual servers. Customers choose and manage the guest operating system and applications running on their instances.",
-      "pt-BR": "O Amazon EC2 fornece servidores virtuais redimensionáveis. O cliente escolhe e gerencia o sistema operacional convidado e os aplicativos executados nas instâncias."
+      "en": "Amazon EC2 provides resizable virtual machines (IaaS). You control the guest OS, installed software, security groups, and scaling, while AWS manages the underlying physical host and hypervisor.",
+      "pt-BR": "O Amazon EC2 fornece máquinas virtuais redimensionáveis (IaaS). Você controla o sistema operacional convidado, softwares, security groups e escalabilidade, enquanto a AWS gerencia o hardware físico e o hypervisor."
     },
     "source": {
-      "label": "Conceitos do Amazon EC2",
+      "label": "Amazon EC2 Concepts",
       "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
     }
   },
@@ -103,11 +103,11 @@
       "pt-BR": "AWS Lambda"
     },
     "content": {
-      "en": "AWS Lambda runs code in response to events without requiring customers to provision or manage the underlying servers.",
-      "pt-BR": "O AWS Lambda executa código em resposta a eventos sem exigir que o cliente provisione ou gerencie os servidores subjacentes."
+      "en": "AWS Lambda is a serverless, event-driven compute service. You upload code, pay only for compute time consumed (billed per millisecond), and never manage servers. Max execution time is 15 minutes.",
+      "pt-BR": "O AWS Lambda é um serviço de computação serverless orientado a eventos. Você envia o código, paga apenas pelo tempo de execução (cobrado por milissegundo) e não gerencia servidores. Limite de 15 minutos por execução."
     },
     "source": {
-      "label": "Guia do desenvolvedor do AWS Lambda",
+      "label": "AWS Lambda Developer Guide",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
     }
   },
@@ -119,11 +119,11 @@
       "pt-BR": "Amazon RDS"
     },
     "content": {
-      "en": "Amazon RDS is a managed relational database service. AWS manages infrastructure tasks such as provisioning and supported maintenance; customers still manage their data and access.",
-      "pt-BR": "O Amazon RDS é um serviço gerenciado de banco de dados relacional. A AWS gerencia tarefas de infraestrutura, como provisionamento e manutenção suportada; o cliente continua gerenciando dados e acessos."
+      "en": "Amazon RDS is a managed relational database service supporting PostgreSQL, MySQL, MariaDB, Oracle, SQL Server, and Db2. AWS automates patching and backups; use Multi-AZ for high availability and Read Replicas for read scaling.",
+      "pt-BR": "O Amazon RDS é um banco relacional gerenciado (PostgreSQL, MySQL, MariaDB, Oracle, SQL Server e Db2). A AWS automatiza patches e backups; use Multi-AZ para alta disponibilidade e Read Replicas para escalar leituras."
     },
     "source": {
-      "label": "Guia do usuário do Amazon RDS",
+      "label": "Amazon RDS User Guide",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
     }
   },
@@ -135,11 +135,11 @@
       "pt-BR": "Amazon CloudWatch"
     },
     "content": {
-      "en": "Amazon CloudWatch collects and monitors metrics, logs, and alarms, helping teams observe AWS resources and applications.",
-      "pt-BR": "O Amazon CloudWatch coleta e monitora métricas, logs e alarmes, ajudando equipes a observar recursos e aplicativos da AWS."
+      "en": "Amazon CloudWatch monitors performance and operational health in real time using metrics, logs, and alarms. Use it to trigger Auto Scaling actions or SNS notifications when CPU or memory thresholds are breached.",
+      "pt-BR": "O Amazon CloudWatch monitora desempenho e saúde operacional em tempo real via métricas, logs e alarmes. Use-o para disparar ações de Auto Scaling ou notificações SNS quando limites de CPU ou memória forem atingidos."
     },
     "source": {
-      "label": "Visão geral do Amazon CloudWatch",
+      "label": "Amazon CloudWatch Overview",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
     }
   },
@@ -151,11 +151,11 @@
       "pt-BR": "AWS CloudTrail"
     },
     "content": {
-      "en": "AWS CloudTrail records account activity and API calls. Use it to answer who performed an action, when it happened, and which AWS resources were involved.",
-      "pt-BR": "O AWS CloudTrail registra atividades da conta e chamadas de API. Use-o para identificar quem realizou uma ação, quando ela ocorreu e quais recursos AWS foram envolvidos."
+      "en": "AWS CloudTrail provides governance, compliance, and auditing by logging all API calls and user actions across your account. Remember: CloudTrail is for auditing 'who did what'; CloudWatch is for performance metrics.",
+      "pt-BR": "O AWS CloudTrail fornece governança, conformidade e auditoria registrando todas as chamadas de API e ações na conta. Lembre-se: CloudTrail audita 'quem fez o quê'; CloudWatch monitora métricas de desempenho."
     },
     "source": {
-      "label": "Guia do usuário do AWS CloudTrail",
+      "label": "AWS CloudTrail User Guide",
       "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
     }
   },
@@ -167,11 +167,11 @@
       "pt-BR": "AWS Budgets"
     },
     "content": {
-      "en": "AWS Budgets lets customers set cost or usage budgets and receive notifications when actual or forecasted amounts exceed configured thresholds.",
-      "pt-BR": "O AWS Budgets permite definir orçamentos de custo ou uso e receber notificações quando valores reais ou previstos ultrapassam os limites configurados."
+      "en": "AWS Budgets lets you set custom cost, usage, Reserved Instance, or Savings Plans thresholds and sends proactive alerts (via email or SNS) when actual or forecasted spend exceeds your limits.",
+      "pt-BR": "O AWS Budgets permite definir limites personalizados de custo, uso, Instâncias Reservadas ou Savings Plans e envia alertas proativos (por e-mail ou SNS) quando os gastos reais ou previstos ultrapassam o limite."
     },
     "source": {
-      "label": "Gerenciamento de custos com AWS Budgets",
+      "label": "Managing Costs with AWS Budgets",
       "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html"
     }
   },
@@ -183,12 +183,3324 @@
       "pt-BR": "AWS Cost Explorer"
     },
     "content": {
-      "en": "AWS Cost Explorer helps visualize, understand, and manage historical AWS costs and usage through reports and forecasts.",
-      "pt-BR": "O AWS Cost Explorer ajuda a visualizar, entender e gerenciar custos e uso históricos da AWS por meio de relatórios e previsões."
+      "en": "AWS Cost Explorer is a visualization tool to analyze historical spend and usage patterns over the past 12 months and forecast future costs for the next 12 months.",
+      "pt-BR": "O AWS Cost Explorer é uma ferramenta visual para analisar padrões históricos de gastos e uso dos últimos 12 meses e prever custos futuros para os próximos 12 meses."
     },
     "source": {
       "label": "AWS Cost Explorer",
       "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html"
+    }
+  },
+  {
+    "id": "amazon-vpc",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon VPC",
+      "pt-BR": "Amazon VPC"
+    },
+    "content": {
+      "en": "Amazon VPC is a logically isolated virtual network within a single AWS Region where you define IP ranges (CIDR), public/private subnets across Availability Zones, route tables, and gateways.",
+      "pt-BR": "A Amazon VPC é uma rede virtual logicamente isolada dentro de uma única Região AWS onde você define faixas de IP (CIDR), sub-redes públicas/privadas em Zonas de Disponibilidade, tabelas de rotas e gateways."
+    },
+    "source": {
+      "label": "What is Amazon VPC?",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+    }
+  },
+  {
+    "id": "amazon-s3-storage-classes",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon S3 Storage Classes",
+      "pt-BR": "Classes de Armazenamento do Amazon S3"
+    },
+    "content": {
+      "en": "Choose S3 classes by access frequency: S3 Standard (frequent), S3 Intelligent-Tiering (unknown/changing patterns), S3 Standard-IA / One Zone-IA (infrequent), and S3 Glacier Instant/Flexible/Deep Archive (long-term archival).",
+      "pt-BR": "Escolha a classe S3 pela frequência de acesso: S3 Standard (frequente), S3 Intelligent-Tiering (padrão desconhecido/variável), S3 Standard-IA / One Zone-IA (infrequente) e S3 Glacier Instant/Flexible/Deep Archive (arquivamento)."
+    },
+    "source": {
+      "label": "Amazon S3 Storage Classes",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html"
+    }
+  },
+  {
+    "id": "amazon-route-53",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Route 53",
+      "pt-BR": "Amazon Route 53"
+    },
+    "content": {
+      "en": "Amazon Route 53 is a global, highly available DNS service with a 100% availability SLA. It supports domain registration, health checks, and routing policies (Simple, Weighted, Latency, Failover, Geolocation).",
+      "pt-BR": "O Amazon Route 53 é um serviço global de DNS com SLA de 100% de disponibilidade. Suporta registro de domínios, verificações de integridade e políticas de roteamento (Simples, Ponderado, Latência, Failover, Geolocalização)."
+    },
+    "source": {
+      "label": "What is Amazon Route 53?",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-trusted-advisor",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Trusted Advisor",
+      "pt-BR": "AWS Trusted Advisor"
+    },
+    "content": {
+      "en": "AWS Trusted Advisor inspects your AWS environment and gives real-time recommendations across 5 pillars: Cost Optimization, Performance, Security, Fault Tolerance, and Service Limits. Full checks require Business or Enterprise support.",
+      "pt-BR": "O AWS Trusted Advisor inspeciona seu ambiente e dá recomendações em 5 pilares: Otimização de Custos, Desempenho, Segurança, Tolerância a Falhas e Limites de Serviço. Todas as verificações exigem suporte Business ou Enterprise."
+    },
+    "source": {
+      "label": "AWS Trusted Advisor",
+      "url": "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html"
+    }
+  },
+  {
+    "id": "aws-organizations",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Organizations",
+      "pt-BR": "AWS Organizations"
+    },
+    "content": {
+      "en": "AWS Organizations centrally manages multiple AWS accounts. Key exam features: Consolidated Billing (single bill + volume discounts across accounts) and Service Control Policies (SCPs) to set maximum permission guardrails.",
+      "pt-BR": "O AWS Organizations gerencia múltiplas contas AWS de forma centralizada. Recursos-chave na prova: Faturamento Consolidado (fatura única + descontos por volume) e Service Control Policies (SCPs) para definir limites máximos de permissão."
+    },
+    "source": {
+      "label": "What is AWS Organizations?",
+      "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html"
+    }
+  },
+  {
+    "id": "aws-support-plans",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Support Plans",
+      "pt-BR": "Planos de Suporte da AWS"
+    },
+    "content": {
+      "en": "Support tiers in ascending order: Basic (free, no tech support), Developer (business-hours email), Business (24/7 support, <1h urgent SLA, full Trusted Advisor), Enterprise On-Ramp (pool of TAMs), and Enterprise (dedicated TAM, <15m critical SLA).",
+      "pt-BR": "Planos em ordem crescente: Basic (grátis, sem suporte técnico), Developer (e-mail em horário comercial), Business (24/7, SLA urgente <1h, Trusted Advisor completo), Enterprise On-Ramp (pool de TAMs) e Enterprise (TAM dedicado, SLA crítico <15min)."
+    },
+    "source": {
+      "label": "AWS Support Plans",
+      "url": "https://aws.amazon.com/premiumsupport/plans/"
+    }
+  },
+  {
+    "id": "aws-well-architected-framework",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Well-Architected Framework",
+      "pt-BR": "AWS Well-Architected Framework"
+    },
+    "content": {
+      "en": "Provides architectural best practices across 6 pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability. Evaluate workloads using the free AWS Well-Architected Tool.",
+      "pt-BR": "Fornece boas práticas de arquitetura em 6 pilares: Excelência Operacional, Segurança, Confiabilidade, Eficiência de Desempenho, Otimização de Custos e Sustentabilidade. Avalie cargas de trabalho usando a ferramenta gratuita AWS Well-Architected Tool."
+    },
+    "source": {
+      "label": "AWS Well-Architected Framework",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+    }
+  },
+  {
+    "id": "amazon-dynamodb",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon DynamoDB",
+      "pt-BR": "Amazon DynamoDB"
+    },
+    "content": {
+      "en": "Amazon DynamoDB is a serverless, fully managed key-value and document NoSQL database offering single-digit millisecond latency at any scale. Use DynamoDB Global Tables for multi-Region active-active replication.",
+      "pt-BR": "O Amazon DynamoDB é um banco de dados NoSQL (chave-valor e documento) serverless e totalmente gerenciado com latência de milissegundos de um dígito em qualquer escala. Use Global Tables para replicação ativo-ativo multi-Região."
+    },
+    "source": {
+      "label": "What is Amazon DynamoDB?",
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+    }
+  },
+  {
+    "id": "aws-iam-policy-evaluation",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "IAM Policy Evaluation Logic",
+      "pt-BR": "Lógica de Avaliação de Políticas do IAM"
+    },
+    "content": {
+      "en": "Evaluation order: 1) Default implicit deny. 2) Any explicit Deny in any applicable policy (IAM, SCP, resource policy) immediately blocks access. 3) Otherwise, an explicit Allow grants access.",
+      "pt-BR": "Ordem de avaliação: 1) Negação implícita padrão. 2) Qualquer Deny explícito em qualquer política aplicável (IAM, SCP, política de recurso) bloqueia imediatamente. 3) Caso contrário, um Allow explícito concede acesso."
+    },
+    "source": {
+      "label": "IAM Policy Evaluation Logic",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+    }
+  },
+  {
+    "id": "cloud-computing-advantages",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Six Advantages of Cloud Computing",
+      "pt-BR": "Seis Vantagens da Computação em Nuvem"
+    },
+    "content": {
+      "en": "Key benefits frequently tested: 1) Trade fixed expense (CapEx) for variable expense (OpEx), 2) Massive economies of scale, 3) Stop guessing capacity, 4) Increase speed and agility, 5) Stop spending money running data centers, 6) Go global in minutes.",
+      "pt-BR": "Benefícios muito cobrados: 1) Trocar despesa fixa (CapEx) por variável (OpEx), 2) Economias de escala massivas, 3) Parar de adivinhar capacidade, 4) Aumentar velocidade e agilidade, 5) Parar de gastar operando data centers, 6) Tornar-se global em minutos."
+    },
+    "source": {
+      "label": "Overview of Amazon Web Services",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html"
+    }
+  },
+  {
+    "id": "cloud-deployment-models",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Cloud Deployment Models",
+      "pt-BR": "Modelos de Implantação em Nuvem"
+    },
+    "content": {
+      "en": "Three models: Cloud-based / All-in (everything runs in the cloud), Hybrid (connects on-premises infrastructure to AWS via VPN or Direct Connect), and On-premises / Private Cloud (deployed locally using virtualization).",
+      "pt-BR": "Três modelos: Na Nuvem / All-in (tudo roda na nuvem), Híbrido (conecta infraestrutura local à AWS via VPN ou Direct Connect) e Local / Nuvem Privada (implantado localmente com virtualização)."
+    },
+    "source": {
+      "label": "Types of Cloud Computing",
+      "url": "https://aws.amazon.com/types-of-cloud-computing/"
+    }
+  },
+  {
+    "id": "cloud-service-models",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "IaaS vs. PaaS vs. SaaS",
+      "pt-BR": "IaaS vs. PaaS vs. SaaS"
+    },
+    "content": {
+      "en": "IaaS gives control over networking, storage, and virtual servers (e.g., EC2). PaaS manages the underlying OS and runtime so you only deploy code (e.g., Elastic Beanstalk). SaaS delivers a complete application to end users (e.g., Amazon WorkSpaces, Chime).",
+      "pt-BR": "IaaS dá controle sobre rede, armazenamento e servidores virtuais (ex.: EC2). PaaS gerencia o SO e runtime para você só publicar o código (ex.: Elastic Beanstalk). SaaS entrega um aplicativo pronto ao usuário final (ex.: Amazon WorkSpaces, Chime)."
+    },
+    "source": {
+      "label": "Cloud Computing Models",
+      "url": "https://aws.amazon.com/types-of-cloud-computing/"
+    }
+  },
+  {
+    "id": "aws-regions",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Regions",
+      "pt-BR": "Regiões da AWS"
+    },
+    "content": {
+      "en": "An AWS Region is a physical geographic location containing multiple isolated Availability Zones. Choose a Region based on: 1) Data governance/compliance laws, 2) Proximity to users (low latency), 3) Service availability, and 4) Pricing.",
+      "pt-BR": "Uma Região AWS é uma localização geográfica física com múltiplas Zonas de Disponibilidade isoladas. Escolha uma Região com base em: 1) Leis de conformidade/soberania de dados, 2) Proximidade dos usuários (baixa latência), 3) Disponibilidade de serviços e 4) Preço."
+    },
+    "source": {
+      "label": "AWS Global Infrastructure",
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
+    }
+  },
+  {
+    "id": "availability-zones",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Availability Zones (AZs)",
+      "pt-BR": "Zonas de Disponibilidade (AZs)"
+    },
+    "content": {
+      "en": "An Availability Zone consists of one or more discrete data centers with redundant power, networking, and connectivity within a Region, separated by meaningful distance (up to ~100 km) to protect against local disasters while maintaining ultra-low latency.",
+      "pt-BR": "Uma Zona de Disponibilidade consiste em um ou mais data centers distintos com energia, rede e conectividade redundantes dentro de uma Região, separados por distância estratégica (até ~100 km) para proteger contra desastres locais mantendo latência ultrabaixa."
+    },
+    "source": {
+      "label": "Regions and Availability Zones",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html"
+    }
+  },
+  {
+    "id": "edge-locations",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Edge Locations (Points of Presence)",
+      "pt-BR": "Locais de Borda (Edge Locations)"
+    },
+    "content": {
+      "en": "Edge Locations are AWS sites located in major cities worldwide—far more numerous than Regions—used by Amazon CloudFront and AWS Global Accelerator to cache content and route traffic closer to end users.",
+      "pt-BR": "Locais de Borda são pontos da AWS nas principais cidades do mundo — muito mais numerosos que as Regiões — usados pelo Amazon CloudFront e AWS Global Accelerator para fazer cache de conteúdo e rotear tráfego mais perto dos usuários."
+    },
+    "source": {
+      "label": "AWS Edge Network",
+      "url": "https://aws.amazon.com/cloudfront/features/#Global_Edge_Network"
+    }
+  },
+  {
+    "id": "aws-local-zones",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Local Zones",
+      "pt-BR": "AWS Local Zones"
+    },
+    "content": {
+      "en": "AWS Local Zones place compute, storage, and database services closer to large population and industry centers where no full AWS Region exists, enabling single-digit millisecond latency for local end users.",
+      "pt-BR": "As AWS Local Zones colocam serviços de computação, armazenamento e banco de dados mais perto de grandes centros urbanos e industriais onde não há uma Região completa, garantindo latência de milissegundos de um dígito para usuários locais."
+    },
+    "source": {
+      "label": "AWS Local Zones",
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/localzones/"
+    }
+  },
+  {
+    "id": "aws-outposts",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Outposts",
+      "pt-BR": "AWS Outposts"
+    },
+    "content": {
+      "en": "AWS Outposts brings native AWS infrastructure, hardware racks, services, and APIs directly into your on-premises data center for a truly consistent hybrid experience and local data processing.",
+      "pt-BR": "O AWS Outposts leva infraestrutura nativa da AWS, racks de hardware, serviços e APIs diretamente para dentro do seu data center local (on-premises) para uma experiência híbrida consistente e processamento local de dados."
+    },
+    "source": {
+      "label": "AWS Outposts",
+      "url": "https://aws.amazon.com/outposts/"
+    }
+  },
+  {
+    "id": "aws-wavelength",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Wavelength",
+      "pt-BR": "AWS Wavelength"
+    },
+    "content": {
+      "en": "AWS Wavelength embeds AWS compute and storage services inside telecommunications providers' 5G networks, delivering ultra-low latency applications to mobile and connected devices.",
+      "pt-BR": "O AWS Wavelength incorpora serviços de computação e armazenamento da AWS dentro das redes 5G das operadoras de telecomunicações, entregando aplicações de latência ultrabaixa para dispositivos móveis e conectados."
+    },
+    "source": {
+      "label": "AWS Wavelength",
+      "url": "https://aws.amazon.com/wavelength/"
+    }
+  },
+  {
+    "id": "elasticity-vs-scalability",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Elasticity vs. Scalability",
+      "pt-BR": "Elasticidade vs. Escalabilidade"
+    },
+    "content": {
+      "en": "Scalability is the ability to handle growing workloads (vertically by resizing an instance, or horizontally by adding instances). Elasticity is the ability to automatically scale resources BOTH out and in dynamically as demand fluctuates.",
+      "pt-BR": "Escalabilidade é a capacidade de suportar cargas crescentes (verticalmente aumentando a instância, ou horizontalmente adicionando instâncias). Elasticidade é a capacidade de expandir E reduzir recursos automaticamente conforme a demanda oscila."
+    },
+    "source": {
+      "label": "Well-Architected Reliability Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "high-availability-vs-fault-tolerance",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "High Availability vs. Fault Tolerance",
+      "pt-BR": "Alta Disponibilidade vs. Tolerância a Falhas"
+    },
+    "content": {
+      "en": "High Availability aims to minimize downtime and recover quickly when a component fails (e.g., Multi-AZ failover). Fault Tolerance ensures zero downtime and continuous operation even during component failure through active redundancy.",
+      "pt-BR": "Alta Disponibilidade busca minimizar o tempo de inatividade e recuperar-se rápido após uma falha (ex.: failover Multi-AZ). Tolerância a Falhas garante zero downtime e operação contínua mesmo durante falhas via redundância ativa."
+    },
+    "source": {
+      "label": "Reliability Pillar - AWS Well-Architected",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "loose-coupling",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Loose Coupling",
+      "pt-BR": "Acoplamento Fraco (Loose Coupling)"
+    },
+    "content": {
+      "en": "Design architectures so components interact through intermediate layers (like Amazon SQS queues, SNS topics, or EventBridge) rather than direct dependencies, preventing cascading failures.",
+      "pt-BR": "Projete arquiteturas em que os componentes interajam por meio de camadas intermediárias (como filas Amazon SQS, tópicos SNS ou EventBridge) em vez de dependências diretas, evitando falhas em cascata."
+    },
+    "source": {
+      "label": "Best Practices for Loosely Coupled Architectures",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-03.html"
+    }
+  },
+  {
+    "id": "aws-caf",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Cloud Adoption Framework (AWS CAF)",
+      "pt-BR": "AWS Cloud Adoption Framework (AWS CAF)"
+    },
+    "content": {
+      "en": "Helps organizations plan and accelerate cloud transformation across 6 perspectives: Business, People, Governance (non-technical), and Platform, Security, Operations (technical).",
+      "pt-BR": "Ajuda organizações a planejar e acelerar a jornada para a nuvem em 6 perspectivas: Negócios, Pessoas e Governança (não técnicas), e Plataforma, Segurança e Operações (técnicas)."
+    },
+    "source": {
+      "label": "AWS Cloud Adoption Framework",
+      "url": "https://aws.amazon.com/cloud-adoption-framework/"
+    }
+  },
+  {
+    "id": "aws-caf-phases",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS CAF Transformation Phases",
+      "pt-BR": "Fases de Transformação do AWS CAF"
+    },
+    "content": {
+      "en": "Cloud transformation follows four iterative phases: Envision (identify business outcomes), Align (identify capability gaps), Launch (deliver pilot productions), and Scale (expand production workloads).",
+      "pt-BR": "A transformação na nuvem segue quatro fases iterativas: Idealizar/Envision (identificar resultados de negócio), Alinhar/Align (identificar lacunas), Lançar/Launch (entregar pilotos em produção) e Escalar/Scale (expandir cargas de trabalho)."
+    },
+    "source": {
+      "label": "AWS CAF Overview",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/cloud-transformation-journey.html"
+    }
+  },
+  {
+    "id": "aws-migration-7-rs",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "7 Migration Strategies (7 Rs)",
+      "pt-BR": "7 Estratégias de Migração (7 Rs)"
+    },
+    "content": {
+      "en": "Common exam scenarios: Rehost ('lift-and-shift' as-is), Replatform ('lift-tinker-and-shift', e.g., moving DB to RDS), Refactor/Re-architect (redesign using cloud-native/serverless), Repurchase ('drop and shop' to SaaS), Relocate, Retain, and Retire.",
+      "pt-BR": "Cenários comuns na prova: Rehost ('lift-and-shift' sem alterações), Replatform (pequenas otimizações, ex.: migrar banco para RDS), Refactor (redesenhar para cloud-native/serverless), Repurchase (trocar por SaaS), Relocate, Retain e Retire."
+    },
+    "source": {
+      "label": "AWS Migration Strategies",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/migration-readiness/migration-strategies.html"
+    }
+  },
+  {
+    "id": "design-for-failure",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Design for Failure",
+      "pt-BR": "Projetar para Falhas (Design for Failure)"
+    },
+    "content": {
+      "en": "Assume hardware and components will eventually fail. Eliminate single points of failure by deploying across multiple Availability Zones, automating health checks, and using self-healing architectures.",
+      "pt-BR": "Assuma que hardwares e componentes vão falhar em algum momento. Elimine pontos únicos de falha implantando em múltiplas Zonas de Disponibilidade, automatizando health checks e usando arquiteturas com autorrecuperação."
+    },
+    "source": {
+      "label": "AWS Well-Architected Framework",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+    }
+  },
+  {
+    "id": "disposable-resources",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Disposable Resources & Infrastructure as Code",
+      "pt-BR": "Recursos Descartáveis e Infraestrutura como Código"
+    },
+    "content": {
+      "en": "Treat servers as temporary and disposable ('cattle, not pets'). Automate environment provisioning and teardown consistently using Infrastructure as Code (IaC) like AWS CloudFormation.",
+      "pt-BR": "Trate servidores como temporários e descartáveis. Automatize o provisionamento e a destruição de ambientes de forma consistente usando Infraestrutura como Código (IaC), como o AWS CloudFormation."
+    },
+    "source": {
+      "label": "Operational Excellence Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "aws-artifact",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Artifact",
+      "pt-BR": "AWS Artifact"
+    },
+    "content": {
+      "en": "AWS Artifact is a self-service portal providing on-demand access to AWS's security and compliance reports (ISO, PCI, SOC) and online agreements such as the Business Associate Addendum (BAA) for HIPAA.",
+      "pt-BR": "O AWS Artifact é um portal de autoatendimento que fornece acesso sob demanda a relatórios de segurança e conformidade da AWS (ISO, PCI, SOC) e acordos online como o BAA (HIPAA)."
+    },
+    "source": {
+      "label": "What is AWS Artifact?",
+      "url": "https://docs.aws.amazon.com/artifact/latest/ug/what-is-aws-artifact.html"
+    }
+  },
+  {
+    "id": "aws-shield",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Shield",
+      "pt-BR": "AWS Shield"
+    },
+    "content": {
+      "en": "AWS Shield is a managed DDoS protection service. Shield Standard is automatically enabled at no extra cost for all AWS customers; Shield Advanced provides enhanced Layer 3-7 DDoS protection, 24/7 SRT access, and DDoS cost protection.",
+      "pt-BR": "O AWS Shield é um serviço gerenciado de proteção contra DDoS. O Shield Standard é ativado automaticamente sem custo extra para todos; o Shield Advanced oferece proteção avançada nas camadas 3-7, equipe SRT 24/7 e proteção de custos contra ataques."
+    },
+    "source": {
+      "label": "AWS Shield",
+      "url": "https://aws.amazon.com/shield/"
+    }
+  },
+  {
+    "id": "aws-waf",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS WAF (Web Application Firewall)",
+      "pt-BR": "AWS WAF (Web Application Firewall)"
+    },
+    "content": {
+      "en": "AWS WAF protects web applications at Layer 7 (HTTP/HTTPS) against common exploits like SQL injection and cross-site scripting (XSS). It attaches to CloudFront, Application Load Balancer, API Gateway, and AppSync.",
+      "pt-BR": "O AWS WAF protege aplicações web na Camada 7 (HTTP/HTTPS) contra ataques como SQL injection e cross-site scripting (XSS). Ele é anexado ao CloudFront, Application Load Balancer, API Gateway e AppSync."
+    },
+    "source": {
+      "label": "What is AWS WAF?",
+      "url": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html"
+    }
+  },
+  {
+    "id": "amazon-guardduty",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon GuardDuty",
+      "pt-BR": "Amazon GuardDuty"
+    },
+    "content": {
+      "en": "Amazon GuardDuty is an intelligent threat detection service that continuously monitors CloudTrail logs, VPC Flow Logs, and DNS logs for malicious activity, compromised credentials, or cryptocurrency mining.",
+      "pt-BR": "O Amazon GuardDuty é um serviço inteligente de detecção de ameaças que monitora continuamente logs do CloudTrail, VPC Flow Logs e logs DNS em busca de atividades maliciosas, credenciais comprometidas ou mineração de criptomoedas."
+    },
+    "source": {
+      "label": "What is Amazon GuardDuty?",
+      "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html"
+    }
+  },
+  {
+    "id": "amazon-inspector",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon Inspector",
+      "pt-BR": "Amazon Inspector"
+    },
+    "content": {
+      "en": "Amazon Inspector is an automated vulnerability management service that continuously scans Amazon EC2 instances, container images in Amazon ECR, and AWS Lambda functions for software vulnerabilities (CVEs) and unintended network exposure.",
+      "pt-BR": "O Amazon Inspector é um serviço automatizado de gerenciamento de vulnerabilidades que verifica continuamente instâncias EC2, imagens de contêiner no ECR e funções Lambda em busca de falhas de software (CVEs) e exposição de rede."
+    },
+    "source": {
+      "label": "What is Amazon Inspector?",
+      "url": "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html"
+    }
+  },
+  {
+    "id": "amazon-macie",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon Macie",
+      "pt-BR": "Amazon Macie"
+    },
+    "content": {
+      "en": "Amazon Macie uses machine learning and pattern matching to automatically discover, classify, and protect sensitive data—such as Personally Identifiable Information (PII), credit card numbers, or credentials—stored in Amazon S3.",
+      "pt-BR": "O Amazon Macie usa machine learning e correspondência de padrões para descobrir, classificar e proteger automaticamente dados confidenciais — como PII (dados pessoais), cartões de crédito ou credenciais — armazenados no Amazon S3."
+    },
+    "source": {
+      "label": "What is Amazon Macie?",
+      "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html"
+    }
+  },
+  {
+    "id": "aws-kms",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Key Management Service (AWS KMS)",
+      "pt-BR": "AWS Key Management Service (AWS KMS)"
+    },
+    "content": {
+      "en": "AWS KMS is a managed service that makes it easy to create, control, and rotate cryptographic keys used to encrypt data at rest across AWS services (S3, EBS, RDS) and in your own applications.",
+      "pt-BR": "O AWS KMS é um serviço gerenciado que facilita criar, controlar e rotacionar chaves criptográficas usadas para criptografar dados em repouso nos serviços AWS (S3, EBS, RDS) e nas suas próprias aplicações."
+    },
+    "source": {
+      "label": "What is AWS KMS?",
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
+    }
+  },
+  {
+    "id": "aws-secrets-manager",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Secrets Manager",
+      "pt-BR": "AWS Secrets Manager"
+    },
+    "content": {
+      "en": "AWS Secrets Manager securely stores, retrieves, and automatically rotates database credentials, API keys, and other secrets, eliminating hardcoded credentials from application source code.",
+      "pt-BR": "O AWS Secrets Manager armazena, recupera e rotaciona automaticamente credenciais de banco de dados, chaves de API e outros segredos, eliminando senhas fixas (hardcoded) no código-fonte."
+    },
+    "source": {
+      "label": "What is AWS Secrets Manager?",
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+    }
+  },
+  {
+    "id": "aws-config",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Config",
+      "pt-BR": "AWS Config"
+    },
+    "content": {
+      "en": "AWS Config continuously assesses, audits, and records configuration changes of your AWS resources over time, evaluating them against compliance rules (e.g., alerting if an S3 bucket becomes public or an EBS volume is unencrypted).",
+      "pt-BR": "O AWS Config avalia, audita e registra continuamente mudanças de configuração dos recursos AWS ao longo do tempo, verificando conformidade com regras (ex.: alertar se um bucket S3 ficar público ou um volume EBS sem criptografia)."
+    },
+    "source": {
+      "label": "What is AWS Config?",
+      "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+    }
+  },
+  {
+    "id": "aws-security-hub",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Security Hub",
+      "pt-BR": "AWS Security Hub"
+    },
+    "content": {
+      "en": "AWS Security Hub aggregates, organizes, and prioritizes security alerts and findings from multiple AWS services (GuardDuty, Inspector, Macie, IAM Access Analyzer) into a single centralized dashboard.",
+      "pt-BR": "O AWS Security Hub agrega, organiza e prioriza alertas e descobertas de segurança de vários serviços (GuardDuty, Inspector, Macie, IAM Access Analyzer) em um único painel centralizado."
+    },
+    "source": {
+      "label": "What is AWS Security Hub?",
+      "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"
+    }
+  },
+  {
+    "id": "amazon-detective",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon Detective",
+      "pt-BR": "Amazon Detective"
+    },
+    "content": {
+      "en": "Amazon Detective analyzes logs and network traffic to help security teams investigate, visualize, and quickly identify the root cause of potential security findings or suspicious activities.",
+      "pt-BR": "O Amazon Detective analisa logs e tráfego de rede para ajudar equipes de segurança a investigar, visualizar e identificar rapidamente a causa raiz de incidentes ou atividades suspeitas."
+    },
+    "source": {
+      "label": "What is Amazon Detective?",
+      "url": "https://docs.aws.amazon.com/detective/latest/userguide/what-is-detective.html"
+    }
+  },
+  {
+    "id": "aws-certificate-manager",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Certificate Manager (ACM)",
+      "pt-BR": "AWS Certificate Manager (ACM)"
+    },
+    "content": {
+      "en": "AWS Certificate Manager provisions, manages, and automatically renews public and private SSL/TLS certificates for free to secure data in transit on CloudFront, ELB, and API Gateway.",
+      "pt-BR": "O AWS Certificate Manager provisiona, gerencia e renova automaticamente certificados SSL/TLS públicos e privados gratuitamente para proteger dados em trânsito no CloudFront, ELB e API Gateway."
+    },
+    "source": {
+      "label": "What is AWS Certificate Manager?",
+      "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html"
+    }
+  },
+  {
+    "id": "aws-iam-identity-center",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS IAM Identity Center (AWS SSO)",
+      "pt-BR": "AWS IAM Identity Center (AWS SSO)"
+    },
+    "content": {
+      "en": "AWS IAM Identity Center is the recommended service for managing workforce single sign-on (SSO) access across multiple AWS Organizations accounts and business cloud applications using existing corporate identities.",
+      "pt-BR": "O AWS IAM Identity Center é o serviço recomendado para gerenciar login único (SSO) de colaboradores em múltiplas contas do AWS Organizations e aplicativos corporativos usando identidades existentes."
+    },
+    "source": {
+      "label": "What is IAM Identity Center?",
+      "url": "https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-cognito",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon Cognito",
+      "pt-BR": "Amazon Cognito"
+    },
+    "content": {
+      "en": "Amazon Cognito adds customer user sign-up, sign-in, and access control to your web and mobile apps, supporting millions of external end users and social identity providers (Google, Facebook, Apple).",
+      "pt-BR": "O Amazon Cognito adiciona cadastro, login e controle de acesso de clientes externos às suas aplicações web e mobile, suportando milhões de usuários e provedores sociais (Google, Facebook, Apple)."
+    },
+    "source": {
+      "label": "What is Amazon Cognito?",
+      "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+    }
+  },
+  {
+    "id": "security-groups-vs-nacls",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Security Groups vs. Network ACLs (NACLs)",
+      "pt-BR": "Security Groups vs. Network ACLs (NACLs)"
+    },
+    "content": {
+      "en": "Security Groups operate at the instance level, support Allow rules only, and are Stateful (return traffic is automatically allowed). NACLs operate at the subnet level, support both Allow and Deny rules, and are Stateless.",
+      "pt-BR": "Security Groups atuam no nível da instância, suportam apenas regras Allow e são Stateful (o tráfego de retorno é liberado automaticamente). NACLs atuam no nível da sub-rede, suportam regras Allow e Deny e são Stateless."
+    },
+    "source": {
+      "label": "Compare Security Groups and Network ACLs",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/infrastructure-security.html"
+    }
+  },
+  {
+    "id": "encryption-at-rest-and-in-transit",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Encryption at Rest vs. Encryption in Transit",
+      "pt-BR": "Criptografia em Repouso vs. em Trânsito"
+    },
+    "content": {
+      "en": "Encryption at rest protects stored data on disk/storage (using AWS KMS, S3 SSE, EBS/RDS encryption). Encryption in transit protects data moving over networks (using TLS/HTTPS via AWS Certificate Manager or VPN).",
+      "pt-BR": "A criptografia em repouso protege dados armazenados em disco (usando AWS KMS, S3 SSE, criptografia de EBS/RDS). A criptografia em trânsito protege dados trafegando na rede (usando TLS/HTTPS via AWS Certificate Manager ou VPN)."
+    },
+    "source": {
+      "label": "Data Protection in AWS",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/data-protection.html"
+    }
+  },
+  {
+    "id": "aws-cloudhsm",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS CloudHSM",
+      "pt-BR": "AWS CloudHSM"
+    },
+    "content": {
+      "en": "AWS CloudHSM provides dedicated, single-tenant Hardware Security Modules in the cloud for strict regulatory compliance where customers must retain exclusive single-tenant control over their cryptographic keys.",
+      "pt-BR": "O AWS CloudHSM fornece Módulos de Segurança de Hardware (HSM) dedicados e de locatário único (single-tenant) na nuvem para rigorosa conformidade regulatória em que o cliente deve manter controle exclusivo das chaves."
+    },
+    "source": {
+      "label": "What is AWS CloudHSM?",
+      "url": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html"
+    }
+  },
+  {
+    "id": "aws-network-firewall",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Network Firewall",
+      "pt-BR": "AWS Network Firewall"
+    },
+    "content": {
+      "en": "AWS Network Firewall is a managed, stateful firewall service that provides deep packet inspection, intrusion prevention (IPS), and domain filtering across your entire Amazon VPC.",
+      "pt-BR": "O AWS Network Firewall é um firewall stateful gerenciado que oferece inspeção profunda de pacotes, prevenção de intrusão (IPS) e filtragem de domínios em toda a sua Amazon VPC."
+    },
+    "source": {
+      "label": "What is AWS Network Firewall?",
+      "url": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html"
+    }
+  },
+  {
+    "id": "aws-firewall-manager",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Firewall Manager",
+      "pt-BR": "AWS Firewall Manager"
+    },
+    "content": {
+      "en": "AWS Firewall Manager centrally configures and manages firewall rules—such as AWS WAF, AWS Shield Advanced, Security Groups, and Network Firewall—across all accounts and resources in AWS Organizations.",
+      "pt-BR": "O AWS Firewall Manager configura e gerencia centralmente regras de firewall — como AWS WAF, AWS Shield Advanced, Security Groups e Network Firewall — em todas as contas e recursos do AWS Organizations."
+    },
+    "source": {
+      "label": "What is AWS Firewall Manager?",
+      "url": "https://docs.aws.amazon.com/waf/latest/developerguide/fms-chapter.html"
+    }
+  },
+  {
+    "id": "amazon-ebs",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Elastic Block Store (Amazon EBS)",
+      "pt-BR": "Amazon Elastic Block Store (Amazon EBS)"
+    },
+    "content": {
+      "en": "Amazon EBS provides persistent, high-performance block-level storage volumes attached to a single EC2 instance within the same Availability Zone. Back up EBS volumes incrementally to Amazon S3 using EBS Snapshots.",
+      "pt-BR": "O Amazon EBS fornece volumes persistentes de armazenamento em bloco de alto desempenho anexados a uma única instância EC2 na mesma Zona de Disponibilidade. Faça backups incrementais no S3 usando EBS Snapshots."
+    },
+    "source": {
+      "label": "Amazon EBS User Guide",
+      "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html"
+    }
+  },
+  {
+    "id": "ec2-instance-store",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "EC2 Instance Store",
+      "pt-BR": "EC2 Instance Store"
+    },
+    "content": {
+      "en": "An EC2 Instance Store provides temporary (ephemeral), ultra-fast block-level storage physically attached to the host computer. Data is lost if the instance stops, terminates, or fails—ideal for caches and buffers.",
+      "pt-BR": "O EC2 Instance Store fornece armazenamento em bloco temporário (efêmero) e ultrarrápido fisicamente conectado ao servidor host. Os dados são perdidos se a instância parar, encerrar ou falhar — ideal para caches e buffers."
+    },
+    "source": {
+      "label": "Amazon EC2 Instance Store",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html"
+    }
+  },
+  {
+    "id": "amazon-efs",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Elastic File System (Amazon EFS)",
+      "pt-BR": "Amazon Elastic File System (Amazon EFS)"
+    },
+    "content": {
+      "en": "Amazon EFS is a serverless, fully elastic NFS file system that can be mounted simultaneously by hundreds or thousands of Linux EC2 instances across multiple Availability Zones.",
+      "pt-BR": "O Amazon EFS é um sistema de arquivos NFS serverless e totalmente elástico que pode ser montado simultaneamente por centenas ou milhares de instâncias EC2 Linux em múltiplas Zonas de Disponibilidade."
+    },
+    "source": {
+      "label": "What is Amazon EFS?",
+      "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
+    }
+  },
+  {
+    "id": "amazon-fsx",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon FSx",
+      "pt-BR": "Amazon FSx"
+    },
+    "content": {
+      "en": "Amazon FSx launches and runs fully managed third-party high-performance file systems, such as FSx for Windows File Server (SMB), FSx for Lustre (HPC/ML), FSx for NetApp ONTAP, and FSx for OpenZFS.",
+      "pt-BR": "O Amazon FSx executa sistemas de arquivos de terceiros de alto desempenho totalmente gerenciados, como FSx for Windows File Server (SMB), FSx for Lustre (HPC/ML), FSx for NetApp ONTAP e FSx for OpenZFS."
+    },
+    "source": {
+      "label": "What is Amazon FSx?",
+      "url": "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html"
+    }
+  },
+  {
+    "id": "aws-storage-gateway",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Storage Gateway",
+      "pt-BR": "AWS Storage Gateway"
+    },
+    "content": {
+      "en": "AWS Storage Gateway is a hybrid cloud storage service that gives on-premises applications seamless access to virtually unlimited AWS cloud storage (S3, Glacier, EBS) with local caching.",
+      "pt-BR": "O AWS Storage Gateway é um serviço de armazenamento híbrido que dá às aplicações locais (on-premises) acesso contínuo ao armazenamento em nuvem da AWS (S3, Glacier, EBS) com cache local."
+    },
+    "source": {
+      "label": "What is AWS Storage Gateway?",
+      "url": "https://docs.aws.amazon.com/storagegateway/latest/userguide/WhatIsStorageGateway.html"
+    }
+  },
+  {
+    "id": "aws-snow-family",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Snow Family (Snowball & Snowmobile)",
+      "pt-BR": "Família AWS Snow (Snowball e Snowmobile)"
+    },
+    "content": {
+      "en": "Physical ruggedized devices for edge computing and offline bulk data transfer (terabytes to exabytes) into/out of AWS when network bandwidth is limited, slow, or costly.",
+      "pt-BR": "Dispositivos físicos robustos para computação de borda e transferência offline de grandes volumes de dados (terabytes a exabytes) para dentro ou fora da AWS quando a rede é limitada, lenta ou cara."
+    },
+    "source": {
+      "label": "AWS Snow Family",
+      "url": "https://aws.amazon.com/snow/"
+    }
+  },
+  {
+    "id": "aws-backup",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Backup",
+      "pt-BR": "AWS Backup"
+    },
+    "content": {
+      "en": "AWS Backup is a centralized, policy-based backup service that automates and governs data backups across AWS services (EC2, EBS, RDS, DynamoDB, EFS, S3) and across multiple accounts.",
+      "pt-BR": "O AWS Backup é um serviço centralizado baseado em políticas que automatiza e governa backups de dados em diversos serviços AWS (EC2, EBS, RDS, DynamoDB, EFS, S3) e em múltiplas contas."
+    },
+    "source": {
+      "label": "What is AWS Backup?",
+      "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html"
+    }
+  },
+  {
+    "id": "ec2-auto-scaling",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon EC2 Auto Scaling",
+      "pt-BR": "Amazon EC2 Auto Scaling"
+    },
+    "content": {
+      "en": "EC2 Auto Scaling automatically adds (scales out) or removes (scales in) EC2 instances based on demand, schedules, or predictive policies, and automatically replaces unhealthy instances.",
+      "pt-BR": "O EC2 Auto Scaling adiciona (scale out) ou remove (scale in) instâncias EC2 automaticamente com base na demanda, agendamentos ou políticas preditivas, substituindo instâncias com falha."
+    },
+    "source": {
+      "label": "What is Amazon EC2 Auto Scaling?",
+      "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html"
+    }
+  },
+  {
+    "id": "elastic-load-balancing",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Elastic Load Balancing (ELB)",
+      "pt-BR": "Elastic Load Balancing (ELB)"
+    },
+    "content": {
+      "en": "ELB automatically distributes incoming traffic across multiple targets (EC2, containers, IPs) in multiple AZs. Types: Application Load Balancer (Layer 7 HTTP/HTTPS), Network Load Balancer (Layer 4 ultra-high performance), and Gateway Load Balancer.",
+      "pt-BR": "O ELB distribui automaticamente o tráfego de entrada entre múltiplos alvos (EC2, contêineres, IPs) em várias AZs. Tipos: Application Load Balancer (Camada 7 HTTP/HTTPS), Network Load Balancer (Camada 4 ultra desempenho) e Gateway Load Balancer."
+    },
+    "source": {
+      "label": "What is Elastic Load Balancing?",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+    }
+  },
+  {
+    "id": "aws-elastic-beanstalk",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Elastic Beanstalk",
+      "pt-BR": "AWS Elastic Beanstalk"
+    },
+    "content": {
+      "en": "AWS Elastic Beanstalk is a PaaS service for quickly deploying and scaling web applications. You simply upload your code, and Beanstalk automatically handles provisioning (EC2, ELB, Auto Scaling, RDS) while letting you retain full access to underlying resources.",
+      "pt-BR": "O AWS Elastic Beanstalk é um serviço PaaS para implantar e escalar aplicações web rapidamente. Você envia seu código e o Beanstalk provisiona automaticamente EC2, ELB, Auto Scaling e RDS, mantendo seu acesso aos recursos subjacentes."
+    },
+    "source": {
+      "label": "What is AWS Elastic Beanstalk?",
+      "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html"
+    }
+  },
+  {
+    "id": "amazon-ecs",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Elastic Container Service (Amazon ECS)",
+      "pt-BR": "Amazon Elastic Container Service (Amazon ECS)"
+    },
+    "content": {
+      "en": "Amazon ECS is a highly scalable, fast container orchestration service natively integrated with AWS. You can run ECS containers on EC2 instances you manage or serverless using AWS Fargate.",
+      "pt-BR": "O Amazon ECS é um serviço rápido e escalável de orquestração de contêineres integrado nativamente à AWS. Você pode rodar contêineres ECS em instâncias EC2 ou de forma serverless com o AWS Fargate."
+    },
+    "source": {
+      "label": "What is Amazon ECS?",
+      "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html"
+    }
+  },
+  {
+    "id": "amazon-eks",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Elastic Kubernetes Service (Amazon EKS)",
+      "pt-BR": "Amazon Elastic Kubernetes Service (Amazon EKS)"
+    },
+    "content": {
+      "en": "Amazon EKS is a managed Kubernetes service that runs the Kubernetes control plane across multiple AZs without requiring you to install or maintain Kubernetes masters—ideal for migrating existing Kubernetes workloads.",
+      "pt-BR": "O Amazon EKS é um serviço gerenciado de Kubernetes que executa o plano de controle em múltiplas AZs sem exigir que você instale ou mantenha os nós mestres — ideal para migrar cargas de trabalho Kubernetes existentes."
+    },
+    "source": {
+      "label": "What is Amazon EKS?",
+      "url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
+    }
+  },
+  {
+    "id": "aws-fargate",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Fargate",
+      "pt-BR": "AWS Fargate"
+    },
+    "content": {
+      "en": "AWS Fargate is a serverless compute engine for containers (works with both Amazon ECS and EKS). You pay only for the vCPU and memory resources your containers consume without provisioning or managing EC2 instances.",
+      "pt-BR": "O AWS Fargate é um motor de computação serverless para contêineres (funciona com Amazon ECS e EKS). Você paga apenas pela vCPU e memória consumidas pelos contêineres, sem provisionar ou gerenciar instâncias EC2."
+    },
+    "source": {
+      "label": "What is AWS Fargate?",
+      "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
+    }
+  },
+  {
+    "id": "amazon-ecr",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Elastic Container Registry (Amazon ECR)",
+      "pt-BR": "Amazon Elastic Container Registry (Amazon ECR)"
+    },
+    "content": {
+      "en": "Amazon ECR is a fully managed Docker container registry integrated with ECS, EKS, and IAM, making it easy for developers to store, manage, scan, and deploy container images.",
+      "pt-BR": "O Amazon ECR é um registro gerenciado de contêineres Docker integrado ao ECS, EKS e IAM, facilitando armazenar, gerenciar, escanear e implantar imagens de contêineres."
+    },
+    "source": {
+      "label": "What is Amazon ECR?",
+      "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html"
+    }
+  },
+  {
+    "id": "amazon-lightsail",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Lightsail",
+      "pt-BR": "Amazon Lightsail"
+    },
+    "content": {
+      "en": "Amazon Lightsail is an easy-to-use virtual private server (VPS) service offering bundled compute, storage, and networking at a low, predictable monthly price—ideal for simple websites, WordPress, or small projects.",
+      "pt-BR": "O Amazon Lightsail é um serviço de servidor virtual privado (VPS) fácil de usar que inclui computação, armazenamento e rede por um preço mensal fixo e previsível — ideal para sites simples, WordPress ou pequenos projetos."
+    },
+    "source": {
+      "label": "What is Amazon Lightsail?",
+      "url": "https://docs.aws.amazon.com/lightsail/latest/userguide/what-is-amazon-lightsail.html"
+    }
+  },
+  {
+    "id": "aws-batch",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Batch",
+      "pt-BR": "AWS Batch"
+    },
+    "content": {
+      "en": "AWS Batch dynamically provisions the optimal quantity and type of compute resources (EC2 or Fargate) to run hundreds of thousands of batch computing jobs without manual cluster management.",
+      "pt-BR": "O AWS Batch provisiona dinamicamente a quantidade e o tipo ideais de recursos de computação (EC2 ou Fargate) para executar centenas de milhares de jobs em lote sem gerenciamento manual de clusters."
+    },
+    "source": {
+      "label": "What is AWS Batch?",
+      "url": "https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html"
+    }
+  },
+  {
+    "id": "amazon-aurora",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Aurora",
+      "pt-BR": "Amazon Aurora"
+    },
+    "content": {
+      "en": "Amazon Aurora is an AWS-built relational database compatible with MySQL and PostgreSQL, delivering up to 5x MySQL and 3x PostgreSQL performance with self-healing storage replicated 6 ways across 3 AZs.",
+      "pt-BR": "O Amazon Aurora é um banco relacional criado pela AWS compatível com MySQL e PostgreSQL, entregando até 5x o desempenho do MySQL e 3x do PostgreSQL, com armazenamento autorreparável replicado em 6 cópias por 3 AZs."
+    },
+    "source": {
+      "label": "What is Amazon Aurora?",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html"
+    }
+  },
+  {
+    "id": "amazon-redshift",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Redshift",
+      "pt-BR": "Amazon Redshift"
+    },
+    "content": {
+      "en": "Amazon Redshift is a fast, fully managed petabyte-scale cloud data warehouse optimized for Online Analytical Processing (OLAP), complex SQL queries, and Business Intelligence (BI) reporting.",
+      "pt-BR": "O Amazon Redshift é um data warehouse em nuvem rápido e gerenciado em escala de petabytes, otimizado para processamento analítico online (OLAP), consultas SQL complexas e relatórios de Business Intelligence (BI)."
+    },
+    "source": {
+      "label": "What is Amazon Redshift?",
+      "url": "https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html"
+    }
+  },
+  {
+    "id": "amazon-elasticache",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon ElastiCache",
+      "pt-BR": "Amazon ElastiCache"
+    },
+    "content": {
+      "en": "Amazon ElastiCache is a managed in-memory caching service (compatible with Redis/Valkey and Memcached) that delivers sub-millisecond latency to accelerate read-heavy applications and offload databases.",
+      "pt-BR": "O Amazon ElastiCache é um serviço gerenciado de cache em memória (compatível com Redis/Valkey e Memcached) que oferece latência sub-milissegundo para acelerar aplicações de leitura intensa e aliviar bancos de dados."
+    },
+    "source": {
+      "label": "What is Amazon ElastiCache?",
+      "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html"
+    }
+  },
+  {
+    "id": "amazon-neptune",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Neptune",
+      "pt-BR": "Amazon Neptune"
+    },
+    "content": {
+      "en": "Amazon Neptune is a fully managed graph database service built for storing and navigating highly connected datasets—ideal for social networks, fraud detection, recommendation engines, and knowledge graphs.",
+      "pt-BR": "O Amazon Neptune é um banco de dados de grafos totalmente gerenciado criado para armazenar e navegar em dados altamente conectados — ideal para redes sociais, detecção de fraudes, motores de recomendação e grafos de conhecimento."
+    },
+    "source": {
+      "label": "What is Amazon Neptune?",
+      "url": "https://docs.aws.amazon.com/neptune/latest/userguide/intro.html"
+    }
+  },
+  {
+    "id": "amazon-documentdb",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon DocumentDB",
+      "pt-BR": "Amazon DocumentDB"
+    },
+    "content": {
+      "en": "Amazon DocumentDB is a fast, scalable, fully managed document database service that supports MongoDB workloads and stores JSON data natively.",
+      "pt-BR": "O Amazon DocumentDB é um serviço de banco de dados de documentos rápido, escalável e totalmente gerenciado que suporta cargas de trabalho MongoDB e armazena dados JSON nativamente."
+    },
+    "source": {
+      "label": "What is Amazon DocumentDB?",
+      "url": "https://docs.aws.amazon.com/documentdb/latest/developerguide/what-is.html"
+    }
+  },
+  {
+    "id": "aws-dms",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Database Migration Service (AWS DMS)",
+      "pt-BR": "AWS Database Migration Service (AWS DMS)"
+    },
+    "content": {
+      "en": "AWS DMS migrates databases to AWS quickly and securely with minimal downtime because the source database remains fully operational during migration. Supports both homogeneous (Oracle to Oracle) and heterogeneous (Oracle to Aurora) migrations.",
+      "pt-BR": "O AWS DMS migra bancos de dados para a AWS com tempo de inatividade mínimo, pois o banco de origem permanece operacional durante o processo. Suporta migrações homogêneas (Oracle para Oracle) e heterogêneas (Oracle para Aurora)."
+    },
+    "source": {
+      "label": "What is AWS DMS?",
+      "url": "https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html"
+    }
+  },
+  {
+    "id": "aws-schema-conversion-tool",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Schema Conversion Tool (AWS SCT)",
+      "pt-BR": "AWS Schema Conversion Tool (AWS SCT)"
+    },
+    "content": {
+      "en": "AWS SCT works alongside AWS DMS during heterogeneous database migrations to automatically convert the source database schema and custom code (views, stored procedures) into a format compatible with the target database engine.",
+      "pt-BR": "O AWS SCT trabalha em conjunto com o AWS DMS em migrações heterogêneas para converter automaticamente o esquema do banco de origem e códigos personalizados (views, stored procedures) para o formato do banco de destino."
+    },
+    "source": {
+      "label": "What is AWS Schema Conversion Tool?",
+      "url": "https://docs.aws.amazon.com/SchemaConversionTool/latest/userguide/CHAP_Welcome.html"
+    }
+  },
+  {
+    "id": "amazon-cloudfront",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon CloudFront",
+      "pt-BR": "Amazon CloudFront"
+    },
+    "content": {
+      "en": "Amazon CloudFront is a global Content Delivery Network (CDN) that caches static and dynamic web content at Edge Locations worldwide to reduce latency and improve transfer speeds for global users.",
+      "pt-BR": "O Amazon CloudFront é uma Rede de Entrega de Conteúdo (CDN) global que armazena em cache conteúdo web estático e dinâmico em Edge Locations ao redor do mundo para reduzir a latência e acelerar a entrega aos usuários."
+    },
+    "source": {
+      "label": "What is Amazon CloudFront?",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+    }
+  },
+  {
+    "id": "aws-global-accelerator",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Global Accelerator",
+      "pt-BR": "AWS Global Accelerator"
+    },
+    "content": {
+      "en": "AWS Global Accelerator improves availability and performance for global users by providing two static Anycast IP addresses that route traffic over the congestion-free AWS global backbone network directly to optimal regional endpoints.",
+      "pt-BR": "O AWS Global Accelerator melhora a disponibilidade e o desempenho global fornecendo dois IPs estáticos Anycast que roteiam o tráfego pela rede privada global da AWS diretamente até os endpoints regionais ideais."
+    },
+    "source": {
+      "label": "What is AWS Global Accelerator?",
+      "url": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html"
+    }
+  },
+  {
+    "id": "aws-direct-connect",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Direct Connect",
+      "pt-BR": "AWS Direct Connect"
+    },
+    "content": {
+      "en": "AWS Direct Connect establishes a dedicated, private physical network connection between your on-premises data center and AWS—bypassing the public internet for consistent bandwidth, lower latency, and reduced data transfer costs.",
+      "pt-BR": "O AWS Direct Connect estabelece uma conexão de rede física privada e dedicada entre seu data center local e a AWS — evitando a internet pública para garantir largura de banda consistente, menor latência e menor custo de transferência."
+    },
+    "source": {
+      "label": "What is AWS Direct Connect?",
+      "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
+    }
+  },
+  {
+    "id": "aws-site-to-site-vpn",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Site-to-Site VPN",
+      "pt-BR": "AWS Site-to-Site VPN"
+    },
+    "content": {
+      "en": "AWS Site-to-Site VPN creates an encrypted IPsec tunnel over the public internet between your on-premises network and your Amazon VPC. It is much faster to set up than Direct Connect and ideal as a quick link or backup connection.",
+      "pt-BR": "A AWS Site-to-Site VPN cria um túnel IPsec criptografado pela internet pública entre sua rede local e sua Amazon VPC. É muito mais rápida de configurar que o Direct Connect e ideal como conexão rápida ou de backup."
+    },
+    "source": {
+      "label": "What is AWS Site-to-Site VPN?",
+      "url": "https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html"
+    }
+  },
+  {
+    "id": "internet-gateway-vs-nat-gateway",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Internet Gateway vs. NAT Gateway",
+      "pt-BR": "Internet Gateway vs. NAT Gateway"
+    },
+    "content": {
+      "en": "An Internet Gateway (IGW) allows bidirectional internet access for resources in public subnets. A NAT Gateway allows instances in private subnets to initiate outbound internet connections (e.g., for OS updates) while blocking inbound internet traffic.",
+      "pt-BR": "Um Internet Gateway (IGW) permite acesso bidirecional à internet para recursos em sub-redes públicas. Um NAT Gateway permite que instâncias em sub-redes privadas iniciem conexões de saída para a internet (ex.: atualizações) bloqueando conexões de entrada."
+    },
+    "source": {
+      "label": "NAT Gateways and Internet Gateways",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html"
+    }
+  },
+  {
+    "id": "vpc-peering-vs-transit-gateway",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "VPC Peering vs. AWS Transit Gateway",
+      "pt-BR": "VPC Peering vs. AWS Transit Gateway"
+    },
+    "content": {
+      "en": "VPC Peering connects two VPCs privately (one-to-one, non-transitive). AWS Transit Gateway acts as a central cloud router (hub-and-spoke) to interconnect hundreds of VPCs and on-premises networks at scale.",
+      "pt-BR": "O VPC Peering conecta duas VPCs de forma privada (ponto a ponto, não transitivo). O AWS Transit Gateway atua como um roteador central na nuvem (hub-and-spoke) para interconectar centenas de VPCs e redes locais em escala."
+    },
+    "source": {
+      "label": "What is AWS Transit Gateway?",
+      "url": "https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html"
+    }
+  },
+  {
+    "id": "vpc-endpoints",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "VPC Endpoints (AWS PrivateLink)",
+      "pt-BR": "VPC Endpoints (AWS PrivateLink)"
+    },
+    "content": {
+      "en": "VPC Endpoints privately connect your VPC to supported AWS services (like S3 or DynamoDB) using private IP addresses—keeping traffic strictly inside the AWS network without requiring an Internet Gateway or NAT Gateway.",
+      "pt-BR": "Os VPC Endpoints conectam sua VPC de forma privada a serviços da AWS suportados (como S3 ou DynamoDB) usando IPs privados — mantendo o tráfego estritamente dentro da rede AWS sem precisar de Internet Gateway ou NAT Gateway."
+    },
+    "source": {
+      "label": "What is AWS PrivateLink?",
+      "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html"
+    }
+  },
+  {
+    "id": "amazon-api-gateway",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon API Gateway",
+      "pt-BR": "Amazon API Gateway"
+    },
+    "content": {
+      "en": "Amazon API Gateway is a fully managed service to create, publish, maintain, monitor, and secure REST, HTTP, and WebSocket APIs at any scale—commonly acting as the 'front door' for AWS Lambda.",
+      "pt-BR": "O Amazon API Gateway é um serviço gerenciado para criar, publicar, monitorar e proteger APIs REST, HTTP e WebSocket em qualquer escala — atuando frequentemente como a 'porta de entrada' para o AWS Lambda."
+    },
+    "source": {
+      "label": "What is Amazon API Gateway?",
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+    }
+  },
+  {
+    "id": "amazon-sqs",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Simple Queue Service (Amazon SQS)",
+      "pt-BR": "Amazon Simple Queue Service (Amazon SQS)"
+    },
+    "content": {
+      "en": "Amazon SQS is a fully managed message queuing service used to decouple microservices and distributed systems (pull-based). Supports Standard queues (nearly unlimited throughput, at-least-once delivery) and FIFO queues (strict ordering, exactly-once processing).",
+      "pt-BR": "O Amazon SQS é um serviço gerenciado de filas de mensagens para desacoplar microsserviços (baseado em pull). Suporta filas Standard (vazão quase ilimitada, entrega pelo menos uma vez) e filas FIFO (ordem estrita, processamento exatamente uma vez)."
+    },
+    "source": {
+      "label": "What is Amazon SQS?",
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+    }
+  },
+  {
+    "id": "amazon-sns",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Simple Notification Service (Amazon SNS)",
+      "pt-BR": "Amazon Simple Notification Service (Amazon SNS)"
+    },
+    "content": {
+      "en": "Amazon SNS is a managed pub/sub messaging service (push-based). Publishers send a message once to an SNS topic, and SNS immediately pushes it to multiple subscribers (SQS queues, Lambda functions, HTTP endpoints, email, SMS).",
+      "pt-BR": "O Amazon SNS é um serviço gerenciado de mensagens pub/sub (baseado em push). Publicadores enviam uma mensagem a um tópico SNS e o SNS a entrega imediatamente a múltiplos assinantes (filas SQS, Lambda, HTTP, e-mail, SMS)."
+    },
+    "source": {
+      "label": "What is Amazon SNS?",
+      "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
+    }
+  },
+  {
+    "id": "amazon-eventbridge",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon EventBridge",
+      "pt-BR": "Amazon EventBridge"
+    },
+    "content": {
+      "en": "Amazon EventBridge is a serverless event bus service that connects applications using real-time event data from your own apps, SaaS partners, and AWS services, plus scheduled cron jobs.",
+      "pt-BR": "O Amazon EventBridge é um barramento de eventos serverless que conecta aplicações usando eventos em tempo real de seus próprios sistemas, parceiros SaaS e serviços AWS, além de tarefas agendadas (cron)."
+    },
+    "source": {
+      "label": "What is Amazon EventBridge?",
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+    }
+  },
+  {
+    "id": "aws-step-functions",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Step Functions",
+      "pt-BR": "AWS Step Functions"
+    },
+    "content": {
+      "en": "AWS Step Functions is a visual serverless workflow service that coordinates multiple AWS services (like Lambda, ECS, DynamoDB) into state machines with built-in error handling, retries, and sequential or parallel branching.",
+      "pt-BR": "O AWS Step Functions é um serviço visual de workflows serverless que coordena múltiplos serviços AWS (como Lambda, ECS, DynamoDB) em máquinas de estado com tratamento de erros, retentativas e fluxos sequenciais ou paralelos."
+    },
+    "source": {
+      "label": "What is AWS Step Functions?",
+      "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
+    }
+  },
+  {
+    "id": "aws-cloudformation",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS CloudFormation",
+      "pt-BR": "AWS CloudFormation"
+    },
+    "content": {
+      "en": "AWS CloudFormation is an Infrastructure as Code (IaC) service that lets you model, provision, and update entire AWS resource stacks safely and repeatably using declarative JSON or YAML templates.",
+      "pt-BR": "O AWS CloudFormation é um serviço de Infraestrutura como Código (IaC) que permite modelar, provisionar e atualizar pilhas inteiras de recursos AWS de forma segura e repetível usando templates declarativos em JSON ou YAML."
+    },
+    "source": {
+      "label": "What is AWS CloudFormation?",
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
+    }
+  },
+  {
+    "id": "aws-cdk",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Cloud Development Kit (AWS CDK)",
+      "pt-BR": "AWS Cloud Development Kit (AWS CDK)"
+    },
+    "content": {
+      "en": "AWS CDK is an open-source framework that lets developers define cloud infrastructure using familiar programming languages (TypeScript, Python, Java, C#, Go), which then compiles into AWS CloudFormation templates.",
+      "pt-BR": "O AWS CDK é um framework open-source que permite definir infraestrutura em nuvem usando linguagens de programação familiares (TypeScript, Python, Java, C#, Go), compilando tudo em templates do AWS CloudFormation."
+    },
+    "source": {
+      "label": "What is the AWS CDK?",
+      "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html"
+    }
+  },
+  {
+    "id": "aws-systems-manager",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Systems Manager",
+      "pt-BR": "AWS Systems Manager"
+    },
+    "content": {
+      "en": "AWS Systems Manager provides unified operational visibility and control across EC2 and hybrid instances. Key exam features: Patch Manager (automated OS patching), Session Manager (SSH/RDP-free shell access without opening inbound ports), and Parameter Store.",
+      "pt-BR": "O AWS Systems Manager oferece visibilidade e controle operacional unificado sobre instâncias EC2 e híbridas. Destaques na prova: Patch Manager (patches de SO), Session Manager (acesso shell sem abrir portas SSH/RDP) e Parameter Store."
+    },
+    "source": {
+      "label": "What is AWS Systems Manager?",
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html"
+    }
+  },
+  {
+    "id": "aws-codecommit-codebuild-codedeploy-codepipeline",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS CI/CD Suite (CodeBuild, CodeDeploy, CodePipeline)",
+      "pt-BR": "Suíte CI/CD da AWS (CodeBuild, CodeDeploy, CodePipeline)"
+    },
+    "content": {
+      "en": "AWS CI/CD tools automate software delivery: AWS CodeBuild compiles source code and runs unit tests, AWS CodeDeploy automates code deployments to EC2/ECS/Lambda, and AWS CodePipeline orchestrates the end-to-end release workflow.",
+      "pt-BR": "As ferramentas CI/CD da AWS automatizam entregas de software: AWS CodeBuild compila código e roda testes, AWS CodeDeploy automatiza implantações em EC2/ECS/Lambda e AWS CodePipeline orquestra todo o fluxo de release."
+    },
+    "source": {
+      "label": "DevOps and AWS",
+      "url": "https://aws.amazon.com/devops/"
+    }
+  },
+  {
+    "id": "aws-cloudshell",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS CloudShell",
+      "pt-BR": "AWS CloudShell"
+    },
+    "content": {
+      "en": "AWS CloudShell is a browser-based, pre-authenticated shell launched directly from the AWS Management Console with AWS CLI, Python, and Node.js pre-installed at no additional charge.",
+      "pt-BR": "O AWS CloudShell é um terminal baseado no navegador e já autenticado, iniciado direto pelo Console de Gerenciamento da AWS com AWS CLI, Python e Node.js pré-instalados sem custo adicional."
+    },
+    "source": {
+      "label": "What is AWS CloudShell?",
+      "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-health-dashboard",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Health Dashboard",
+      "pt-BR": "AWS Health Dashboard"
+    },
+    "content": {
+      "en": "AWS Health Dashboard shows both the general status of all AWS services globally and personalized alerts/remediation guidance when AWS service events or scheduled maintenance affect your specific account resources.",
+      "pt-BR": "O AWS Health Dashboard exibe tanto o status geral de todos os serviços AWS globalmente quanto alertas personalizados e orientações quando eventos ou manutenções programadas afetam os recursos específicos da sua conta."
+    },
+    "source": {
+      "label": "What is AWS Health?",
+      "url": "https://docs.aws.amazon.com/health/latest/ug/what-is-aws-health.html"
+    }
+  },
+  {
+    "id": "aws-xray",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS X-Ray",
+      "pt-BR": "AWS X-Ray"
+    },
+    "content": {
+      "en": "AWS X-Ray helps developers analyze, debug, and trace requests end-to-end across distributed microservices architectures to pinpoint performance bottlenecks and errors.",
+      "pt-BR": "O AWS X-Ray ajuda desenvolvedores a analisar, depurar e rastrear requisições de ponta a ponta em arquiteturas distribuídas de microsserviços para identificar gargalos de desempenho e erros."
+    },
+    "source": {
+      "label": "What is AWS X-Ray?",
+      "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html"
+    }
+  },
+  {
+    "id": "amazon-athena",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Athena",
+      "pt-BR": "Amazon Athena"
+    },
+    "content": {
+      "en": "Amazon Athena is a serverless, interactive query service that makes it easy to analyze data directly in Amazon S3 using standard SQL—pay only per query based on data scanned, with no infrastructure to manage.",
+      "pt-BR": "O Amazon Athena é um serviço de consulta interativa serverless que permite analisar dados diretamente no Amazon S3 usando SQL padrão — você paga apenas pelas consultas conforme os dados escaneados, sem gerenciar servidores."
+    },
+    "source": {
+      "label": "What is Amazon Athena?",
+      "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html"
+    }
+  },
+  {
+    "id": "aws-glue",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Glue",
+      "pt-BR": "AWS Glue"
+    },
+    "content": {
+      "en": "AWS Glue is a serverless data integration and ETL (Extract, Transform, Load) service that discovers, prepares, cleans, and combines data from multiple sources for analytics and machine learning.",
+      "pt-BR": "O AWS Glue é um serviço serverless de integração de dados e ETL (Extração, Transformação e Carga) que descobre, prepara, limpa e combina dados de várias fontes para análise e machine learning."
+    },
+    "source": {
+      "label": "What is AWS Glue?",
+      "url": "https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html"
+    }
+  },
+  {
+    "id": "amazon-kinesis",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Kinesis",
+      "pt-BR": "Amazon Kinesis"
+    },
+    "content": {
+      "en": "Amazon Kinesis collects, processes, and analyzes real-time streaming data (clickstreams, IoT telemetry, logs, video) at massive scale so you can react to insights immediately rather than waiting for batch processing.",
+      "pt-BR": "O Amazon Kinesis coleta, processa e analisa fluxos de dados (streaming) em tempo real (cliques, telemetria IoT, logs, vídeo) em larga escala para reagir imediatamente sem esperar processamento em lote."
+    },
+    "source": {
+      "label": "What is Amazon Kinesis?",
+      "url": "https://aws.amazon.com/kinesis/"
+    }
+  },
+  {
+    "id": "amazon-quicksight",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon QuickSight",
+      "pt-BR": "Amazon QuickSight"
+    },
+    "content": {
+      "en": "Amazon QuickSight is a serverless, cloud-native Business Intelligence (BI) service used to build interactive dashboards, charts, and ML-powered insights for business users.",
+      "pt-BR": "O Amazon QuickSight é um serviço serverless de Business Intelligence (BI) nativo da nuvem usado para criar dashboards interativos, gráficos e insights com ML para usuários de negócios."
+    },
+    "source": {
+      "label": "What is Amazon QuickSight?",
+      "url": "https://docs.aws.amazon.com/quicksight/latest/user/welcome.html"
+    }
+  },
+  {
+    "id": "amazon-emr",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon EMR",
+      "pt-BR": "Amazon EMR"
+    },
+    "content": {
+      "en": "Amazon EMR is a managed big data platform for processing vast amounts of data using open-source frameworks such as Apache Spark, Apache Hadoop, Apache Hive, and Presto.",
+      "pt-BR": "O Amazon EMR é uma plataforma gerenciada de big data para processar grandes volumes de dados usando frameworks open-source como Apache Spark, Apache Hadoop, Apache Hive e Presto."
+    },
+    "source": {
+      "label": "What is Amazon EMR?",
+      "url": "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html"
+    }
+  },
+  {
+    "id": "amazon-opensearch-service",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon OpenSearch Service",
+      "pt-BR": "Amazon OpenSearch Service"
+    },
+    "content": {
+      "en": "Amazon OpenSearch Service makes it easy to deploy, operate, and scale OpenSearch clusters for interactive log analytics, real-time application monitoring, and full-text website search.",
+      "pt-BR": "O Amazon OpenSearch Service facilita implantar, operar e escalar clusters OpenSearch para análise interativa de logs, monitoramento de aplicações em tempo real e busca textual completa."
+    },
+    "source": {
+      "label": "What is Amazon OpenSearch Service?",
+      "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-sagemaker",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon SageMaker",
+      "pt-BR": "Amazon SageMaker"
+    },
+    "content": {
+      "en": "Amazon SageMaker is a fully managed end-to-end machine learning service enabling data scientists and developers to build, train, and deploy ML models at scale.",
+      "pt-BR": "O Amazon SageMaker é um serviço gerenciado completo de machine learning que permite a cientistas de dados e desenvolvedores construir, treinar e implantar modelos de ML em escala."
+    },
+    "source": {
+      "label": "What is Amazon SageMaker?",
+      "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html"
+    }
+  },
+  {
+    "id": "amazon-rekognition",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Rekognition",
+      "pt-BR": "Amazon Rekognition"
+    },
+    "content": {
+      "en": "Amazon Rekognition is a managed computer vision service that analyzes images and videos to identify objects, people, text, scenes, inappropriate content, and facial features via simple API calls.",
+      "pt-BR": "O Amazon Rekognition é um serviço gerenciado de visão computacional que analisa imagens e vídeos para identificar objetos, pessoas, textos, cenas, conteúdo impróprio e rostos por meio de chamadas de API."
+    },
+    "source": {
+      "label": "What is Amazon Rekognition?",
+      "url": "https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-comprehend",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Comprehend",
+      "pt-BR": "Amazon Comprehend"
+    },
+    "content": {
+      "en": "Amazon Comprehend is a Natural Language Processing (NLP) service that uses machine learning to uncover insights in unstructured text—such as customer sentiment, key phrases, language, and entities.",
+      "pt-BR": "O Amazon Comprehend é um serviço de Processamento de Linguagem Natural (NLP) que usa machine learning para extrair insights de textos não estruturados — como sentimento do cliente, frases-chave, idioma e entidades."
+    },
+    "source": {
+      "label": "What is Amazon Comprehend?",
+      "url": "https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-textract",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Textract",
+      "pt-BR": "Amazon Textract"
+    },
+    "content": {
+      "en": "Amazon Textract automatically extracts printed text, handwriting, form key-value pairs, and tables from scanned documents and PDFs—going far beyond simple Optical Character Recognition (OCR).",
+      "pt-BR": "O Amazon Textract extrai automaticamente texto impresso, manuscrito, pares chave-valor de formulários e tabelas de documentos digitalizados e PDFs — indo muito além de um simples OCR."
+    },
+    "source": {
+      "label": "What is Amazon Textract?",
+      "url": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-polly-and-transcribe",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Polly vs. Amazon Transcribe",
+      "pt-BR": "Amazon Polly vs. Amazon Transcribe"
+    },
+    "content": {
+      "en": "Easy exam pair: Amazon Polly converts written text INTO lifelike speech (Text-to-Speech), while Amazon Transcribe converts spoken audio/video INTO written text (Speech-to-Text).",
+      "pt-BR": "Dupla clássica de prova: o Amazon Polly converte texto escrito EM fala realista (Text-to-Speech), enquanto o Amazon Transcribe converte áudio/vídeo falado EM texto escrito (Speech-to-Text)."
+    },
+    "source": {
+      "label": "AWS AI Services",
+      "url": "https://aws.amazon.com/machine-learning/ai-services/"
+    }
+  },
+  {
+    "id": "amazon-translate-and-lex",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Translate & Amazon Lex",
+      "pt-BR": "Amazon Translate e Amazon Lex"
+    },
+    "content": {
+      "en": "Amazon Translate provides fast, neural machine language translation across dozens of languages. Amazon Lex builds conversational voice and text chatbots (powered by the same engine as Amazon Alexa).",
+      "pt-BR": "O Amazon Translate fornece tradução automática neural rápida entre dezenas de idiomas. O Amazon Lex cria chatbots conversacionais de voz e texto (com a mesma tecnologia do Amazon Alexa)."
+    },
+    "source": {
+      "label": "What is Amazon Lex?",
+      "url": "https://docs.aws.amazon.com/lexv2/latest/dg/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-kendra",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Kendra",
+      "pt-BR": "Amazon Kendra"
+    },
+    "content": {
+      "en": "Amazon Kendra is an intelligent enterprise search service powered by machine learning that lets employees search across internal company silos (wikis, SharePoint, S3, databases) using natural language questions.",
+      "pt-BR": "O Amazon Kendra é um serviço inteligente de busca corporativa com machine learning que permite aos funcionários pesquisar em repositórios internos (wikis, SharePoint, S3, bancos) usando perguntas em linguagem natural."
+    },
+    "source": {
+      "label": "What is Amazon Kendra?",
+      "url": "https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html"
+    }
+  },
+  {
+    "id": "amazon-bedrock",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Bedrock",
+      "pt-BR": "Amazon Bedrock"
+    },
+    "content": {
+      "en": "Amazon Bedrock is a fully managed serverless service offering API access to high-performing Foundation Models (FMs) from leading AI companies and Amazon, allowing you to customize and build generative AI apps securely.",
+      "pt-BR": "O Amazon Bedrock é um serviço serverless totalmente gerenciado que oferece acesso via API a Modelos de Fundação (FMs) de alto desempenho de empresas líderes e da Amazon, permitindo criar aplicações de IA generativa com segurança."
+    },
+    "source": {
+      "label": "What is Amazon Bedrock?",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html"
+    }
+  },
+  {
+    "id": "ec2-pricing-models",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "Amazon EC2 Purchasing Options",
+      "pt-BR": "Opções de Compra do Amazon EC2"
+    },
+    "content": {
+      "en": "On-Demand (pay by second, no commitment, spiky/unpredictable workloads), Savings Plans / Reserved Instances (up to 72% discount for 1- or 3-year steady-state commitment), Spot Instances (up to 90% discount for fault-tolerant, interruptible workloads), and Dedicated Hosts (physical server isolation for compliance/BYOL).",
+      "pt-BR": "On-Demand (pague por segundo, sem compromisso, cargas imprevisíveis), Savings Plans / Instâncias Reservadas (até 72% de desconto com compromisso de 1 ou 3 anos), Spot Instances (até 90% de desconto para cargas tolerantes a interrupções) e Dedicated Hosts (servidor físico dedicado para conformidade/licenças)."
+    },
+    "source": {
+      "label": "Amazon EC2 Instance Purchasing Options",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html"
+    }
+  },
+  {
+    "id": "aws-savings-plans",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Savings Plans",
+      "pt-BR": "AWS Savings Plans"
+    },
+    "content": {
+      "en": "Flexible pricing model offering up to 72% savings in exchange for a 1- or 3-year commitment to a consistent hourly spend ($/hour). Compute Savings Plans automatically apply across EC2 families, Regions, AWS Fargate, and AWS Lambda.",
+      "pt-BR": "Modelo flexível com até 72% de economia em troca de compromisso de 1 ou 3 anos com um gasto horário constante ($/hora). Os Compute Savings Plans aplicam-se automaticamente entre famílias EC2, Regiões, AWS Fargate e AWS Lambda."
+    },
+    "source": {
+      "label": "What are Savings Plans?",
+      "url": "https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html"
+    }
+  },
+  {
+    "id": "reserved-instances-payment-options",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "Reserved Instances (RI) Terms & Payment Options",
+      "pt-BR": "Prazos e Pagamento de Instâncias Reservadas (RI)"
+    },
+    "content": {
+      "en": "Reserved Instances offer 1-year or 3-year terms (3-year gives a larger discount) and three payment options: All Upfront (biggest discount), Partial Upfront, and No Upfront (smallest discount). Convertible RIs allow changing instance families.",
+      "pt-BR": "Instâncias Reservadas têm prazos de 1 ou 3 anos (3 anos dá maior desconto) e três opções de pagamento: All Upfront / Tudo Adiantado (maior desconto), Partial Upfront e No Upfront (menor desconto). RIs Conversíveis permitem trocar de família."
+    },
+    "source": {
+      "label": "Reserved Instances",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-reserved-instances.html"
+    }
+  },
+  {
+    "id": "aws-pricing-calculator",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Pricing Calculator",
+      "pt-BR": "AWS Pricing Calculator"
+    },
+    "content": {
+      "en": "AWS Pricing Calculator is a free web-based planning tool used BEFORE deploying workloads to estimate monthly costs of AWS services and architectures—never confuse it with Cost Explorer (which analyzes past/current bills).",
+      "pt-BR": "A AWS Pricing Calculator é uma ferramenta web gratuita usada ANTES de implantar cargas de trabalho para estimar custos mensais de serviços e arquiteturas — não confunda com o Cost Explorer (que analisa faturas passadas/atuais)."
+    },
+    "source": {
+      "label": "What is AWS Pricing Calculator?",
+      "url": "https://docs.aws.amazon.com/pricing-calculator/latest/userguide/what-is-pricing-calculator.html"
+    }
+  },
+  {
+    "id": "aws-free-tier",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Free Tier Categories",
+      "pt-BR": "Categorias do Nível Gratuito da AWS (Free Tier)"
+    },
+    "content": {
+      "en": "AWS Free Tier has three offer types: Always Free (e.g., 1M Lambda requests/month, 25 GB DynamoDB storage), 12 Months Free after sign-up (e.g., 750 hours/month of t2.micro/t3.micro EC2, 5 GB S3 Standard), and Short-Term Trials.",
+      "pt-BR": "O AWS Free Tier possui três categorias: Sempre Gratuito (ex.: 1M de requisições Lambda/mês, 25 GB no DynamoDB), 12 Meses Grátis após o cadastro (ex.: 750h/mês de EC2 t2.micro/t3.micro, 5 GB no S3 Standard) e Avaliações de Curto Prazo."
+    },
+    "source": {
+      "label": "AWS Free Tier",
+      "url": "https://aws.amazon.com/free/"
+    }
+  },
+  {
+    "id": "aws-data-transfer-pricing",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Data Transfer Pricing Rules",
+      "pt-BR": "Regras de Cobrança de Transferência de Dados na AWS"
+    },
+    "content": {
+      "en": "Core pricing rule: Data transfer INBOUND (ingress) to AWS from the internet is almost always FREE ($0). Data transfer OUTBOUND (egress) from AWS to the internet or across Regions is charged per GB.",
+      "pt-BR": "Regra fundamental de preços: Transferência de dados DE ENTRADA (inbound) da internet para a AWS é quase sempre GRATUITA ($0). Transferência DE SAÍDA (outbound) da AWS para a internet ou entre Regiões é cobrada por GB."
+    },
+    "source": {
+      "label": "AWS Pricing Overview",
+      "url": "https://aws.amazon.com/pricing/"
+    }
+  },
+  {
+    "id": "aws-cost-and-usage-report",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Cost and Usage Report (AWS CUR)",
+      "pt-BR": "AWS Cost and Usage Report (AWS CUR)"
+    },
+    "content": {
+      "en": "AWS Cost and Usage Report delivers the most comprehensive, granular line-item billing dataset available—including hourly/daily usage, pricing, tags, and Reserved Instance/Savings Plans amortization—delivered directly to an S3 bucket.",
+      "pt-BR": "O AWS Cost and Usage Report entrega o conjunto de dados de faturamento mais abrangente e granular disponível — incluindo uso horário/diário, preços, tags e amortização de RIs/Savings Plans — salvo diretamente em um bucket S3."
+    },
+    "source": {
+      "label": "What are AWS Cost and Usage Reports?",
+      "url": "https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html"
+    }
+  },
+  {
+    "id": "cost-allocation-tags",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "Cost Allocation Tags",
+      "pt-BR": "Tags de Alocação de Custos"
+    },
+    "content": {
+      "en": "Tags are key-value metadata labels (e.g., Environment:Production, CostCenter:Finance) attached to AWS resources. Once activated as Cost Allocation Tags in the Billing console, they allow you to track and categorize spend by project, team, or department.",
+      "pt-BR": "Tags são rótulos de metadados chave-valor (ex.: Ambiente:Producao, CentroCusto:Financeiro) anexados aos recursos AWS. Após ativadas no console de Billing, permitem rastrear e categorizar gastos por projeto, equipe ou departamento."
+    },
+    "source": {
+      "label": "Using Cost Allocation Tags",
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html"
+    }
+  },
+  {
+    "id": "aws-cost-anomaly-detection",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Cost Anomaly Detection",
+      "pt-BR": "AWS Cost Anomaly Detection"
+    },
+    "content": {
+      "en": "AWS Cost Anomaly Detection uses machine learning to continuously monitor your spending patterns and automatically alert you to unexpected cost spikes (anomalies) along with root-cause analysis.",
+      "pt-BR": "O AWS Cost Anomaly Detection usa machine learning para monitorar continuamente seus padrões de gastos e alertar automaticamente sobre picos inesperados de custo (anomalias) com análise de causa raiz."
+    },
+    "source": {
+      "label": "Getting Started with AWS Cost Anomaly Detection",
+      "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/manage-ad.html"
+    }
+  },
+  {
+    "id": "aws-compute-optimizer",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Compute Optimizer",
+      "pt-BR": "AWS Compute Optimizer"
+    },
+    "content": {
+      "en": "AWS Compute Optimizer analyzes historical CloudWatch utilization metrics using machine learning to recommend optimal AWS resource configurations (right-sizing EC2, EBS, Lambda, and ECS on Fargate) to cut costs and improve performance.",
+      "pt-BR": "O AWS Compute Optimizer analisa métricas históricas de utilização do CloudWatch com machine learning para recomendar configurações ideais (right-sizing de EC2, EBS, Lambda e ECS no Fargate) para reduzir custos e melhorar desempenho."
+    },
+    "source": {
+      "label": "What is AWS Compute Optimizer?",
+      "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
+    }
+  },
+  {
+    "id": "aws-marketplace",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Marketplace",
+      "pt-BR": "AWS Marketplace"
+    },
+    "content": {
+      "en": "AWS Marketplace is a curated digital catalog with thousands of third-party software listings (firewalls, databases, DevOps tools, AMIs, SaaS) that you can find, test, buy, and deploy directly into your AWS account on one consolidated bill.",
+      "pt-BR": "O AWS Marketplace é um catálogo digital com milhares de softwares de terceiros (firewalls, bancos de dados, ferramentas DevOps, AMIs, SaaS) que você pode encontrar, testar, comprar e implantar na sua conta AWS em uma fatura consolidada."
+    },
+    "source": {
+      "label": "What is AWS Marketplace?",
+      "url": "https://docs.aws.amazon.com/marketplace/latest/buyerguide/what-is-marketplace.html"
+    }
+  },
+  {
+    "id": "aws-activate-and-iq",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS IQ & AWS Partner Network (APN)",
+      "pt-BR": "AWS IQ e Rede de Parceiros AWS (APN)"
+    },
+    "content": {
+      "en": "AWS IQ helps customers quickly find, engage, and pay AWS-certified third-party freelancers and consulting firms for on-demand project work. APN is the global community of AWS Consulting and Technology Partners.",
+      "pt-BR": "O AWS IQ ajuda clientes a encontrar, contratar e pagar rapidamente freelancers e consultorias certificadas pela AWS para projetos sob demanda. A APN é a rede global de Parceiros de Consultoria e Tecnologia da AWS."
+    },
+    "source": {
+      "label": "What is AWS IQ?",
+      "url": "https://docs.aws.amazon.com/aws-iq/latest/user-guide/what-is-aws-iq.html"
+    }
+  },
+  {
+    "id": "aws-repost",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS re:Post",
+      "pt-BR": "AWS re:Post"
+    },
+    "content": {
+      "en": "AWS re:Post is a free, community-driven Q&A knowledge service where AWS customers, community heroes, and AWS engineers ask and answer technical questions—available on all support tiers including Basic.",
+      "pt-BR": "O AWS re:Post é um serviço gratuito de perguntas e respostas da comunidade onde clientes, especialistas e engenheiros da AWS tiram dúvidas técnicas — disponível em todos os planos de suporte, incluindo o Basic."
+    },
+    "source": {
+      "label": "AWS re:Post",
+      "url": "https://repost.aws/"
+    }
+  },
+  {
+    "id": "aws-control-tower",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Control Tower",
+      "pt-BR": "AWS Control Tower"
+    },
+    "content": {
+      "en": "AWS Control Tower provides the easiest way to set up and govern a secure, compliant multi-account AWS environment ('landing zone') using pre-packaged guardrails, AWS Organizations, and IAM Identity Center.",
+      "pt-BR": "O AWS Control Tower oferece a maneira mais fácil de configurar e governar um ambiente AWS multi-contas seguro e em conformidade ('landing zone') usando guardrails prontos, AWS Organizations e IAM Identity Center."
+    },
+    "source": {
+      "label": "What is AWS Control Tower?",
+      "url": "https://docs.aws.amazon.com/controltower/latest/userguide/what-is-control-tower.html"
+    }
+  },
+  {
+    "id": "aws-service-catalog",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Service Catalog",
+      "pt-BR": "AWS Service Catalog"
+    },
+    "content": {
+      "en": "AWS Service Catalog lets organizations create and manage catalogs of pre-approved IT services (standardized CloudFormation templates) so end users can self-service deploy compliant infrastructure without needing direct admin permissions.",
+      "pt-BR": "O AWS Service Catalog permite criar e gerenciar catálogos de serviços de TI pré-aprovados (templates CloudFormation padronizados) para que usuários implantem infraestrutura em conformidade por autoatendimento sem precisar de permissões de administrador."
+    },
+    "source": {
+      "label": "What is AWS Service Catalog?",
+      "url": "https://docs.aws.amazon.com/servicecatalog/latest/adminguide/introduction.html"
+    }
+  },
+  {
+    "id": "aws-resource-access-manager",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Resource Access Manager (AWS RAM)",
+      "pt-BR": "AWS Resource Access Manager (AWS RAM)"
+    },
+    "content": {
+      "en": "AWS RAM lets you securely share AWS resources—such as VPC subnets, Transit Gateways, Route 53 Resolver rules, and License Manager configurations—across multiple AWS accounts or within AWS Organizations without duplicating resources.",
+      "pt-BR": "O AWS RAM permite compartilhar recursos AWS com segurança — como sub-redes VPC, Transit Gateways, regras do Route 53 e configurações do License Manager — entre múltiplas contas ou no AWS Organizations sem duplicar recursos."
+    },
+    "source": {
+      "label": "What is AWS RAM?",
+      "url": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html"
+    }
+  },
+  {
+    "id": "aws-audit-manager",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Audit Manager",
+      "pt-BR": "AWS Audit Manager"
+    },
+    "content": {
+      "en": "AWS Audit Manager continuously audits your AWS usage to simplify how you assess risk and compliance with regulations and industry standards (such as GDPR, HIPAA, PCI DSS) by automating evidence collection.",
+      "pt-BR": "O AWS Audit Manager audita continuamente seu uso da AWS para simplificar a avaliação de riscos e conformidade com regulamentações e padrões (como GDPR, HIPAA, PCI DSS) automatizando a coleta de evidências."
+    },
+    "source": {
+      "label": "What is AWS Audit Manager?",
+      "url": "https://docs.aws.amazon.com/audit-manager/latest/userguide/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-workspaces",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon WorkSpaces",
+      "pt-BR": "Amazon WorkSpaces"
+    },
+    "content": {
+      "en": "Amazon WorkSpaces is a fully managed, persistent Virtual Desktop Infrastructure (VDI / Desktop-as-a-Service) enabling remote employees to access Windows or Linux desktops from any supported device.",
+      "pt-BR": "O Amazon WorkSpaces é um serviço gerenciado de Infraestrutura de Desktop Virtual (VDI / Desktop-as-a-Service) persistente que permite a funcionários remotos acessar desktops Windows ou Linux de qualquer dispositivo."
+    },
+    "source": {
+      "label": "What is Amazon WorkSpaces?",
+      "url": "https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces.html"
+    }
+  },
+  {
+    "id": "amazon-appstream-2",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon AppStream 2.0",
+      "pt-BR": "Amazon AppStream 2.0"
+    },
+    "content": {
+      "en": "Amazon AppStream 2.0 is a fully managed, non-persistent application streaming service that streams desktop applications securely to any web browser without rewriting the app or managing client installations.",
+      "pt-BR": "O Amazon AppStream 2.0 é um serviço gerenciado não persistente que transmite (faz streaming de) aplicações desktop com segurança para qualquer navegador web sem reescrever o sistema ou instalar nada no cliente."
+    },
+    "source": {
+      "label": "What is Amazon AppStream 2.0?",
+      "url": "https://docs.aws.amazon.com/appstream2/latest/developerguide/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-connect",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Connect",
+      "pt-BR": "Amazon Connect"
+    },
+    "content": {
+      "en": "Amazon Connect is an omnichannel cloud contact center service that enables organizations to set up a scalable customer support center in minutes with pay-as-you-go pricing and AI-powered speech analytics.",
+      "pt-BR": "O Amazon Connect é um serviço de contact center omnichannel na nuvem que permite configurar uma central de atendimento escalável em minutos com pagamento conforme o uso e análise de voz com IA."
+    },
+    "source": {
+      "label": "What is Amazon Connect?",
+      "url": "https://docs.aws.amazon.com/connect/latest/adminguide/what-is-amazon-connect.html"
+    }
+  },
+  {
+    "id": "amazon-ses",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Simple Email Service (Amazon SES)",
+      "pt-BR": "Amazon Simple Email Service (Amazon SES)"
+    },
+    "content": {
+      "en": "Amazon SES is a cost-effective, high-scale cloud email service designed for sending transactional emails (order confirmations, password resets) and marketing campaigns from your applications.",
+      "pt-BR": "O Amazon SES é um serviço de e-mail em nuvem econômico e de alta escala projetado para enviar e-mails transacionais (confirmações de pedidos, redefinição de senhas) e campanhas a partir de suas aplicações."
+    },
+    "source": {
+      "label": "What is Amazon SES?",
+      "url": "https://docs.aws.amazon.com/ses/latest/dg/Welcome.html"
+    }
+  },
+  {
+    "id": "amazon-pinpoint",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Pinpoint",
+      "pt-BR": "Amazon Pinpoint"
+    },
+    "content": {
+      "en": "Amazon Pinpoint is a multichannel marketing communications service that lets you segment audiences and send targeted campaigns via email, SMS, push notifications, and voice.",
+      "pt-BR": "O Amazon Pinpoint é um serviço de comunicação de marketing multicanal que permite segmentar públicos e enviar campanhas direcionadas por e-mail, SMS, notificações push e voz."
+    },
+    "source": {
+      "label": "What is Amazon Pinpoint?",
+      "url": "https://docs.aws.amazon.com/pinpoint/latest/userguide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-amplify",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Amplify",
+      "pt-BR": "AWS Amplify"
+    },
+    "content": {
+      "en": "AWS Amplify is a complete set of tools and services that enables frontend web and mobile developers to quickly build, host, and connect full-stack cloud backends (authentication, APIs, storage).",
+      "pt-BR": "O AWS Amplify é um conjunto completo de ferramentas e serviços que permite a desenvolvedores web e mobile criar, hospedar e conectar backends full-stack na nuvem rapidamente (autenticação, APIs, armazenamento)."
+    },
+    "source": {
+      "label": "What is AWS Amplify?",
+      "url": "https://docs.amplify.aws/"
+    }
+  },
+  {
+    "id": "aws-device-farm",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Device Farm",
+      "pt-BR": "AWS Device Farm"
+    },
+    "content": {
+      "en": "AWS Device Farm is an application testing service that lets developers test and interact with Android, iOS, and web apps on real, physical smartphones and tablets hosted in the AWS Cloud.",
+      "pt-BR": "O AWS Device Farm é um serviço de testes que permite testar e interagir com aplicativos Android, iOS e web em smartphones e tablets reais e físicos hospedados na nuvem da AWS."
+    },
+    "source": {
+      "label": "What is AWS Device Farm?",
+      "url": "https://docs.aws.amazon.com/devicefarm/latest/developerguide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-iot-core",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS IoT Core",
+      "pt-BR": "AWS IoT Core"
+    },
+    "content": {
+      "en": "AWS IoT Core lets billions of connected Internet of Things (IoT) devices securely connect and exchange trillions of messages with AWS cloud applications and other devices without managing servers.",
+      "pt-BR": "O AWS IoT Core permite que bilhões de dispositivos conectados de Internet das Coisas (IoT) se conectem com segurança e troquem trilhões de mensagens com aplicações na nuvem AWS sem gerenciar servidores."
+    },
+    "source": {
+      "label": "What is AWS IoT Core?",
+      "url": "https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html"
+    }
+  },
+  {
+    "id": "aws-iot-greengrass",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS IoT Greengrass",
+      "pt-BR": "AWS IoT Greengrass"
+    },
+    "content": {
+      "en": "AWS IoT Greengrass is an open-source edge runtime and cloud service that brings local compute, messaging, data caching, and ML inference directly onto connected edge devices even when offline.",
+      "pt-BR": "O AWS IoT Greengrass é um runtime de borda open-source que leva computação local, mensagens, cache de dados e inferência de ML diretamente para dispositivos conectados na borda, mesmo quando estão offline."
+    },
+    "source": {
+      "label": "What is AWS IoT Greengrass?",
+      "url": "https://docs.aws.amazon.com/greengrass/v2/developerguide/what-is-iot-greengrass.html"
+    }
+  },
+  {
+    "id": "aws-application-discovery-service",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Application Discovery Service",
+      "pt-BR": "AWS Application Discovery Service"
+    },
+    "content": {
+      "en": "AWS Application Discovery Service helps enterprise customers plan cloud migration projects by gathering configuration, usage, and behavior data about their on-premises servers and dependencies.",
+      "pt-BR": "O AWS Application Discovery Service ajuda empresas a planejar migrações para a nuvem coletando dados de configuração, uso e comportamento de seus servidores locais (on-premises) e suas dependências."
+    },
+    "source": {
+      "label": "What is AWS Application Discovery Service?",
+      "url": "https://docs.aws.amazon.com/application-discovery/latest/userguide/what-is-appdiscovery.html"
+    }
+  },
+  {
+    "id": "aws-application-migration-service",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Application Migration Service (AWS MGN)",
+      "pt-BR": "AWS Application Migration Service (AWS MGN)"
+    },
+    "content": {
+      "en": "AWS MGN is the primary recommended service for 'lift-and-shift' (Rehost) migrations, automatically converting physical, virtual, or cloud servers to run natively on AWS with minimal downtime.",
+      "pt-BR": "O AWS MGN é o principal serviço recomendado para migrações 'lift-and-shift' (Rehost), convertendo automaticamente servidores físicos, virtuais ou de outras nuvens para rodar nativamente na AWS com downtime mínimo."
+    },
+    "source": {
+      "label": "What is AWS Application Migration Service?",
+      "url": "https://docs.aws.amazon.com/mgn/latest/ug/what-is-application-migration-service.html"
+    }
+  },
+  {
+    "id": "aws-migration-hub",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Migration Hub",
+      "pt-BR": "AWS Migration Hub"
+    },
+    "content": {
+      "en": "AWS Migration Hub provides a single centralized location to track the progress of application migrations across multiple AWS and partner migration tools (such as AWS MGN and AWS DMS).",
+      "pt-BR": "O AWS Migration Hub fornece um único painel centralizado para acompanhar o progresso de migrações de aplicações realizadas por múltiplas ferramentas da AWS e de parceiros (como AWS MGN e AWS DMS)."
+    },
+    "source": {
+      "label": "What is AWS Migration Hub?",
+      "url": "https://docs.aws.amazon.com/migrationhub/latest/ug/whatis.html"
+    }
+  },
+  {
+    "id": "aws-datasync",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS DataSync",
+      "pt-BR": "AWS DataSync"
+    },
+    "content": {
+      "en": "AWS DataSync is an online data transfer service that automates and accelerates moving large amounts of data between on-premises storage systems and AWS storage services (S3, EFS, FSx) over the network.",
+      "pt-BR": "O AWS DataSync é um serviço de transferência de dados online que automatiza e acelera a movimentação de grandes volumes de dados entre armazenamento local (on-premises) e serviços AWS (S3, EFS, FSx) pela rede."
+    },
+    "source": {
+      "label": "What is AWS DataSync?",
+      "url": "https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html"
+    }
+  },
+  {
+    "id": "aws-transfer-family",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Transfer Family",
+      "pt-BR": "AWS Transfer Family"
+    },
+    "content": {
+      "en": "AWS Transfer Family provides fully managed file transfers directly into and out of Amazon S3 or Amazon EFS using standard protocols: SFTP, FTPS, FTP, and AS2.",
+      "pt-BR": "O AWS Transfer Family fornece transferências de arquivos totalmente gerenciadas diretamente para dentro ou fora do Amazon S3 ou Amazon EFS usando protocolos padrão: SFTP, FTPS, FTP e AS2."
+    },
+    "source": {
+      "label": "What is AWS Transfer Family?",
+      "url": "https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html"
+    }
+  },
+  {
+    "id": "s3-lifecycle-policies",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon S3 Lifecycle Policies",
+      "pt-BR": "Políticas de Ciclo de Vida do Amazon S3"
+    },
+    "content": {
+      "en": "S3 Lifecycle rules automate cost optimization by transitioning objects to cheaper storage classes (e.g., Standard to Standard-IA after 30 days, then Glacier after 90 days) and expiring/deleting old objects automatically.",
+      "pt-BR": "As regras de Ciclo de Vida do S3 automatizam a economia movendo objetos para classes mais baratas (ex.: Standard para Standard-IA após 30 dias e Glacier após 90 dias) e expirando/excluindo objetos antigos automaticamente."
+    },
+    "source": {
+      "label": "Managing your storage lifecycle",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
+    }
+  },
+  {
+    "id": "s3-versioning-and-object-lock",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "S3 Versioning & S3 Object Lock (WORM)",
+      "pt-BR": "Versionamento do S3 e S3 Object Lock (WORM)"
+    },
+    "content": {
+      "en": "S3 Versioning preserves multiple variants of an object in the same bucket to recover from accidental deletions or overwrites. S3 Object Lock enforces Write-Once-Read-Many (WORM) protection to prevent objects from being deleted or modified for a fixed retention period.",
+      "pt-BR": "O Versionamento do S3 preserva múltiplas versões de um objeto no mesmo bucket para recuperação contra exclusões ou sobrescritas acidentais. O S3 Object Lock aplica proteção WORM (Write-Once-Read-Many) impedindo exclusão ou alteração durante um período de retenção."
+    },
+    "source": {
+      "label": "Locking objects with Object Lock",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html"
+    }
+  },
+  {
+    "id": "s3-replication",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "S3 Cross-Region Replication (CRR) vs. Same-Region Replication (SRR)",
+      "pt-BR": "Replicação S3 entre Regiões (CRR) vs. na Mesma Região (SRR)"
+    },
+    "content": {
+      "en": "S3 CRR automatically copies objects across buckets in different AWS Regions for compliance, lower latency access, and disaster recovery. S3 SRR replicates objects within the same Region for log aggregation or live/test account synchronization.",
+      "pt-BR": "O S3 CRR copia objetos automaticamente entre buckets em Regiões diferentes para conformidade, menor latência e recuperação de desastres. O S3 SRR replica objetos na mesma Região para agregação de logs ou sincronização entre contas."
+    },
+    "source": {
+      "label": "Replicating objects in Amazon S3",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html"
+    }
+  },
+  {
+    "id": "ec2-instance-families",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon EC2 Instance Families",
+      "pt-BR": "Famílias de Instâncias Amazon EC2"
+    },
+    "content": {
+      "en": "Choose EC2 families by workload: General Purpose (T, M - balanced compute/memory), Compute Optimized (C - batch processing, gaming, high-traffic web), Memory Optimized (R, X - in-memory databases, big data), Storage Optimized (I, D - high sequential I/O), and Accelerated Computing (P, G - GPUs for ML/graphics).",
+      "pt-BR": "Escolha a família EC2 pela carga: Uso Geral (T, M - equilíbrio), Otimizada para Computação (C - batch, jogos, web intenso), Otimizada para Memória (R, X - bancos em memória, big data), Otimizada para Armazenamento (I, D - alto I/O) e Computação Acelerada (P, G - GPUs para ML/gráficos)."
+    },
+    "source": {
+      "label": "Amazon EC2 Instance Types",
+      "url": "https://aws.amazon.com/ec2/instance-types/"
+    }
+  },
+  {
+    "id": "amazon-machine-image",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Machine Image (AMI)",
+      "pt-BR": "Amazon Machine Image (AMI)"
+    },
+    "content": {
+      "en": "An AMI is a pre-configured template containing the operating system, application server, and applications required to launch an EC2 instance. You can launch multiple identical instances from a single AMI.",
+      "pt-BR": "Uma AMI é um modelo pré-configurado contendo o sistema operacional, servidor de aplicação e softwares necessários para iniciar uma instância EC2. Você pode lançar múltiplas instâncias idênticas a partir de uma única AMI."
+    },
+    "source": {
+      "label": "Amazon Machine Images (AMI)",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html"
+    }
+  },
+  {
+    "id": "rpo-vs-rto",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "RPO vs. RTO in Disaster Recovery",
+      "pt-BR": "RPO vs. RTO na Recuperação de Desastres"
+    },
+    "content": {
+      "en": "RPO (Recovery Point Objective) is the maximum acceptable amount of data loss measured in time (how often you back up). RTO (Recovery Time Objective) is the maximum acceptable downtime after a disaster before service must be restored.",
+      "pt-BR": "RPO (Objetivo de Ponto de Recuperação) é a perda máxima aceitável de dados medida em tempo (frequência de backup). RTO (Objetivo de Tempo de Recuperação) é o tempo máximo aceitável de inatividade após um desastre até o serviço voltar."
+    },
+    "source": {
+      "label": "Disaster Recovery Options in the Cloud",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+    }
+  },
+  {
+    "id": "disaster-recovery-strategies",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "4 Disaster Recovery (DR) Strategies",
+      "pt-BR": "4 Estratégias de Recuperação de Desastres (DR)"
+    },
+    "content": {
+      "en": "Ordered from lowest cost/highest RTO to highest cost/near-zero RTO: 1) Backup & Restore, 2) Pilot Light (only core data/DB replicated, compute turned off), 3) Warm Standby (scaled-down copy always running), and 4) Multi-Site Active-Active (full scale running in multiple Regions).",
+      "pt-BR": "Do menor custo/maior RTO ao maior custo/RTO quase zero: 1) Backup e Restauração, 2) Pilot Light (apenas dados/banco replicados, computação desligada), 3) Warm Standby (cópia reduzida sempre ativa) e 4) Multi-Site Ativo-Ativo (escala total em múltiplas Regiões)."
+    },
+    "source": {
+      "label": "Disaster Recovery Strategies",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/plan-for-disaster-recovery-dr.html"
+    }
+  },
+  {
+    "id": "rds-multi-az-vs-read-replicas",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "RDS Multi-AZ vs. RDS Read Replicas",
+      "pt-BR": "RDS Multi-AZ vs. RDS Read Replicas"
+    },
+    "content": {
+      "en": "RDS Multi-AZ synchronously replicates data to a standby instance in another AZ for High Availability and automatic failover (cannot serve read traffic). RDS Read Replicas asynchronously replicate data (within or across Regions) to scale read-heavy workloads.",
+      "pt-BR": "O RDS Multi-AZ replica dados de forma síncrona para uma instância standby em outra AZ para Alta Disponibilidade e failover automático (não atende leituras). As Read Replicas replicam de forma assíncrona (na mesma ou em outra Região) para escalar leituras."
+    },
+    "source": {
+      "label": "High Availability (Multi-AZ) for Amazon RDS",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html"
+    }
+  },
+  {
+    "id": "vpc-subnets-public-vs-private",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Public vs. Private Subnets in a VPC",
+      "pt-BR": "Sub-redes Públicas vs. Privadas em uma VPC"
+    },
+    "content": {
+      "en": "A subnet is tied to a single Availability Zone. A Public Subnet has a route in its Route Table pointing to an Internet Gateway (for web servers/load balancers). A Private Subnet has no direct route to an Internet Gateway (for databases and backend servers).",
+      "pt-BR": "Uma sub-rede pertence a uma única Zona de Disponibilidade. Uma Sub-rede Pública possui rota na Tabela de Rotas apontando para um Internet Gateway (para servidores web/load balancers). Uma Sub-rede Privada não tem rota direta para o Internet Gateway (para bancos de dados e backends)."
+    },
+    "source": {
+      "label": "Subnets for your VPC",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html"
+    }
+  },
+  {
+    "id": "vpc-flow-logs",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "VPC Flow Logs",
+      "pt-BR": "VPC Flow Logs"
+    },
+    "content": {
+      "en": "VPC Flow Logs capture metadata about IP traffic going to and from network interfaces in your VPC (source/destination IP, ports, accepted/rejected packets) and send them to CloudWatch Logs or S3 for troubleshooting and security monitoring.",
+      "pt-BR": "Os VPC Flow Logs capturam metadados sobre o tráfego IP de entrada e saída nas interfaces de rede da sua VPC (IP origem/destino, portas, pacotes aceitos/rejeitados) e os enviam para o CloudWatch Logs ou S3 para diagnóstico e monitoramento de segurança."
+    },
+    "source": {
+      "label": "Logging IP traffic using VPC Flow Logs",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html"
+    }
+  },
+  {
+    "id": "aws-resource-groups-and-tag-editor",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Resource Groups & Tag Editor",
+      "pt-BR": "AWS Resource Groups e Tag Editor"
+    },
+    "content": {
+      "en": "AWS Resource Groups let you organize, view, and automate tasks on large collections of AWS resources that share common tags. Tag Editor lets you search and bulk-edit tags across multiple Regions and services.",
+      "pt-BR": "Os AWS Resource Groups permitem organizar, visualizar e automatizar tarefas em grandes coleções de recursos AWS que compartilham tags. O Tag Editor permite pesquisar e editar tags em lote em múltiplas Regiões e serviços."
+    },
+    "source": {
+      "label": "What are AWS Resource Groups?",
+      "url": "https://docs.aws.amazon.com/ARG/latest/userguide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-license-manager",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS License Manager",
+      "pt-BR": "AWS License Manager"
+    },
+    "content": {
+      "en": "AWS License Manager makes it easier to manage, track, and enforce Bring-Your-Own-License (BYOL) software agreements (such as Microsoft, SAP, Oracle) across AWS and on-premises environments to prevent licensing violations.",
+      "pt-BR": "O AWS License Manager facilita gerenciar, rastrear e aplicar regras de licenças próprias (BYOL) de softwares (como Microsoft, SAP, Oracle) na AWS e em ambientes locais para evitar violações de licenciamento."
+    },
+    "source": {
+      "label": "What is AWS License Manager?",
+      "url": "https://docs.aws.amazon.com/license-manager/latest/userguide/license-manager.html"
+    }
+  },
+  {
+    "id": "aws-managed-services-ams",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Managed Services (AMS)",
+      "pt-BR": "AWS Managed Services (AMS)"
+    },
+    "content": {
+      "en": "AWS Managed Services (AMS) operates your AWS infrastructure on your behalf—handling ongoing monitoring, incident management, security patching, and backups for organizations lacking internal cloud operations expertise.",
+      "pt-BR": "O AWS Managed Services (AMS) opera sua infraestrutura AWS em seu nome — cuidando de monitoramento contínuo, gerenciamento de incidentes, patches de segurança e backups para empresas sem equipe interna especializada em nuvem."
+    },
+    "source": {
+      "label": "What is AWS Managed Services?",
+      "url": "https://docs.aws.amazon.com/managedservices/latest/userguide/what-is-ams.html"
+    }
+  },
+  {
+    "id": "aws-professional-services",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Professional Services & AWS Training",
+      "pt-BR": "AWS Professional Services e AWS Training"
+    },
+    "content": {
+      "en": "AWS Professional Services is a global team of AWS experts who work alongside your team to execute enterprise cloud migrations and specialized projects. AWS Training and Certification (including AWS Skill Builder) builds internal team cloud skills.",
+      "pt-BR": "O AWS Professional Services é uma equipe global de especialistas da AWS que atua junto ao seu time em migrações corporativas e projetos especializados. O AWS Training and Certification (incluindo AWS Skill Builder) capacita sua equipe interna."
+    },
+    "source": {
+      "label": "AWS Professional Services",
+      "url": "https://aws.amazon.com/professional-services/"
+    }
+  },
+  {
+    "id": "service-quotas",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Service Quotas (Service Limits)",
+      "pt-BR": "AWS Service Quotas (Limites de Serviço)"
+    },
+    "content": {
+      "en": "AWS Service Quotas allows you to view and manage the maximum number of resources (limits) you can create in your AWS account—such as max VPCs per Region or running EC2 instances—and request quota increases easily.",
+      "pt-BR": "O AWS Service Quotas permite visualizar e gerenciar o número máximo de recursos (limites) que você pode criar na sua conta — como máximo de VPCs por Região ou instâncias EC2 ativas — e solicitar aumentos facilmente."
+    },
+    "source": {
+      "label": "What is Service Quotas?",
+      "url": "https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html"
+    }
+  },
+  {
+    "id": "shared-responsibility-rds-vs-ec2",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Shared Responsibility: EC2 vs. RDS vs. S3/Lambda",
+      "pt-BR": "Responsabilidade Compartilhada: EC2 vs. RDS vs. S3/Lambda"
+    },
+    "content": {
+      "en": "Exam trap: On EC2 (IaaS), YOU patch the guest OS and database. On RDS (managed service), AWS patches the OS and database engine, while YOU manage DB users, firewall rules, and data. On Lambda/S3 (abstracted services), AWS manages infrastructure, OS, and runtime, while YOU manage code, data, and IAM.",
+      "pt-BR": "Pegadinha de prova: No EC2 (IaaS), VOCÊ aplica patches no SO e no banco. No RDS (gerenciado), a AWS aplica patches no SO e no motor do banco, e VOCÊ gerencia usuários, firewall e dados. No Lambda/S3, a AWS gerencia tudo abaixo do seu código/dados e IAM."
+    },
+    "source": {
+      "label": "Shared Responsibility Model",
+      "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
+    }
+  },
+  {
+    "id": "iam-users-groups-policies",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "IAM Users, Groups, and Policies",
+      "pt-BR": "Usuários, Grupos e Políticas do IAM"
+    },
+    "content": {
+      "en": "An IAM User represents a person or service interacting with AWS. An IAM Group is a collection of IAM users to simplify permission management (groups cannot contain other groups). An IAM Policy is a JSON document defining permissions.",
+      "pt-BR": "Um Usuário IAM representa uma pessoa ou serviço que interage com a AWS. Um Grupo IAM reúne usuários para simplificar permissões (grupos não podem conter outros grupos). Uma Política IAM é um documento JSON que define permissões."
+    },
+    "source": {
+      "label": "Identities (users, groups, and roles)",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id.html"
+    }
+  },
+  {
+    "id": "iam-credential-report-vs-access-advisor",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "IAM Credential Report vs. IAM Access Advisor",
+      "pt-BR": "IAM Credential Report vs. IAM Access Advisor"
+    },
+    "content": {
+      "en": "IAM Credential Report lists all users in your account and the status of their credentials (passwords, access keys, MFA devices). IAM Access Advisor shows the service permissions granted to a user/role and when those services were last accessed—helping enforce least privilege.",
+      "pt-BR": "O IAM Credential Report lista todos os usuários da conta e o status de suas credenciais (senhas, chaves de acesso, MFA). O IAM Access Advisor mostra as permissões concedidas a um usuário/role e quando foram usadas pela última vez — ajudando a aplicar o menor privilégio."
+    },
+    "source": {
+      "label": "Getting credential reports for your AWS account",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  {
+    "id": "aws-root-user-best-practices",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Account Root User Best Practices",
+      "pt-BR": "Boas Práticas do Usuário Raiz (Root) da Conta AWS"
+    },
+    "content": {
+      "en": "Never use the root user for everyday administrative tasks. Lock away root credentials, enable hardware or virtual MFA immediately, delete any root access keys, and create an IAM Admin user or IAM Identity Center role for daily work.",
+      "pt-BR": "Nunca use o usuário raiz (root) para tarefas administrativas diárias. Proteja as credenciais root, habilite MFA imediatamente, exclua quaisquer chaves de acesso do root e crie um usuário/role IAM Admin para o dia a dia."
+    },
+    "source": {
+      "label": "Tasks that require root user credentials",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-tasks.html"
+    }
+  },
+  {
+    "id": "service-control-policies",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Service Control Policies (SCPs)",
+      "pt-BR": "Políticas de Controle de Serviço (SCPs)"
+    },
+    "content": {
+      "en": "SCPs are organization policies in AWS Organizations that specify the maximum permissions available for member accounts (even restricting the root user of member accounts). SCPs do NOT grant permissions on their own; they only act as guardrails.",
+      "pt-BR": "SCPs são políticas do AWS Organizations que definem as permissões máximas disponíveis para contas-membro (restringindo até mesmo o usuário root dessas contas). SCPs NÃO concedem permissões sozinhas; atuam apenas como guardrails."
+    },
+    "source": {
+      "label": "Service control policies (SCPs)",
+      "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+    }
+  },
+  {
+    "id": "compliance-programs-hipaa-pci-gdpr",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Compliance Programs (PCI DSS, HIPAA, GDPR, SOC)",
+      "pt-BR": "Programas de Conformidade AWS (PCI DSS, HIPAA, GDPR, SOC)"
+    },
+    "content": {
+      "en": "AWS maintains global certifications (SOC 1/2/3, ISO 27001, PCI DSS, FedRAMP), which make AWS infrastructure compliant. However, achieving overall application compliance (such as HIPAA or GDPR) remains a shared responsibility requiring proper customer configuration.",
+      "pt-BR": "A AWS mantém certificações globais (SOC 1/2/3, ISO 27001, PCI DSS, FedRAMP), tornando a infraestrutura compatível. Porém, alcançar a conformidade total da aplicação (como HIPAA ou GDPR) continua sendo responsabilidade compartilhada, exigindo configuração correta do cliente."
+    },
+    "source": {
+      "label": "AWS Cloud Compliance",
+      "url": "https://aws.amazon.com/compliance/"
+    }
+  },
+  {
+    "id": "aws-waf-vs-shield-vs-network-firewall",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "WAF vs. Shield vs. Network Firewall",
+      "pt-BR": "WAF vs. Shield vs. Network Firewall"
+    },
+    "content": {
+      "en": "Quick exam distinction: Use AWS Shield to stop DDoS volumetric attacks. Use AWS WAF to block HTTP/HTTPS web exploits (SQLi, XSS, bad bots/IPs). Use AWS Network Firewall for VPC-wide Layer 3-7 packet filtering and intrusion prevention.",
+      "pt-BR": "Distinção rápida na prova: Use AWS Shield para parar ataques volumétricos DDoS. Use AWS WAF para bloquear ataques web HTTP/HTTPS (SQLi, XSS, bots/IPs). Use AWS Network Firewall para filtragem de pacotes e prevenção de intrusão em toda a VPC."
+    },
+    "source": {
+      "label": "AWS Perimeter Protection",
+      "url": "https://aws.amazon.com/security/perimeter-protection/"
+    }
+  },
+  {
+    "id": "guardduty-vs-inspector-vs-macie",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "GuardDuty vs. Inspector vs. Macie",
+      "pt-BR": "GuardDuty vs. Inspector vs. Macie"
+    },
+    "content": {
+      "en": "Frequent exam trio: GuardDuty = intelligent threat detection (analyzes logs for malicious behavior). Inspector = automated vulnerability scanning (CVEs in EC2, ECR, Lambda). Macie = sensitive data/PII discovery in Amazon S3.",
+      "pt-BR": "Trio muito cobrado: GuardDuty = detecção inteligente de ameaças (analisa logs em busca de comportamento malicioso). Inspector = varredura de vulnerabilidades (CVEs em EC2, ECR, Lambda). Macie = descoberta de dados sensíveis/PII no Amazon S3."
+    },
+    "source": {
+      "label": "AWS Security, Identity, & Compliance",
+      "url": "https://aws.amazon.com/products/security/"
+    }
+  },
+  {
+    "id": "cloudtrail-vs-cloudwatch-vs-config",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "CloudTrail vs. CloudWatch vs. AWS Config",
+      "pt-BR": "CloudTrail vs. CloudWatch vs. AWS Config"
+    },
+    "content": {
+      "en": "Must-know distinction: CloudTrail = API auditing ('who made an API call'). CloudWatch = performance monitoring & alarms ('CPU is at 90%'). AWS Config = resource configuration history & compliance ('who changed a Security Group rule and does it comply?').",
+      "pt-BR": "Distinção obrigatória: CloudTrail = auditoria de API ('quem fez uma chamada de API'). CloudWatch = monitoramento de desempenho e alarmes ('CPU está em 90%'). AWS Config = histórico de configuração e conformidade ('quem mudou um Security Group e se está conforme')."
+    },
+    "source": {
+      "label": "Management and Governance on AWS",
+      "url": "https://aws.amazon.com/products/management-and-governance/"
+    }
+  },
+  {
+    "id": "well-architected-operational-excellence",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Well-Architected Pillar: Operational Excellence",
+      "pt-BR": "Pilar Well-Architected: Excelência Operacional"
+    },
+    "content": {
+      "en": "Focuses on running and monitoring systems to deliver business value and continually improving processes. Key practices: Perform operations as code (IaC), make frequent, small, reversible changes, and learn from all operational failures.",
+      "pt-BR": "Foca em executar e monitorar sistemas para entregar valor ao negócio e melhorar processos continuamente. Boas práticas: Operações como código (IaC), mudanças frequentes, pequenas e reversíveis, e aprendizado com falhas operacionais."
+    },
+    "source": {
+      "label": "Operational Excellence Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "well-architected-security",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Well-Architected Pillar: Security",
+      "pt-BR": "Pilar Well-Architected: Segurança"
+    },
+    "content": {
+      "en": "Focuses on protecting information, systems, and assets. Key practices: Implement a strong identity foundation (least privilege), enable traceability, apply security at all layers, automate security best practices, and protect data in transit and at rest.",
+      "pt-BR": "Foca em proteger informações, sistemas e ativos. Boas práticas: Base sólida de identidade (menor privilégio), rastreabilidade, segurança em todas as camadas, automação de segurança e proteção de dados em trânsito e em repouso."
+    },
+    "source": {
+      "label": "Security Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "well-architected-reliability",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Well-Architected Pillar: Reliability",
+      "pt-BR": "Pilar Well-Architected: Confiabilidade"
+    },
+    "content": {
+      "en": "Focuses on a workload performing its intended function correctly and consistently and recovering quickly from failures. Key practices: Automatically recover from failure, test recovery procedures, scale horizontally, and stop guessing capacity.",
+      "pt-BR": "Foca na capacidade de uma carga de trabalho executar sua função corretamente e recuperar-se rápido de falhas. Boas práticas: Recuperação automática de falhas, testar procedimentos de recuperação, escalar horizontalmente e parar de adivinhar capacidade."
+    },
+    "source": {
+      "label": "Reliability Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "well-architected-performance-efficiency",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Well-Architected Pillar: Performance Efficiency",
+      "pt-BR": "Pilar Well-Architected: Eficiência de Desempenho"
+    },
+    "content": {
+      "en": "Focuses on using computing resources efficiently to meet system requirements and maintaining efficiency as demand changes. Key practices: Democratize advanced technologies, go global in minutes, use serverless architectures, and experiment more often.",
+      "pt-BR": "Foca no uso eficiente de recursos computacionais para atender requisitos e manter eficiência conforme a demanda muda. Boas práticas: Democratizar tecnologias avançadas, tornar-se global em minutos, usar arquiteturas serverless e experimentar mais."
+    },
+    "source": {
+      "label": "Performance Efficiency Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/performance-efficiency-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "well-architected-cost-optimization",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Well-Architected Pillar: Cost Optimization",
+      "pt-BR": "Pilar Well-Architected: Otimização de Custos"
+    },
+    "content": {
+      "en": "Focuses on avoiding unnecessary costs and achieving business outcomes at the lowest price point. Key practices: Implement Cloud Financial Management, adopt a consumption model, stop spending money on undifferentiated heavy lifting, and analyze expenditure.",
+      "pt-BR": "Foca em evitar custos desnecessários e atingir resultados pelo menor preço. Boas práticas: Implementar Gestão Financeira na Nuvem (FinOps), adotar modelo de consumo, parar de gastar com trabalho pesado indiferenciado e analisar despesas."
+    },
+    "source": {
+      "label": "Cost Optimization Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "well-architected-sustainability",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Well-Architected Pillar: Sustainability",
+      "pt-BR": "Pilar Well-Architected: Sustentabilidade"
+    },
+    "content": {
+      "en": "Focuses on minimizing environmental impacts of running cloud workloads. Key practices: Maximize utilization (right-sizing, turning off idle resources), use managed/serverless services, and adopt energy-efficient hardware like AWS Graviton processors.",
+      "pt-BR": "Foca em minimizar os impactos ambientais da execução de cargas na nuvem. Boas práticas: Maximizar a utilização (right-sizing, desligar recursos ociosos), usar serviços gerenciados/serverless e adotar hardware eficiente como processadores AWS Graviton."
+    },
+    "source": {
+      "label": "Sustainability Pillar",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/sustainability-pillar/welcome.html"
+    }
+  },
+  {
+    "id": "aws-graviton",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Graviton Processors",
+      "pt-BR": "Processadores AWS Graviton"
+    },
+    "content": {
+      "en": "AWS Graviton processors are custom-designed ARM-based CPUs built by AWS that deliver the best price-performance and significantly lower energy consumption for cloud workloads running on EC2, Fargate, Lambda, and RDS.",
+      "pt-BR": "Os processadores AWS Graviton são CPUs personalizadas baseadas em arquitetura ARM criadas pela AWS que oferecem o melhor custo-desempenho e consumo de energia muito menor para cargas em EC2, Fargate, Lambda e RDS."
+    },
+    "source": {
+      "label": "AWS Graviton Processor",
+      "url": "https://aws.amazon.com/ec2/graviton/"
+    }
+  },
+  {
+    "id": "undifferentiated-heavy-lifting",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "Undifferentiated Heavy Lifting",
+      "pt-BR": "Trabalho Pesado Indiferenciado (Undifferentiated Heavy Lifting)"
+    },
+    "content": {
+      "en": "Refers to time-consuming IT infrastructure tasks (racking servers, cooling, OS patching, database backups) that add no competitive advantage to your business—offloaded to AWS by using managed and serverless services.",
+      "pt-BR": "Refere-se a tarefas demoradas de infraestrutura de TI (instalar servidores, refrigeração, patches de SO, backups) que não trazem diferencial competitivo ao negócio — transferidas à AWS pelo uso de serviços gerenciados e serverless."
+    },
+    "source": {
+      "label": "AWS Well-Architected Framework",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+    }
+  },
+  {
+    "id": "s3-glacier-retrieval-options",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon S3 Glacier Tiers",
+      "pt-BR": "Camadas do Amazon S3 Glacier"
+    },
+    "content": {
+      "en": "Three archive tiers: S3 Glacier Instant Retrieval (millisecond access for rarely accessed data), S3 Glacier Flexible Retrieval (retrieval from minutes to 12 hours), and S3 Glacier Deep Archive (lowest-cost AWS storage, 12 to 48 hours retrieval).",
+      "pt-BR": "Três camadas de arquivamento: S3 Glacier Instant Retrieval (acesso em milissegundos para dados raramente acessados), S3 Glacier Flexible Retrieval (recuperação de minutos a 12 horas) e S3 Glacier Deep Archive (armazenamento mais barato da AWS, recuperação de 12 a 48 horas)."
+    },
+    "source": {
+      "label": "S3 Glacier Storage Classes",
+      "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
+    }
+  },
+  {
+    "id": "s3-presigned-urls",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon S3 Presigned URLs",
+      "pt-BR": "URLs Pré-assinadas do Amazon S3 (Presigned URLs)"
+    },
+    "content": {
+      "en": "S3 Presigned URLs grant temporary, time-limited access to upload or download a specific private S3 object without changing bucket permissions or requiring the user to have AWS credentials.",
+      "pt-BR": "As URLs Pré-assinadas do S3 concedem acesso temporário e com prazo determinado para baixar ou enviar um objeto privado específico no S3 sem alterar permissões do bucket ou exigir credenciais AWS do usuário."
+    },
+    "source": {
+      "label": "Sharing objects with presigned URLs",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html"
+    }
+  },
+  {
+    "id": "s3-block-public-access",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon S3 Block Public Access",
+      "pt-BR": "Bloqueio de Acesso Público do Amazon S3"
+    },
+    "content": {
+      "en": "S3 Block Public Access is enabled by default on all new buckets and acts as a centralized safety override to ensure S3 buckets and objects are never inadvertently exposed to the public internet.",
+      "pt-BR": "O Bloqueio de Acesso Público do S3 vem ativado por padrão em todos os novos buckets e atua como uma trava centralizada de segurança para garantir que buckets e objetos nunca fiquem expostos acidentalmente na internet."
+    },
+    "source": {
+      "label": "Blocking public access to your Amazon S3 storage",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  {
+    "id": "s3-static-website-hosting",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Hosting Static Websites on Amazon S3",
+      "pt-BR": "Hospedagem de Sites Estáticos no Amazon S3"
+    },
+    "content": {
+      "en": "Amazon S3 can host static websites (HTML, CSS, client-side JavaScript, images) cheaply and at massive scale without any web servers—commonly paired with Amazon CloudFront for HTTPS and global caching.",
+      "pt-BR": "O Amazon S3 pode hospedar sites estáticos (HTML, CSS, JavaScript client-side, imagens) de forma barata e em escala massiva sem servidores web — normalmente combinado com o Amazon CloudFront para HTTPS e cache global."
+    },
+    "source": {
+      "label": "Hosting a static website using Amazon S3",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html"
+    }
+  },
+  {
+    "id": "amazon-eventbridge-vs-sns-vs-sqs",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "SQS vs. SNS vs. EventBridge",
+      "pt-BR": "SQS vs. SNS vs. EventBridge"
+    },
+    "content": {
+      "en": "Exam comparison: Use SQS for decoupling via durable message queues (1 consumer pulls messages). Use SNS for high-throughput pub/sub fan-out notifications to many subscribers. Use EventBridge for event-driven routing based on JSON event rules across AWS/SaaS apps.",
+      "pt-BR": "Comparação de prova: Use SQS para desacoplar via filas duráveis (consumidor puxa mensagens). Use SNS para notificações pub/sub fan-out em alta velocidade para vários assinantes. Use EventBridge para roteamento orientado a eventos baseado em regras JSON entre apps AWS/SaaS."
+    },
+    "source": {
+      "label": "Application Integration on AWS",
+      "url": "https://aws.amazon.com/products/application-integration/"
+    }
+  },
+  {
+    "id": "aws-secrets-manager-vs-parameter-store",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Secrets Manager vs. Systems Manager Parameter Store",
+      "pt-BR": "AWS Secrets Manager vs. Systems Manager Parameter Store"
+    },
+    "content": {
+      "en": "Both store encrypted configuration values and passwords. Choose AWS Secrets Manager when the exam question specifically mentions automatic credential rotation (especially for Amazon RDS databases).",
+      "pt-BR": "Ambos armazenam configurações e senhas criptografadas. Escolha o AWS Secrets Manager quando a questão da prova mencionar especificamente rotação automática de credenciais (especialmente para bancos Amazon RDS)."
+    },
+    "source": {
+      "label": "AWS Secrets Manager Overview",
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+    }
+  },
+  {
+    "id": "aws-cloudformation-vs-elastic-beanstalk",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS CloudFormation vs. AWS Elastic Beanstalk",
+      "pt-BR": "AWS CloudFormation vs. AWS Elastic Beanstalk"
+    },
+    "content": {
+      "en": "CloudFormation is a general Infrastructure as Code (IaC) tool to provision ANY AWS service via YAML/JSON templates. Elastic Beanstalk is a PaaS service specifically focused on deploying and running web applications quickly.",
+      "pt-BR": "O CloudFormation é uma ferramenta geral de Infraestrutura como Código (IaC) para provisionar QUALQUER serviço AWS via templates YAML/JSON. O Elastic Beanstalk é um serviço PaaS focado especificamente em implantar e rodar aplicações web rapidamente."
+    },
+    "source": {
+      "label": "Deployment Services on AWS",
+      "url": "https://aws.amazon.com/products/developer-tools/"
+    }
+  },
+  {
+    "id": "aws-opsworks",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS OpsWorks",
+      "pt-BR": "AWS OpsWorks"
+    },
+    "content": {
+      "en": "AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet to automate server configuration, deployment, and management across EC2 and on-premises servers.",
+      "pt-BR": "O AWS OpsWorks é um serviço de gerenciamento de configuração que fornece instâncias gerenciadas do Chef e Puppet para automatizar a configuração, implantação e gestão de servidores EC2 e locais."
+    },
+    "source": {
+      "label": "What is AWS OpsWorks?",
+      "url": "https://docs.aws.amazon.com/opsworks/latest/userguide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-cloudwatch-logs-vs-metrics-vs-alarms",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "CloudWatch Metrics, Logs, and Alarms",
+      "pt-BR": "Métricas, Logs e Alarmes do CloudWatch"
+    },
+    "content": {
+      "en": "CloudWatch Metrics track numerical performance data over time (e.g., CPUUtilization, NetworkIn). CloudWatch Logs centralize application and OS log files. CloudWatch Alarms watch metrics and automatically trigger actions (Auto Scaling, SNS, EC2 stop/reboot).",
+      "pt-BR": "Métricas do CloudWatch acompanham dados numéricos ao longo do tempo (ex.: CPUUtilization). Logs do CloudWatch centralizam arquivos de log de aplicações e SO. Alarmes do CloudWatch observam métricas e disparam ações (Auto Scaling, SNS, parar/reiniciar EC2)."
+    },
+    "source": {
+      "label": "How Amazon CloudWatch Works",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_architecture.html"
+    }
+  },
+  {
+    "id": "aws-consolidated-billing",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "Consolidated Billing in AWS Organizations",
+      "pt-BR": "Faturamento Consolidado no AWS Organizations"
+    },
+    "content": {
+      "en": "Consolidated Billing combines usage across all member accounts in AWS Organizations into a single monthly bill at no extra cost—aggregating usage to unlock tiered volume discounts and sharing Reserved Instances and Savings Plans across accounts.",
+      "pt-BR": "O Faturamento Consolidado combina o uso de todas as contas-membro do AWS Organizations em uma única fatura mensal sem custo extra — somando o consumo para atingir descontos por volume e compartilhando Instâncias Reservadas e Savings Plans entre contas."
+    },
+    "source": {
+      "label": "Consolidated billing for AWS Organizations",
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html"
+    }
+  },
+  {
+    "id": "aws-billing-conductor",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Billing Conductor",
+      "pt-BR": "AWS Billing Conductor"
+    },
+    "content": {
+      "en": "AWS Billing Conductor lets organizations and Managed Service Providers (MSPs) customize monthly billing views, apply custom pricing rules, and allocate shared credits or fees for internal chargeback and showback reporting.",
+      "pt-BR": "O AWS Billing Conductor permite que organizações e Provedores de Serviços Gerenciados (MSPs) personalizem visões de faturamento mensal, apliquem regras de preços customizadas e aloquem créditos ou taxas para relatórios internos (chargeback/showback)."
+    },
+    "source": {
+      "label": "What is AWS Billing Conductor?",
+      "url": "https://docs.aws.amazon.com/billingconductor/latest/userguide/what-is-abc.html"
+    }
+  },
+  {
+    "id": "aws-tco-and-cloud-economics",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "Total Cost of Ownership (TCO) in AWS",
+      "pt-BR": "Custo Total de Propriedade (TCO) na AWS"
+    },
+    "content": {
+      "en": "TCO compares the full cost of running an on-premises data center (servers, storage, networking, facility power, cooling, real estate, IT labor) against running the equivalent workload in AWS—often evaluated using AWS Migration Evaluator.",
+      "pt-BR": "O TCO compara o custo completo de manter um data center local (servidores, armazenamento, rede, energia, refrigeração, espaço físico, equipe de TI) com a execução equivalente na AWS — frequentemente avaliado com o AWS Migration Evaluator."
+    },
+    "source": {
+      "label": "AWS Cloud Economics",
+      "url": "https://aws.amazon.com/economics/"
+    }
+  },
+  {
+    "id": "aws-migration-evaluator",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Migration Evaluator",
+      "pt-BR": "AWS Migration Evaluator"
+    },
+    "content": {
+      "en": "AWS Migration Evaluator is a complimentary assessment service that builds data-driven business cases for cloud migration by analyzing existing on-premises server footprints and projecting AWS right-sized costs.",
+      "pt-BR": "O AWS Migration Evaluator é um serviço gratuito de avaliação que cria casos de negócios baseados em dados para migração à nuvem, analisando a infraestrutura local existente e projetando custos otimizados na AWS."
+    },
+    "source": {
+      "label": "What is AWS Migration Evaluator?",
+      "url": "https://docs.aws.amazon.com/migration-evaluator/latest/ug/what-is-migration-evaluator.html"
+    }
+  },
+  {
+    "id": "aws-support-tam-and-iem",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "Technical Account Manager (TAM) & Infrastructure Event Management (IEM)",
+      "pt-BR": "Technical Account Manager (TAM) e Infrastructure Event Management (IEM)"
+    },
+    "content": {
+      "en": "A dedicated Technical Account Manager (TAM) provides proactive architectural guidance and is exclusive to the Enterprise Support plan. Infrastructure Event Management (IEM) provides architectural and scaling support for major launches/events (included in Enterprise; available as add-on for Business).",
+      "pt-BR": "Um Technical Account Manager (TAM) dedicado fornece orientação proativa de arquitetura e é exclusivo do plano Enterprise Support. O Infrastructure Event Management (IEM) apoia grandes lançamentos e eventos (incluído no Enterprise; adicional no Business)."
+    },
+    "source": {
+      "label": "Compare AWS Support Plans",
+      "url": "https://aws.amazon.com/premiumsupport/plans/"
+    }
+  },
+  {
+    "id": "aws-concierge-support",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Support Concierge",
+      "pt-BR": "AWS Support Concierge"
+    },
+    "content": {
+      "en": "The AWS Support Concierge team consists of billing and account specialists included with Enterprise On-Ramp and Enterprise Support plans to help optimize billing, account structure, and cost inquiries.",
+      "pt-BR": "A equipe AWS Support Concierge é formada por especialistas em faturamento e contas incluídos nos planos Enterprise On-Ramp e Enterprise Support para ajudar a otimizar cobranças, estrutura de contas e dúvidas financeiras."
+    },
+    "source": {
+      "label": "AWS Enterprise Support",
+      "url": "https://aws.amazon.com/premiumsupport/plans/enterprise/"
+    }
+  },
+  {
+    "id": "aws-abuse-team",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Abuse Team & Penetration Testing Policy",
+      "pt-BR": "Equipe AWS Abuse e Política de Testes de Penetração"
+    },
+    "content": {
+      "en": "Customers may perform penetration testing on 8 permitted AWS services (such as EC2, RDS, Aurora, CloudFront, API Gateway, Lambda) without prior approval, while DDoS simulations and DNS zone walking remain strictly prohibited. Contact the AWS Abuse team to report malicious activity originating from AWS IPs.",
+      "pt-BR": "Clientes podem realizar testes de penetração em 8 serviços permitidos (como EC2, RDS, Aurora, CloudFront, API Gateway, Lambda) sem aprovação prévia, mas simulações de DDoS e DNS zone walking são proibidas. Contate a equipe AWS Abuse para reportar atividades maliciosas vindas de IPs da AWS."
+    },
+    "source": {
+      "label": "AWS Customer Support Policy for Penetration Testing",
+      "url": "https://aws.amazon.com/security/penetration-testing/"
+    }
+  },
+  {
+    "id": "aws-directory-service",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Directory Service",
+      "pt-BR": "AWS Directory Service"
+    },
+    "content": {
+      "en": "AWS Directory Service provides multiple ways to use Microsoft Active Directory (AD) with AWS workloads, including AWS Managed Microsoft AD and AD Connector to integrate existing on-premises directories.",
+      "pt-BR": "O AWS Directory Service oferece várias maneiras de usar o Microsoft Active Directory (AD) com cargas de trabalho AWS, incluindo o AWS Managed Microsoft AD e o AD Connector para integrar diretórios locais existentes."
+    },
+    "source": {
+      "label": "What is AWS Directory Service?",
+      "url": "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/what_is.html"
+    }
+  },
+  {
+    "id": "amazon-inspector-vs-trusted-advisor",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "Amazon Inspector vs. AWS Trusted Advisor Security Checks",
+      "pt-BR": "Amazon Inspector vs. Verificações de Segurança do Trusted Advisor"
+    },
+    "content": {
+      "en": "Amazon Inspector scans INSIDE your OS instances, containers, and Lambda code for software CVEs and package vulnerabilities. AWS Trusted Advisor inspects your AWS ACCOUNT configuration for best practices (like open S3 buckets, missing root MFA, or unrestricted Security Group ports).",
+      "pt-BR": "O Amazon Inspector verifica DENTRO das suas instâncias de SO, contêineres e código Lambda em busca de falhas CVEs. O AWS Trusted Advisor inspeciona a configuração da sua CONTA AWS quanto a boas práticas (como buckets S3 abertos, falta de MFA no root ou portas abertas em Security Groups)."
+    },
+    "source": {
+      "label": "AWS Security Best Practices",
+      "url": "https://aws.amazon.com/architecture/security-identity-compliance/"
+    }
+  },
+  {
+    "id": "aws-auto-scaling-vs-ec2-auto-scaling",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Auto Scaling vs. Amazon EC2 Auto Scaling",
+      "pt-BR": "AWS Auto Scaling vs. Amazon EC2 Auto Scaling"
+    },
+    "content": {
+      "en": "Amazon EC2 Auto Scaling specifically scales EC2 instance fleets. AWS Auto Scaling provides a unified scaling interface across multiple AWS services—including EC2, ECS tasks, DynamoDB throughput, and Aurora Replicas.",
+      "pt-BR": "O Amazon EC2 Auto Scaling escala especificamente frotas de instâncias EC2. O AWS Auto Scaling fornece uma interface unificada de escalabilidade para múltiplos serviços AWS — incluindo EC2, tarefas ECS, capacidade do DynamoDB e Aurora Replicas."
+    },
+    "source": {
+      "label": "What is AWS Auto Scaling?",
+      "url": "https://docs.aws.amazon.com/autoscaling/application/userguide/what-is-application-auto-scaling.html"
+    }
+  },
+  {
+    "id": "amazon-rds-proxy",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon RDS Proxy",
+      "pt-BR": "Amazon RDS Proxy"
+    },
+    "content": {
+      "en": "Amazon RDS Proxy is a fully managed, highly available database proxy that pools and shares established database connections—preventing connection exhaustion from serverless apps (like AWS Lambda) and reducing failover times.",
+      "pt-BR": "O Amazon RDS Proxy é um proxy de banco de dados gerenciado que agrupa e compartilha conexões estabelecidas — evitando o esgotamento de conexões por aplicações serverless (como AWS Lambda) e reduzindo o tempo de failover."
+    },
+    "source": {
+      "label": "Managing connections with Amazon RDS Proxy",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
+    }
+  },
+  {
+    "id": "amazon-aurora-serverless",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Aurora Serverless",
+      "pt-BR": "Amazon Aurora Serverless"
+    },
+    "content": {
+      "en": "Amazon Aurora Serverless is an on-demand, auto-scaling configuration for Amazon Aurora that automatically starts up, shuts down, and scales database capacity up or down in fractions of a second based on application demand.",
+      "pt-BR": "O Amazon Aurora Serverless é uma configuração sob demanda e autoescalável do Amazon Aurora que inicia, desliga e ajusta automaticamente a capacidade do banco em frações de segundo conforme a demanda da aplicação."
+    },
+    "source": {
+      "label": "Using Amazon Aurora Serverless",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html"
+    }
+  },
+  {
+    "id": "dynamodb-dax",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon DynamoDB Accelerator (DAX)",
+      "pt-BR": "Amazon DynamoDB Accelerator (DAX)"
+    },
+    "content": {
+      "en": "DAX is a fully managed, highly available in-memory cache specifically built for Amazon DynamoDB, reducing read response times from single-digit milliseconds down to microseconds.",
+      "pt-BR": "O DAX é um cache em memória totalmente gerenciado construído especificamente para o Amazon DynamoDB, reduzindo o tempo de resposta de leitura de milissegundos de um dígito para microssegundos."
+    },
+    "source": {
+      "label": "In-memory acceleration with DynamoDB Accelerator (DAX)",
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html"
+    }
+  },
+  {
+    "id": "aws-lake-formation",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Lake Formation",
+      "pt-BR": "AWS Lake Formation"
+    },
+    "content": {
+      "en": "AWS Lake Formation simplifies setting up, securing, and managing a centralized data lake on Amazon S3 within days—automating data ingestion, cataloging, and fine-grained column/row-level access permissions.",
+      "pt-BR": "O AWS Lake Formation simplifica a criação, proteção e gestão de um data lake centralizado no Amazon S3 em poucos dias — automatizando ingestão de dados, catalogação e permissões granulares por linha e coluna."
+    },
+    "source": {
+      "label": "What is AWS Lake Formation?",
+      "url": "https://docs.aws.amazon.com/lake-formation/latest/dg/what-is-lake-formation.html"
+    }
+  },
+  {
+    "id": "amazon-managed-streaming-for-apache-kafka",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon MSK (Managed Streaming for Apache Kafka)",
+      "pt-BR": "Amazon MSK (Managed Streaming for Apache Kafka)"
+    },
+    "content": {
+      "en": "Amazon MSK is a fully managed service that makes it easy to build and run applications that use open-source Apache Kafka to process streaming data without managing Kafka brokers or ZooKeeper nodes.",
+      "pt-BR": "O Amazon MSK é um serviço totalmente gerenciado que facilita criar e executar aplicações que usam Apache Kafka open-source para processar streaming de dados sem gerenciar brokers Kafka ou nós ZooKeeper."
+    },
+    "source": {
+      "label": "What is Amazon MSK?",
+      "url": "https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html"
+    }
+  },
+  {
+    "id": "aws-cloud9",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Cloud9",
+      "pt-BR": "AWS Cloud9"
+    },
+    "content": {
+      "en": "AWS Cloud9 is a cloud-based Integrated Development Environment (IDE) that lets developers write, run, and debug code using just a browser, complete with a built-in terminal and preconfigured AWS tools.",
+      "pt-BR": "O AWS Cloud9 é um Ambiente de Desenvolvimento Integrado (IDE) baseado na nuvem que permite escrever, executar e depurar código usando apenas um navegador, com terminal integrado e ferramentas AWS pré-configuradas."
+    },
+    "source": {
+      "label": "What is AWS Cloud9?",
+      "url": "https://docs.aws.amazon.com/cloud9/latest/user-guide/welcome.html"
+    }
+  },
+  {
+    "id": "aws-codeartifact",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS CodeArtifact",
+      "pt-BR": "AWS CodeArtifact"
+    },
+    "content": {
+      "en": "AWS CodeArtifact is a fully managed artifact repository service that makes it easy for organizations to securely store, publish, and share software packages (npm, Maven, PyPI, NuGet) used in software development.",
+      "pt-BR": "O AWS CodeArtifact é um serviço gerenciado de repositório de artefatos que facilita armazenar, publicar e compartilhar pacotes de software (npm, Maven, PyPI, NuGet) usados no desenvolvimento."
+    },
+    "source": {
+      "label": "What is AWS CodeArtifact?",
+      "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html"
+    }
+  },
+  {
+    "id": "aws-fault-injection-service",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Fault Injection Service (AWS FIS)",
+      "pt-BR": "AWS Fault Injection Service (AWS FIS)"
+    },
+    "content": {
+      "en": "AWS Fault Injection Service is a managed chaos engineering service that lets teams inject controlled faults (such as EC2 instance terminations, latency, or API throttling) to test and improve application resilience.",
+      "pt-BR": "O AWS Fault Injection Service é um serviço gerenciado de engenharia do caos que permite injetar falhas controladas (como encerramento de instâncias EC2, latência ou limitação de API) para testar e melhorar a resiliência das aplicações."
+    },
+    "source": {
+      "label": "What is AWS Fault Injection Service?",
+      "url": "https://docs.aws.amazon.com/fis/latest/userguide/what-is.html"
+    }
+  },
+  {
+    "id": "aws-elastic-disaster-recovery",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Elastic Disaster Recovery (AWS DRS)",
+      "pt-BR": "AWS Elastic Disaster Recovery (AWS DRS)"
+    },
+    "content": {
+      "en": "AWS Elastic Disaster Recovery minimizes downtime and data loss with fast, reliable recovery of on-premises and cloud-based applications using affordable storage, minimal compute, and point-in-time recovery.",
+      "pt-BR": "O AWS Elastic Disaster Recovery minimiza o tempo de inatividade e a perda de dados com recuperação rápida e confiável de aplicações locais e em nuvem usando armazenamento econômico, computação mínima e recuperação pontual (point-in-time)."
+    },
+    "source": {
+      "label": "What is AWS Elastic Disaster Recovery?",
+      "url": "https://docs.aws.amazon.com/drs/latest/userguide/what-is-drs.html"
+    }
+  },
+  {
+    "id": "amazon-braket",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Braket",
+      "pt-BR": "Amazon Braket"
+    },
+    "content": {
+      "en": "Amazon Braket is a fully managed quantum computing service that helps researchers and developers explore, design, test, and run quantum algorithms on simulators and real quantum hardware.",
+      "pt-BR": "O Amazon Braket é um serviço totalmente gerenciado de computação quântica que ajuda pesquisadores e desenvolvedores a explorar, testar e executar algoritmos quânticos em simuladores e hardware quântico real."
+    },
+    "source": {
+      "label": "What is Amazon Braket?",
+      "url": "https://docs.aws.amazon.com/braket/latest/developerguide/what-is-braket.html"
+    }
+  },
+  {
+    "id": "aws-ground-station",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Ground Station",
+      "pt-BR": "AWS Ground Station"
+    },
+    "content": {
+      "en": "AWS Ground Station is a fully managed service that lets you control satellite communications, downlink satellite data, and scale operations globally without building or managing your own satellite ground station antennas.",
+      "pt-BR": "O AWS Ground Station é um serviço totalmente gerenciado que permite controlar comunicações via satélite, baixar dados de satélites e escalar operações globalmente sem construir ou gerenciar antenas terrestres próprias."
+    },
+    "source": {
+      "label": "What is AWS Ground Station?",
+      "url": "https://docs.aws.amazon.com/ground-station/latest/ug/what-is-aws-ground-station.html"
+    }
+  },
+  {
+    "id": "amazon-appflow",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon AppFlow",
+      "pt-BR": "Amazon AppFlow"
+    },
+    "content": {
+      "en": "Amazon AppFlow is a fully managed, no-code integration service that securely transfers data bidirectionally between Software-as-a-Service (SaaS) applications (like Salesforce, Slack, Zendesk) and AWS services (like S3 and Redshift).",
+      "pt-BR": "O Amazon AppFlow é um serviço de integração gerenciado e sem código (no-code) que transfere dados de forma segura e bidirecional entre aplicações SaaS (como Salesforce, Slack, Zendesk) e serviços AWS (como S3 e Redshift)."
+    },
+    "source": {
+      "label": "What is Amazon AppFlow?",
+      "url": "https://docs.aws.amazon.com/appflow/latest/userguide/what-is-appflow.html"
+    }
+  },
+  {
+    "id": "aws-cloud-trail-insights",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS CloudTrail Insights",
+      "pt-BR": "AWS CloudTrail Insights"
+    },
+    "content": {
+      "en": "CloudTrail Insights automatically analyzes management events in your AWS account to detect unusual operational activity—such as spikes in resource provisioning, bursts of IAM actions, or gaps in periodic maintenance.",
+      "pt-BR": "O CloudTrail Insights analisa automaticamente eventos de gerenciamento na sua conta AWS para detectar atividades operacionais incomuns — como picos no provisionamento de recursos, rajadas de ações IAM ou falhas em rotinas periódicas."
+    },
+    "source": {
+      "label": "Working with CloudTrail Insights",
+      "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-insights-events-with-cloudtrail.html"
+    }
+  },
+  {
+    "id": "aws-verified-access-and-client-vpn",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Client VPN & AWS Verified Access",
+      "pt-BR": "AWS Client VPN e AWS Verified Access"
+    },
+    "content": {
+      "en": "AWS Client VPN enables remote employees to securely access AWS and on-premises networks using OpenVPN. AWS Verified Access provides VPN-less, Zero-Trust access to corporate web apps based on user identity and device security posture.",
+      "pt-BR": "O AWS Client VPN permite que funcionários remotos acessem com segurança redes AWS e locais via OpenVPN. O AWS Verified Access fornece acesso Zero-Trust sem VPN a aplicações web corporativas com base na identidade do usuário e postura do dispositivo."
+    },
+    "source": {
+      "label": "What is AWS Client VPN?",
+      "url": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/what-is.html"
+    }
+  },
+  {
+    "id": "aws-signer",
+    "domainId": "security-compliance",
+    "title": {
+      "en": "AWS Signer",
+      "pt-BR": "AWS Signer"
+    },
+    "content": {
+      "en": "AWS Signer is a fully managed code-signing service that ensures the trust and integrity of your code (such as AWS Lambda deployment packages and container images) by verifying it has not been altered since signing.",
+      "pt-BR": "O AWS Signer é um serviço gerenciado de assinatura de código que garante a confiança e integridade do seu software (como pacotes do AWS Lambda e imagens de contêiner), verificando que não foi alterado após a assinatura."
+    },
+    "source": {
+      "label": "What is AWS Signer?",
+      "url": "https://docs.aws.amazon.com/signer/latest/developerguide/Welcome.html"
+    }
+  },
+  {
+    "id": "amazon-q-developer-and-business",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Q",
+      "pt-BR": "Amazon Q"
+    },
+    "content": {
+      "en": "Amazon Q is a generative AI-powered assistant tailored for business and software development—helping developers write, debug, and upgrade code, and helping employees query internal company data securely.",
+      "pt-BR": "O Amazon Q é um assistente com IA generativa voltado para negócios e desenvolvimento de software — ajudando desenvolvedores a escrever, depurar e atualizar código, e funcionários a consultar dados internos da empresa com segurança."
+    },
+    "source": {
+      "label": "What is Amazon Q?",
+      "url": "https://aws.amazon.com/q/"
+    }
+  },
+  {
+    "id": "aws-proton",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Proton",
+      "pt-BR": "AWS Proton"
+    },
+    "content": {
+      "en": "AWS Proton is a fully managed application delivery service for container and serverless applications, enabling platform teams to define standardized infrastructure templates that developers can self-service deploy.",
+      "pt-BR": "O AWS Proton é um serviço gerenciado de entrega de aplicações para contêineres e serverless, permitindo que equipes de plataforma definam templates padronizados de infraestrutura para implantação por autoatendimento pelos desenvolvedores."
+    },
+    "source": {
+      "label": "What is AWS Proton?",
+      "url": "https://docs.aws.amazon.com/proton/latest/userguide/Welcome.html"
+    }
+  },
+  {
+    "id": "aws-managed-blockchain",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Managed Blockchain",
+      "pt-BR": "Amazon Managed Blockchain"
+    },
+    "content": {
+      "en": "Amazon Managed Blockchain is a fully managed service that makes it easy to join public networks or create and manage scalable private blockchain networks using open-source frameworks like Hyperledger Fabric and Ethereum.",
+      "pt-BR": "O Amazon Managed Blockchain é um serviço totalmente gerenciado que facilita ingressar em redes públicas ou criar redes blockchain privadas escaláveis usando frameworks open-source como Hyperledger Fabric e Ethereum."
+    },
+    "source": {
+      "label": "What is Amazon Managed Blockchain?",
+      "url": "https://docs.aws.amazon.com/managed-blockchain/latest/managementguide/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-qldb",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Quantum Ledger Database (Amazon QLDB)",
+      "pt-BR": "Amazon Quantum Ledger Database (Amazon QLDB)"
+    },
+    "content": {
+      "en": "Amazon QLDB is a fully managed ledger database that provides a transparent, immutable, and cryptographically verifiable transaction log owned by a central trusted authority.",
+      "pt-BR": "O Amazon QLDB é um banco de dados de razão (ledger) totalmente gerenciado que fornece um log de transações transparente, imutável e criptograficamente verificável sob uma autoridade central confiável."
+    },
+    "source": {
+      "label": "What is Amazon QLDB?",
+      "url": "https://docs.aws.amazon.com/qldb/latest/developerguide/what-is.html"
+    }
+  },
+  {
+    "id": "amazon-timestream",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Amazon Timestream",
+      "pt-BR": "Amazon Timestream"
+    },
+    "content": {
+      "en": "Amazon Timestream is a fast, scalable, serverless time-series database service built for IoT and operational telemetry applications, capable of storing and analyzing trillions of events per day.",
+      "pt-BR": "O Amazon Timestream é um banco de dados serverless de séries temporais rápido e escalável, criado para aplicações de IoT e telemetria operacional, capaz de armazenar e analisar trilhões de eventos por dia."
+    },
+    "source": {
+      "label": "What is Amazon Timestream?",
+      "url": "https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html"
+    }
+  },
+  {
+    "id": "aws-cloud-map",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "AWS Cloud Map",
+      "pt-BR": "AWS Cloud Map"
+    },
+    "content": {
+      "en": "AWS Cloud Map is a cloud resource discovery service that lets you define custom names for your application resources (microservices, databases, queues) and dynamically maintains their updated locations.",
+      "pt-BR": "O AWS Cloud Map é um serviço de descoberta de recursos na nuvem que permite definir nomes personalizados para os componentes da sua aplicação (microsserviços, bancos, filas) mantendo suas localizações sempre atualizadas."
+    },
+    "source": {
+      "label": "What is AWS Cloud Map?",
+      "url": "https://docs.aws.amazon.com/cloud-map/latest/dg/what-is-cloud-map.html"
+    }
+  },
+  {
+    "id": "aws-global-infrastructure-summary",
+    "domainId": "cloud-concepts",
+    "title": {
+      "en": "AWS Global Infrastructure Hierarchy",
+      "pt-BR": "Hierarquia da Infraestrutura Global da AWS"
+    },
+    "content": {
+      "en": "Understand the scope: Regions contain multiple isolated Availability Zones (usually 3+); Availability Zones contain one or more physical Data Centers; Edge Locations (Points of Presence) sit outside Regions in major cities to cache content globally.",
+      "pt-BR": "Entenda o escopo: Regiões contêm múltiplas Zonas de Disponibilidade isoladas (geralmente 3+); Zonas de Disponibilidade contêm um ou mais Data Centers físicos; Locais de Borda (Edge Locations) ficam nas principais cidades para fazer cache global."
+    },
+    "source": {
+      "label": "AWS Global Infrastructure",
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
+    }
+  },
+  {
+    "id": "aws-console-cli-sdk",
+    "domainId": "cloud-technology-services",
+    "title": {
+      "en": "Three Ways to Interact with AWS",
+      "pt-BR": "Três Formas de Interagir com a AWS"
+    },
+    "content": {
+      "en": "All three use AWS APIs under the hood: 1) AWS Management Console (visual web UI), 2) AWS Command Line Interface / CLI (automate tasks via terminal scripts), and 3) AWS Software Development Kits / SDKs (integrate AWS directly into application code).",
+      "pt-BR": "Todas usam APIs da AWS por baixo dos panos: 1) Console de Gerenciamento da AWS (interface web visual), 2) AWS CLI (automatizar tarefas via terminal/scripts) e 3) AWS SDKs (integrar a AWS diretamente no código das aplicações)."
+    },
+    "source": {
+      "label": "Tools to Build on AWS",
+      "url": "https://aws.amazon.com/tools/"
+    }
+  },
+  {
+    "id": "aws-billing-dashboard-and-alerts",
+    "domainId": "billing-pricing-support",
+    "title": {
+      "en": "AWS Billing & Cost Management Dashboard",
+      "pt-BR": "Painel de Faturamento e Gestão de Custos da AWS"
+    },
+    "content": {
+      "en": "The AWS Billing Console is your central hub to view current month-to-date charges, download tax invoices, manage payment methods, configure Free Tier usage alerts, and access Cost Explorer and AWS Budgets.",
+      "pt-BR": "O Console de Billing da AWS é o ponto central para visualizar gastos acumulados no mês, baixar faturas fiscais, gerenciar métodos de pagamento, ativar alertas do Free Tier e acessar o Cost Explorer e AWS Budgets."
+    },
+    "source": {
+      "label": "AWS Billing User Guide",
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html"
     }
   }
 ]
