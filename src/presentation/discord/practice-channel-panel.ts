@@ -102,9 +102,10 @@ async function startPracticeSessionForPanel(
       error instanceof PracticeError &&
       error.code === "no_questions_available"
     ) {
-      const content = locale === "en"
-        ? "No study questions are available yet. Please try again later."
-        : "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.";
+      const content =
+        locale === "en"
+          ? "No study questions are available yet. Please try again later."
+          : "Ainda não há questões de estudo disponíveis. Tente novamente mais tarde.";
 
       if (storedMessage?.channelId === channel.id) {
         try {

@@ -325,7 +325,11 @@ async function handleSetChannelCommand(
 
   if (interaction.commandName === "set-practice-channel") {
     await services.channelSettings.setPracticeChannel(guildId, channel.id);
-    await services.maintainPracticePanel(guildId, channel.id, interaction.user.id);
+    await services.maintainPracticePanel(
+      guildId,
+      channel.id,
+      interaction.user.id,
+    );
   } else {
     const currentSettings = await services.channelSettings.getSettings(guildId);
     await services.channelSettings.setTipsChannel(guildId, channel.id);
