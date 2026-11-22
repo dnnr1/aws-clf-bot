@@ -18,5 +18,17 @@ services:
       retries: 5
       start_period: 10s
 
+  bot:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-aws_clf_bot}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-aws_clf_bot}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
